@@ -1,0 +1,91 @@
+# V2: B = “doctor assistant” + operational translator
+insert_after_contains(v2, '真正能开维修工单的“体检报告”', [
+('B','那这张体检报告就不是为了好看。比如健康分低，但结构件仍有余量，可以优先修功能件；如果结构短板已经逼近寿命上限，再反复换小部件，投入产出就要重新评估。这样“修不修、修什么”才从经验判断变成有证据的处置。')])
+insert_after_contains(v2, '换句话说，我们不是看着今天建，而是带着明天算', [
+('B','而且这张“建设处方”会随条件变化。烟叶规模变了、旧烤房修好了、某些闲置房重新启用了，沙盘都会重新计算。它不是一次性盖章，而是一张会随资源状态更新的动态处方。')])
+
+# V3: B = field narrator following lifecycle
+insert_after_contains(v3, '通过调剂又增加约185担烘烤量', [
+('B','对烟农来说，这一段其实最直观：以前“哪栋空、谁能用”主要靠熟人和电话协调；现在系统先把空闲窗口和可用状态摆出来。烤房第一次从“谁知道消息谁先找到”，变成“谁有真实需求谁就能被系统匹配”。')])
+insert_after_contains(v3, '不会和健康在用房按“1栋=1栋”简单相加', [
+('B','这一步很关键。因为在纸面台账里，它们都叫“一栋”；可在烘烤旺季，一栋健康在用房和一栋损毁房提供的服务能力完全不同。把“数量”换成“有效能力”，才有资格继续谈新建。')])
+insert_after_contains(v3, '未来仍然稳定缺，才建', [
+('B','所以这栋烤房的一生，最后会影响整个村的下一步：如果修复后能补回烤能，就先修；如果退出后形成长期缺口，再进入新增建设。单栋资产的健康变化，真正被纳入了区域资源配置。')])
+
+# V4: B = technical challenger, closer to 3D-style two-person rhythm
+insert_after_contains(v4, '于是进入第二步——诊断', [
+('B','也就是说，“识别”不是做一个资产清单，而是先把后面建模需要的数据口径统一起来。没有一栋一档，健康分就没有可靠输入；没有维修历史和状态记录，后面的寿命判断也只能靠经验。第一步其实是在给两套模型打地基。')])
+insert_after_contains(v4, '维修可以续命，但不能回春', [
+('B','我理解这一步和一般综合评分最大的不同，是它保留了工程约束。分数可以加权，但物理寿命不能无限加回来；模型既允许维修产生“恢复”，又不允许把十几年的结构老化一笔勾销，所以结果才敢拿去排维修优先级。')])
+insert_after_contains(v4, '如果未来这样发展，在哪补、补多少，结果会怎样', [
+('B','这也是“推演”和“预测”的区别。我们不是只报一个未来数值，而是让管理者主动改变假设：面积涨一点会怎样、修复一批旧房会怎样、增加一个候选点又会怎样。每改一个条件，系统重算一次，决策过程本身就能被验证。')])
+
+# V5: B = map operator / visual co-narrator
+insert_after_contains(v5, '纸面数量和真实能力完全不是一回事', [
+('B','在大屏上这个差别会非常直观：数量图上两个村可能都有100栋，但切到“有效烤能”图层，一个仍然是绿色，另一个可能已经进入高负载区。评委不用看公式，也能马上理解为什么“有房”不等于“有能力”。')])
+insert_after_contains(v5, '管理者可以在花钱之前，先在屏幕上把方案走一遍', [
+('B','我可以现场做一次操作：先点“增长5%”，看哪些村由黄变红；再落下一个候选点，看负载有没有回落。如果回落不明显，这个点就不是好方案。沙盘把过去会议桌上的争论，变成屏幕上可以比较的方案。')])
+insert_after_contains(v5, '其中肖家坪村7栋', [
+('B','这样一来，“建在哪里”也不再只听谁的声音大。先看存量能不能调、能不能修，再看未来缺口是否持续，最后再比较候选点。每一次落子之前，都先把代价和收益算一遍。')])
+
+def han_count(s):
+    return len(re.findall(r'[一-鿿]', s))
+
+def stats(items):
+    a=b=spoken=0
+    for typ,txt in items:
+        if typ in ('A','B'):
+            h=han_count(txt); spoken+=h
+            if typ=='A': a+=h
+            else: b+=h
+    return a,b,spoken, a/spoken if spoken else 0
+
+# ---------------- DOCX helpers ----------------
+def set_run_font(run, name=BODY_FONT, size=Pt(16), bold=None, color=None):
+    run.font.name=name
+    run.font.size=size
+    if bold is not None: run.font.bold=bold
+    if color is not None: run.font.color.rgb=RGBColor(*color)
+    rPr=run._element.get_or_add_rPr()
+    rFonts=rPr.rFonts
+    if rFonts is None:
+        rFonts=OxmlElement('w:rFonts'); rPr.insert(0,rFonts)
+    for k in ('ascii','hAnsi','eastAsia','cs'):
+        rFonts.set(qn('w:'+k), name)
+
+
+def set_cell_shading(cell, fill):
+    tcPr=cell._tc.get_or_add_tcPr(); shd=OxmlElement('w:shd'); shd.set(qn('w:fill'),fill); tcPr.append(shd)
+
+def set_cell_text(cell, text, bold=False, size=11, font=BODY_FONT):
+    cell.text=''
+    p=cell.paragraphs[0]; p.paragraph_format.space_after=Pt(0)
+    r=p.add_run(text); set_run_font(r,font,Pt(size),bold)
+    cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
+
+def setup_doc(doc):
+    sec=doc.sections[0]
+    sec.top_margin=Cm(2.2); sec.bottom_margin=Cm(2.2); sec.left_margin=Cm(2.5); sec.right_margin=Cm(2.5)
+    normal=doc.styles['Normal']
+    normal.font.name=BODY_FONT; normal.font.size=Pt(16)
+    normal._element.rPr.rFonts.set(qn('w:eastAsia'), BODY_FONT)
+    pf=normal.paragraph_format; pf.line_spacing=1.5; pf.space_after=Pt(0)
+    for sn,sz in [('Title',22),('Heading 1',18),('Heading 2',16)]:
+        st=doc.styles[sn]; st.font.name = TITLE_FONT if sn=='Title' else HEAD_FONT; st.font.size=Pt(sz); st.font.bold=True
+        st._element.rPr.rFonts.set(qn('w:eastAsia'), TITLE_FONT if sn=='Title' else HEAD_FONT)
+    # footer
+    p=sec.footer.paragraphs[0]; p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+    r=p.add_run('湖北省创客大赛决赛 · 智烤管家发布材料'); set_run_font(r,BODY_FONT,Pt(9),False,(100,100,100))
+
+def add_title(doc, title, subtitle=None):
+    p=doc.add_paragraph(); p.alignment=WD_ALIGN_PARAGRAPH.CENTER; p.paragraph_format.space_after=Pt(12)
+    r=p.add_run(title); set_run_font(r,TITLE_FONT,Pt(22),True)
+    if subtitle:
+        p2=doc.add_paragraph(); p2.alignment=WD_ALIGN_PARAGRAPH.CENTER; p2.paragraph_format.space_after=Pt(18)
+        r2=p2.add_run(subtitle); set_run_font(r,BODY_FONT,Pt(14),False,(80,80,80))
+
+def add_heading(doc,text,level=1):
+    p=doc.add_paragraph(style=f'Heading {level}'); p.paragraph_format.space_before=Pt(10); p.paragraph_format.space_after=Pt(5)
+    r=p.add_run(text); return p
+
+def add_body(doc,text,bold_phrases=None,indent=True,size=16):
