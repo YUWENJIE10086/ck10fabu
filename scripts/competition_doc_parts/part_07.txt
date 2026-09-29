@@ -1,0 +1,85 @@
+    p=doc.add_paragraph(); p.paragraph_format.line_spacing=1.5; p.paragraph_format.space_after=Pt(0)
+    if indent: p.paragraph_format.first_line_indent=Cm(0.74)
+    if not bold_phrases:
+        r=p.add_run(text); set_run_font(r,BODY_FONT,Pt(size))
+    else:
+        # simple phrase splitting
+        pattern='('+'|'.join(map(re.escape,sorted(bold_phrases,key=len,reverse=True)))+')'
+        for part in re.split(pattern,text):
+            if not part: continue
+            r=p.add_run(part); set_run_font(r,BODY_FONT,Pt(size), part in bold_phrases)
+    return p
+
+def add_callout(doc,label,text):
+    t=doc.add_table(rows=1, cols=1); t.alignment=WD_TABLE_ALIGNMENT.CENTER; t.autofit=True
+    cell=t.cell(0,0); set_cell_shading(cell,'F2F2F2')
+    p=cell.paragraphs[0]; p.paragraph_format.space_after=Pt(0); p.paragraph_format.left_indent=Cm(0.2); p.paragraph_format.right_indent=Cm(0.2)
+    r=p.add_run(label+' '); set_run_font(r,HEAD_FONT,Pt(11),True)
+    r=p.add_run(text); set_run_font(r,BODY_FONT,Pt(11))
+    doc.add_paragraph().paragraph_format.space_after=Pt(0)
+
+def add_script(doc, items):
+    for typ,txt in items:
+        if typ=='NOTE':
+            add_callout(doc,'版本定位：',txt.replace('版本定位：',''))
+        elif typ=='PPT':
+            add_callout(doc,'【PPT】',txt)
+        elif typ=='VIDEO':
+            add_callout(doc,'【视频】',txt)
+        elif typ in ('A','B'):
+            p=doc.add_paragraph(); p.paragraph_format.line_spacing=1.45; p.paragraph_format.space_after=Pt(1)
+            p.paragraph_format.left_indent=Cm(0.15)
+            rr=p.add_run(f'{typ}：'); set_run_font(rr,HEAD_FONT,Pt(16),True)
+            # bold signature phrases
+            phrases=['两颗决策大脑','维修可以续命，但不能回春','有效烤能','区位熵','AHP','熵权法','TOPSIS','增长2%、5%、10%','先盘活、再修复、仍有缺口才新建','双模四步法','存量体检—增量推演—平台执行']
+            remaining=txt
+            pattern='('+'|'.join(map(re.escape,sorted([x for x in phrases if x in txt],key=len,reverse=True)))+')' if any(x in txt for x in phrases) else None
+            if pattern:
+                for part in re.split(pattern,txt):
+                    if not part: continue
+                    r=p.add_run(part); set_run_font(r,BODY_FONT,Pt(16),part in phrases)
+            else:
+                r=p.add_run(txt); set_run_font(r,BODY_FONT,Pt(16))
+
+def add_timing_table(doc, items):
+    # derive a simple 8-part plan based on cues
+    rows=[
+      ('0:00–0:50','开场矛盾/故事钩子','A+B','第一分钟必须让评委知道“为什么要做”'),
+      ('0:50–1:25','总体架构/双模型定位','A','两个模型是主角，三智是落地'),
+      ('1:25–3:10','健康评估模型','A主+B追问','讲清输入、机理、输出和“不能回春”'),
+      ('3:10–4:50','新建沙盘推演模型','A主+B追问','讲清有效烤能、组合赋权、情景推演'),
+      ('4:50–5:25','视频演示','视频','30–40秒，不重复口播'),
+      ('5:25–6:35','平台落地/真实案例','A+B','磨坪调剂、雷击抢修、建设论证'),
+      ('6:35–7:25','创新总结','A','双模耦合、先修后建、闭环'),
+      ('7:25–7:50','收束','A+B','留10秒机动，禁止拖到8分钟整')]
+    table=doc.add_table(rows=1,cols=4); table.alignment=WD_TABLE_ALIGNMENT.CENTER; table.style='Table Grid'
+    for i,h in enumerate(['建议时间','内容','角色','舞台任务']): set_cell_text(table.rows[0].cells[i],h,True,10,HEAD_FONT); set_cell_shading(table.rows[0].cells[i],'D9E2F3')
+    for row in rows:
+        cells=table.add_row().cells
+        for i,val in enumerate(row): set_cell_text(cells[i],val,False,10)
+
+def add_ppt_plan(doc, version_name):
+    plans={
+      'V1':[('P1','这栋该修，还是该建？','问题钩子'),('P2','一库两模型一平台＋双模耦合','总架构'),('P3','健康模型：状态—寿命—风险部件','技术1'),('P4','新建沙盘：有效烤能＋情景推演','技术2'),('P5','35秒系统视频','演示'),('P6','磨坪调剂/雷击抢修/150栋修复/29栋新建','实效'),('P7','存量体检→增量推演→执行反馈','创新'),('P8','好房用、旧房修、缺口建、建后管','收束')],
+      'V2':[('P1','烤房也要做体检','隐喻钩子'),('P2','两张处方：存量健康/增量建设','总架构'),('P3','烤房体检报告','健康模型'),('P4','未来建设处方','沙盘模型'),('P5','门诊式视频流程','演示'),('P6','真实案例与数据','实效'),('P7','体检—处方—执行—复诊','闭环'),('P8','给烤房终身体检档案','收束')],
+      'V3':[('P1','一栋烤房的一生','故事钩子'),('P2','生命周期时间轴','主线'),('P3','健康曲线与维修节点','健康模型'),('P4','村级供需与未来推演','新建模型'),('P5','生命周期视频','演示'),('P6','合作社四支队伍','智管'),('P7','从资产名单到生命周期管理','创新'),('P8','建成不是终点','收束')],
+      'V4':[('P1','两颗大脑，四步决策','方法钩子'),('P2','识别：一栋一档','数据'),('P3','诊断：健康/RUL/预警/部件','健康模型'),('P4','推演：有效烤能+2/5/10%','新建模型'),('P5','四步一镜到底视频','演示'),('P6','执行：烟农/合作社/管理端','平台'),('P7','三个“不是”','差异化创新'),('P8','双模四步法','收束')],
+      'V5':[('P1','县域资源棋局','视觉钩子'),('P2','地图三层：状态/健康/负载','数据地图'),('P3','单栋棋子真实战斗力','健康模型'),('P4','村级棋局动态沙盘','新建模型'),('P5','地图一镜到底视频','演示'),('P6','调剂/维修/新建结果','实效'),('P7','数量→有效能力；当前→未来','创新'),('P8','每一步都有依据','收束')]
+    }
+    key=version_name[:2]
+    table=doc.add_table(rows=1,cols=3); table.style='Table Grid'; table.alignment=WD_TABLE_ALIGNMENT.CENTER
+    for i,h in enumerate(['页码','屏幕内容','这一页只完成的任务']): set_cell_text(table.rows[0].cells[i],h,True,10,HEAD_FONT); set_cell_shading(table.rows[0].cells[i],'E2F0D9')
+    for row in plans[key]:
+        cells=table.add_row().cells
+        for i,val in enumerate(row): set_cell_text(cells[i],val,False,10)
+
+
+def create_version_doc(name, items, idx):
+    doc=Document(); setup_doc(doc)
+    add_title(doc, f'智烤管家 · 湖北省创客大赛决赛发布稿（第{idx}版）', name)
+    a,b,total,ratio=stats(items)
+    add_callout(doc,'时长与角色：',f'目标口播约7分30秒–7分50秒；A约承担{ratio*100:.0f}%、B约承担{(1-ratio)*100:.0f}%。当前脚本汉字口播量约{total}字，排练时以实际语速为准。')
+    add_heading(doc,'一、这一版为什么这样写',1)
+    note=next((t for tp,t in items if tp=='NOTE'),'')
+    add_body(doc,note)
+    add_heading(doc,'二、8分钟节奏建议',1); add_timing_table(doc,items)
