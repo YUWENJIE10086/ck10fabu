@@ -33,7 +33,10 @@ readme.write_text('\n'.join(lines),encoding='utf-8')
 # zip all deliverables
 zip_path=OUT/'智烤管家_湖北省创客大赛决赛_五版Word发布稿_0929.zip'
 with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED) as z:
-    for p in sorted(OUT.iterdir()): z.write(p,arcname=p.name)
+    for p in sorted(OUT.iterdir()):
+        if p == zip_path:
+            continue
+        z.write(p,arcname=p.name)
 
 print('STATS')
 for i,(name,items) in enumerate(versions,1):
