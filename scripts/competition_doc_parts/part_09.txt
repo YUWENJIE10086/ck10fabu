@@ -1,0 +1,42 @@
+video_text='''0–5秒：县域地图点亮，一栋烤房被选中；5–12秒：弹出健康分、剩余寿命和风险部件；12–20秒：点击“维修/报修”，系统推荐配件资源与人员；20–29秒：回到村级沙盘，切换“增长5%”，负载与推荐榜重算；29–35秒：落下新增候选点，展示新增前后负载改善；35–40秒：合作社工单完成并评价，画面收束到“数据—模型—决策—执行—反馈”。'''
+add_body(master,video_text)
+add_callout(master,'视频旁白只保留一句：','“先看清存量，再推演增量，让每一次维修和每一笔新建投入都有依据。”')
+
+add_heading(master,'附录B：答辩时再展开、主稿不要堆的技术点',1)
+for t in [
+ 'AHP一致性检验与熵权法的具体权重计算过程；',
+ '健康分中关键部件权重、状态系数、维修折损和房龄上限的具体参数；',
+ '区位熵的县域横向对标口径、TOPSIS正负理想解与贴近度；',
+ '新建沙盘四项融合权重（负载缺口、发展指数、规模趋势、政策管护）的具体设置与校验；',
+ '为什么当前阶段不把LSTM、随机森林等未稳定落地的算法作为主讲核心：决赛主稿以已经可解释、可演示、可追问的模型为主，机器学习增强可作为后续迭代方向。'
+]: add_body(master,t)
+
+add_heading(master,'附录C：资料口径与使用提醒',1)
+for t in [
+ '本稿重点依据仓库“1学习优秀的”中的2025年决赛稿风格、“2我的项目相关的零碎的”中0905–0909的最新HTML/文本模型材料，以及“9月9日我的.txt”项目主线整理。',
+ '项目正式名称沿用：智烤管家——基于健康评估的烤房用投管一体化解决方案。',
+ '主稿使用的核心案例数字：磨坪50栋、115炕次、1380担、调剂增加约185担；雷击抢修不到3小时、较传统缩短约2小时；健康分60以下210栋、精准修复150栋；2026年新建论证29栋、肖家坪7栋。正式上场前请由项目组再次与最终报表核对。',
+ '仓库中的部分doc/docx/pptx为二进制文件，当前GitHub连接器不能直接解码正文；本轮对能直接读取的txt/html材料进行了逐项交叉核对，并以最新日期材料和9月9日项目主线为优先口径。'
+]: add_body(master,t)
+
+master_path=OUT/'00_智烤管家_湖北省创客大赛决赛_五版发布稿_详细总稿_0929.docx'
+master.save(master_path)
+
+# README markdown
+readme=OUT/'README_五版说明.md'
+lines=['# 智烤管家｜湖北省创客大赛决赛五版发布稿','', '本目录包含1份详细总稿和5份可独立排练的Word发布稿。','']
+for i,(name,items) in enumerate(versions,1):
+    a,b,total,ratio=stats(items); lines.append(f'- `{i:02d}_{name}.docx`：约{total}个汉字，A约{ratio*100:.0f}%，B约{(1-ratio)*100:.0f}%。')
+lines += ['', '- `00_智烤管家_湖北省创客大赛决赛_五版发布稿_详细总稿_0929.docx`：包含优秀稿拆解、创新点提炼、模型讲法、五版完整稿、PPT逐页方案、视频脚本与答辩技术点。']
+readme.write_text('\n'.join(lines),encoding='utf-8')
+
+# zip all deliverables
+zip_path=OUT/'智烤管家_湖北省创客大赛决赛_五版Word发布稿_0929.zip'
+with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED) as z:
+    for p in sorted(OUT.iterdir()): z.write(p,arcname=p.name)
+
+print('STATS')
+for i,(name,items) in enumerate(versions,1):
+    a,b,total,ratio=stats(items); print(i,name,'A',a,'B',b,'Total',total,'ratio',round(ratio,3))
+print('MASTER',master_path,master_path.stat().st_size)
+print('ZIP',zip_path,zip_path.stat().st_size)
