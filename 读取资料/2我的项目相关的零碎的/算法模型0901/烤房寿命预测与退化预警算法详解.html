@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烤房寿命预测与退化预警算法详解</title>
+  <style>
+    :root{--bg:#f5faf5;--card:#fff;--ink:#17382f;--sub:#5f6f69;--green:#2e7d32;--green2:#dff0da;--teal:#11888a;--orange:#f47721;--blue:#2f6fbb;--line:#d6e0d6;--shadow:0 8px 24px rgba(23,56,47,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#fff,rgba(255,255,255,0)),var(--bg);color:var(--ink);line-height:1.72}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 56px}.hero,.card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+    .hero{padding:28px 30px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}.card{padding:18px}
+    h1{margin:0 0 6px;font-size:34px} h2{margin:0 0 10px;font-size:22px} .sub{color:var(--sub);font-size:15px}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.chip{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .span7{grid-column:span 7}.span5{grid-column:span 5}.span6{grid-column:span 6}.span12{grid-column:span 12}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{border-left:4px solid var(--orange);background:#fffaf5;padding:12px 14px;border-radius:14px;margin-top:10px}
+    .box.green{border-color:var(--green);background:#f8fcf7}.box.blue{border-color:var(--blue);background:#f7fbff}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0f241f;color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+    th{background:#eef7ea;text-align:left}.tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#dff0da;color:#2e7d32;font-size:12px}
+    ul{margin:10px 0 0 18px;padding:0} li{margin:7px 0;font-size:14px}
+    .footer{margin-top:16px;color:var(--sub);font-size:12px;text-align:center}
+  </style>
+</head>
+<body><div class="wrap">
+  <section class="hero">
+    <h1>烤房寿命预测与退化预警算法详解</h1>
+    <div class="sub">寿命预测不是独立模型，而是建立在健康分基础上的“时序外推”。先知道当前状态，再知道会在什么时候跌破阈值。</div>
+    <div class="chips">
+      <span class="chip">输入：健康分 H0、房龄 age、维修次数 repairCount、部件退化速度</span>
+      <span class="chip">输出：剩余寿命 Tres、预警时间、退役建议、维修窗口</span>
+      <span class="chip">推荐：BDRL 双段退化模型</span>
+    </div>
+  </section>
+  <section class="grid">
+    <div class="card span7">
+      <h2>1. 为什么用双段退化</h2>
+      <p>烤房的退化通常不是平滑直线。前期可能“看起来还行”，但接近失效时会出现加速损坏，这一点在自控仪、加热器、屋顶渗漏和风机轴承上都很常见。所以比起单纯指数衰减，双段退化更贴近烤房实际。</p>
+      <div class="box">
+        <p><b>前段：</b>常规退化，变化相对平缓。</p>
+        <p><b>后段：</b>接近阈值时加速劣化，健康分下降更快。</p>
+        <p><b>维修回弹：</b>大修后健康分和理论寿命终点都会向上修正。</p>
+      </div>
+      <div class="formula">H(t)=H0-a(t-t0), t≤τ
+H(t)=H(τ)-b(t-τ)^2, t>τ
+
+Tres = min( solve(H(t)=Hrepair), Tend_adj-age )
+Tend_adj = Tend + repairCount×ΔT</div>
+    </div>
+    <div class="card span5">
+      <h2>2. 模型参数怎么定</h2>
+      <table>
+        <thead><tr><th>参数</th><th>含义</th><th>建议值</th></tr></thead>
+        <tbody>
+          <tr><td>Hrepair</td><td>维修阈值</td><td>60 或 65</td></tr>
+          <tr><td>τ</td><td>转折点</td><td>接近 60 分时触发</td></tr>
+          <tr><td>ΔT</td><td>每次大修延寿</td><td>3 年</td></tr>
+          <tr><td>a</td><td>前段退化速率</td><td>由历史数据拟合</td></tr>
+          <tr><td>b</td><td>后段加速项</td><td>由历史数据拟合</td></tr>
+        </tbody>
+      </table>
+      <div class="box green">
+        <p>如果样本少，先把 a、b、τ 设为规则参数；当工单、维修、验收数据积累到一定数量后，再用历史序列拟合这些参数，会更准。</p>
+      </div>
+    </div>
+    <div class="card span12">
+      <h2>3. 预测流程怎么跑</h2>
+      <div class="two">
+        <div>
+          <ul>
+            <li>先从烤房档案中取当前健康分 H0、建设年份、设计寿命、最近维修年份。</li>
+            <li>再从维修记录中取 repairCount、维修类型、维修后健康回弹幅度。</li>
+            <li>接着按房龄判断是处于前段平稳退化，还是进入后段加速退化。</li>
+            <li>最后求解健康分跌破阈值的时间点，得到剩余寿命 Tres。</li>
+          </ul>
+        </div>
+        <div class="formula">若 H0 = 74，Hrepair = 60，
+age = 5 年，repairCount = 1，
+Tend = 20 年，ΔT = 3 年，
+则 Tend_adj = 23 年。
+
+若按当前退化速度推算：
+在 3.2 年后 H(t) 将跌破 60，
+则 Tres = min(3.2, 18) = 3.2 年。</div>
+      </div>
+      <p>这个结果的意义不是“寿命到了才修”，而是告诉管理者“还有多久进入危险区”。它可以直接回到修缮优先级、备件准备、预算安排和抢修窗口。</p>
+    </div>
+    <div class="card span6">
+      <h2>4. 预警分级建议</h2>
+      <table>
+        <thead><tr><th>剩余寿命</th><th>等级</th><th>建议</th></tr></thead>
+        <tbody>
+          <tr><td>≤ 1 年</td><td><span class="tag">红色</span></td><td>立即纳入抢修或退出计划</td></tr>
+          <tr><td>1 - 3 年</td><td><span class="tag">橙色</span></td><td>优先安排修缮和备件</td></tr>
+          <tr><td>3 - 5 年</td><td><span class="tag">黄色</span></td><td>加强养护，滚动观察</td></tr>
+          <tr><td>&gt; 5 年</td><td><span class="tag">绿色</span></td><td>常规管护</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card span6">
+      <h2>5. 更适合你项目的创新点</h2>
+      <ul>
+        <li>寿命预测必须以健康分为前置输入，形成“分数驱动的寿命预测”。</li>
+        <li>大修回弹要进入模型，不然会低估修复后的寿命。</li>
+        <li>政策剩余年限与算法结果取较小值，防止超龄烤房出现“负寿命”。</li>
+        <li>若未来引入时序传感器，可把温度波动、报警次数和负荷曲线加入退化特征。</li>
+      </ul>
+    </div>
+    <div class="card span12">
+      <h2>6. 讲给评委听的表述</h2>
+      <p>“我们不是单独预测寿命，而是先用健康分把烤房状态量化，再根据房龄和维修回弹效果推算剩余寿命。这样一来，模型既能告诉你这台烤房现在健康不健康，也能告诉你它还能稳定用多久，什么时候该安排修、什么时候该提前备件、什么时候该考虑退出或新建。”</p>
+    </div>
+  </section>
+  <div class="footer">可直接作为寿命预测模块说明页，和健康分页联动展示。</div>
+</div></body>
+</html>

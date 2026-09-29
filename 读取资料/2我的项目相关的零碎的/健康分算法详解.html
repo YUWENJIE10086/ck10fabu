@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烤房健康分算法详解</title>
+<style>
+  :root {
+    --green-900: #0A1F18;
+    --green-800: #0D2B22;
+    --green-700: #0D5D46;
+    --green-600: #1A6B4F;
+    --green-500: #2E8B6A;
+    --green-400: #5FB292;
+    --green-300: #7DC4A8;
+    --green-200: #A0D4C0;
+    --green-100: #D4E8DC;
+    --orange: #D4944A;
+    --red: #D4604A;
+    --text-main: #E8F5F0;
+    --text-sub: #8CBCAC;
+    --text-dim: #5A8A72;
+    --card-bg: rgba(13, 45, 34, 0.6);
+    --border: rgba(46, 139, 106, 0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--green-900);
+    color: var(--text-main);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* 头部 */
+  .hero {
+    background: linear-gradient(135deg, #0D2B22 0%, #0A1F18 60%, #0D5D46 130%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,139,106,0.15), transparent 70%);
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--green-300);
+    background: rgba(46,139,106,0.12);
+    border: 1px solid rgba(46,139,106,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .hero h1 { font-size: 32px; font-weight: 800; letter-spacing: 2px; margin-bottom: 12px; }
+  .hero p { color: var(--text-sub); font-size: 15px; max-width: 720px; }
+  .hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sub); }
+  .hero-meta-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* 章节 */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title .num {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--green-700), var(--green-500));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(13,93,70,0.4);
+  }
+
+  /* 算法卡片 */
+  .algo-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .algo-card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .algo-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .algo-badge {
+    font-size: 12px;
+    padding: 3px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .badge-green { background: rgba(46,139,106,0.15); color: var(--green-300); border: 1px solid rgba(46,139,106,0.3); }
+  .badge-orange { background: rgba(212,148,74,0.15); color: #E8B87A; border: 1px solid rgba(212,148,74,0.3); }
+  .badge-red { background: rgba(212,96,74,0.15); color: #F0A08A; border: 1px solid rgba(212,96,74,0.3); }
+  .badge-blue { background: rgba(95,178,146,0.15); color: var(--green-200); border: 1px solid rgba(95,178,146,0.3); }
+  .algo-name { font-size: 20px; font-weight: 700; color: var(--text-main); }
+  .algo-fullname { font-size: 13px; color: var(--text-dim); margin-left: auto; letter-spacing: 0.5px; }
+  .algo-principle { color: var(--text-sub); font-size: 14px; margin-bottom: 16px; line-height: 1.9; }
+
+  /* 公式框 */
+  .formula-box {
+    background: rgba(10, 31, 24, 0.8);
+    border: 1px solid rgba(46,139,106,0.25);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--green-200);
+    line-height: 1.9;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+  .formula-box .hl { color: #7DC4A8; font-weight: 700; }
+
+  /* 参数表 */
+  .params-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 12px 0; }
+  .param-item {
+    background: rgba(10,31,24,0.6);
+    border: 1px solid rgba(46,139,106,0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .param-key { font-size: 12px; color: var(--green-300); font-weight: 600; }
+  .param-label { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .param-default { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  /* 权重条 */
+  .weight-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin: 12px 0; border: 1px solid rgba(46,139,106,0.2); }
+  .weight-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 700; white-space: nowrap; }
+  .weight-legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 4px; }
+  .weight-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-sub); }
+  .weight-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* 表格 */
+  .data-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .data-table th {
+    background: rgba(13,93,70,0.3);
+    color: var(--green-200);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(46,139,106,0.1);
+    color: var(--text-sub);
+  }
+  .data-table tr:hover td { background: rgba(46,139,106,0.05); }
+  .data-table .num { font-family: 'Consolas', monospace; color: var(--green-200); }
+
+  /* 示例计算 */
+  .example-box {
+    background: rgba(46,139,106,0.06);
+    border: 1px solid rgba(46,139,106,0.2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .example-title { font-size: 13px; font-weight: 700; color: var(--green-300); margin-bottom: 10px; }
+  .example-step { font-size: 13px; color: var(--text-sub); line-height: 2; }
+  .example-step .calc { color: var(--green-200); font-family: 'Consolas', monospace; }
+
+  /* 等级划分 */
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 12px 0; }
+  .level-item {
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .level-item .lv-name { font-size: 16px; font-weight: 700; color: #fff; }
+  .level-item .lv-range { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+
+  /* 退化曲线图 */
+  .chart-wrap { background: rgba(10,31,24,0.8); border: 1px solid rgba(46,139,106,0.2); border-radius: 8px; padding: 20px; margin: 12px 0; }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--green-300); margin-bottom: 12px; }
+  .chart-legend { display: flex; gap: 20px; margin-top: 12px; font-size: 12px; color: var(--text-sub); }
+  .chart-legend-item { display: flex; align-items: center; gap: 6px; }
+  .chart-legend-swatch { width: 20px; height: 3px; border-radius: 2px; }
+
+  /* 提示框 */
+  .note-box {
+    background: rgba(212,148,74,0.08);
+    border: 1px solid rgba(212,148,74,0.25);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #E8B87A;
+    line-height: 1.8;
+  }
+  .note-box strong { color: #F0C88A; }
+
+  /* 页脚 */
+  .footer { text-align: center; color: var(--text-dim); font-size: 12px; padding: 40px 0 20px; border-top: 1px solid var(--border); margin-top: 40px; }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .container { padding: 20px 16px 60px; }
+    .hero { padding: 32px 24px; }
+    .hero h1 { font-size: 24px; }
+    .algo-card { padding: 20px; }
+    .algo-fullname { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 头部 -->
+  <div class="hero">
+    <div class="hero-tag">ALGORITHM DOCUMENTATION</div>
+    <h1>烤房健康分算法详解</h1>
+    <p>本系统采用多维度健康评价模型，从加热设备、散热器、自控设备、烤房主体、附属设施五大部件出发，
+    综合状态、时效、评价三维度量化烤房健康水平。当前系统采用<b style="color:#7DC4A8">增强型BMHI（最终版）</b>作为正式健康分算法。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span class="dot" style="background:#2E8B6A"></span>5种健康分算法</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#5FB292"></span>5级健康等级</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#7DC4A8"></span>0-100分制</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#D4944A"></span>数据源：kf_basedata + kf_heater/radiator/controller/oven_body</div>
+    </div>
+  </div>
+
+  <!-- 目录 -->
+  <div class="section">
+    <div class="section-title"><span class="num">目</span>算法总览</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>算法</th><th>全称</th><th>核心思路</th><th>状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b style="color:#7DC4A8">BMHI</b></td><td>烤房多维健康指数模型</td><td>AHP层次加权，状态×时效×评价三维量化</td><td><span class="badge-green" style="padding:2px 10px">基础版</span></td></tr>
+        <tr><td><b style="color:#7DC4A8">CDCI</b></td><td>部件退化曲线积分健康度</td><td>三段式退化函数（稳定→线性→加速劣化）</td><td><span class="badge-green" style="padding:2px 10px">推荐</span></td></tr>
+        <tr><td><b style="color:#7DC4A8">FCHE</b></td><td>模糊综合健康评价模型</td><td>模糊隶属度 + 加权平均去模糊化</td><td><span class="badge-blue" style="padding:2px 10px">对比</span></td></tr>
+        <tr><td><b style="color:#7DC4A8">TOPSIS</b></td><td>熵权-TOPSIS健康排序法</td><td>信息熵客观权重 + 相对贴近度排序</td><td><span class="badge-blue" style="padding:2px 10px">对比</span></td></tr>
+        <tr><td><b style="color:#7DC4A8">CRHE</b></td><td>组合赋权融合健康度</td><td>AHP主观 × 熵权客观 乘法合成</td><td><span class="badge-blue" style="padding:2px 10px">对比</span></td></tr>
+        <tr><td><b style="color:#7DC4A8;font-size:15px">增强BMHI</b></td><td>增强型烤房多维健康指数</td><td>BMHI框架 + CDCI三段式退化 + 4部件权重</td><td><span class="badge-red" style="padding:2px 10px">✅ 最终版</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ 增强型BMHI（最终版） ============ -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span>增强型BMHI（最终版）— 当前正式算法</div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-red">✅ 最终版</span>
+        <span class="algo-name">增强型烤房多维健康指数模型</span>
+        <span class="algo-fullname">Enhanced Barn Multi-dimensional Health Index</span>
+      </div>
+      <div class="algo-principle">
+        在基础BMHI框架上融合CDCI三段式退化函数：对加热设备(JR)、散热器(SR)、自控设备(ZK)、烤房主体(ZT)
+        四大部件，每个子部件按「状态分 × 退化分 × 评价分」三维量化，加权汇总得到0-100分健康指数。
+        结果存入 <code style="color:#7DC4A8">health_score_final</code> 字段，并同步至烤房列表显示。
+      </div>
+
+      <div class="formula-box">
+<span class="hl">综合健康分</span>
+HealthScore = W_JR×C_JR + W_SR×C_SR + W_ZK×C_ZK + W_ZT×C_ZT
+
+<span class="hl">部件得分（每个子部件）</span>
+C_i = α × S_status + β × S_degrade + γ × S_eval
+
+<span class="hl">状态分</span>
+S_status: 正常=100, 异常=50, 损坏=0
+
+<span class="hl">退化分（CDCI三段式退化函数）</span>
+S_degrade(Δt) = 100                          (Δt ≤ 0.2L, 稳定区)
+S_degrade(Δt) = 100 - k1×(Δt - 0.2L)         (0.2L &lt; Δt ≤ 0.7L, 线性区)
+S_degrade(Δt) = 30×e^(-k2×(Δt - 0.7L))       (Δt &gt; 0.7L, 加速劣化区)
+k1 = 100/(0.5L),  k2 = 2/L
+
+<span class="hl">评价分</span>
+S_eval: 较好=80, 一般=60, 较差=50, 差=30
+      </div>
+
+      <div class="weight-legend">
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#0D5D46"></span>JR 加热设备 30%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#1A6B4F"></span>SR 散热器 26%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#2E8B6A"></span>ZK 自控设备 26%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#5FB292"></span>ZT 烤房主体 18%</div>
+      </div>
+      <div class="weight-bar">
+        <div class="weight-seg" style="width:30%;background:linear-gradient(90deg,#0D5D46,#1A6B4F)">JR 30%</div>
+        <div class="weight-seg" style="width:26%;background:linear-gradient(90deg,#1A6B4F,#2E8B6A)">SR 26%</div>
+        <div class="weight-seg" style="width:26%;background:linear-gradient(90deg,#2E8B6A,#3DA07A)">ZK 26%</div>
+        <div class="weight-seg" style="width:18%;background:linear-gradient(90deg,#3DA07A,#5FB292)">ZT 18%</div>
+      </div>
+
+      <div class="params-grid">
+        <div class="param-item"><div class="param-key">α</div><div class="param-label">状态权重</div><div class="param-default">默认 0.40</div></div>
+        <div class="param-item"><div class="param-key">β</div><div class="param-label">退化权重</div><div class="param-default">默认 0.30</div></div>
+        <div class="param-item"><div class="param-key">γ</div><div class="param-label">评价权重</div><div class="param-default">默认 0.30</div></div>
+        <div class="param-item"><div class="param-key">W_JR</div><div class="param-label">加热设备权重</div><div class="param-default">默认 0.30</div></div>
+        <div class="param-item"><div class="param-key">W_SR</div><div class="param-label">散热器权重</div><div class="param-default">默认 0.26</div></div>
+        <div class="param-item"><div class="param-key">W_ZK</div><div class="param-label">自控设备权重</div><div class="param-default">默认 0.26</div></div>
+        <div class="param-item"><div class="param-key">W_ZT</div><div class="param-label">烤房主体权重</div><div class="param-default">默认 0.18</div></div>
+        <div class="param-item"><div class="param-key">L_JR</div><div class="param-label">加热设备额定寿命</div><div class="param-default">10年</div></div>
+        <div class="param-item"><div class="param-key">L_SR</div><div class="param-label">散热器额定寿命</div><div class="param-default">12年</div></div>
+        <div class="param-item"><div class="param-key">L_ZK</div><div class="param-label">自控设备额定寿命</div><div class="param-default">10年</div></div>
+        <div class="param-item"><div class="param-key">L_ZT</div><div class="param-label">烤房主体额定寿命</div><div class="param-default">20年</div></div>
+      </div>
+
+      <div class="example-box">
+        <div class="example-title">📐 计算示例</div>
+        <div class="example-step">
+          假设某烤房加热设备(burner)已使用4年、状态正常、评价较好，额定寿命L=10年：<br>
+          <span class="calc">Δt = 4，稳定区终点 = 0.2×10 = 2年，线性区终点 = 0.7×10 = 7年</span><br>
+          <span class="calc">Δt=4 处于线性区 → S_degrade = 100 - (100/5)×(4-2) = 100 - 40 = 60</span><br>
+          <span class="calc">S_status = 100（正常），S_eval = 80（较好）</span><br>
+          <span class="calc">C_JR = 0.4×100 + 0.3×60 + 0.3×80 = 40 + 18 + 24 = 82.0</span><br>
+          同理计算 SR、ZK、ZT 部件得分后加权汇总即得综合健康分。
+        </div>
+      </div>
+    </div>
+
+    <!-- 等级划分 -->
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-name">健康等级划分（5级）</span>
+      </div>
+      <div class="level-grid">
+        <div class="level-item" style="background:linear-gradient(135deg,#1A6B4F,#2E8B6A)"><div class="lv-name">优良</div><div class="lv-range">≥ 90 分</div></div>
+        <div class="level-item" style="background:linear-gradient(135deg,#2E8B6A,#5FB292)"><div class="lv-name">良好</div><div class="lv-range">75 ~ 90 分</div></div>
+        <div class="level-item" style="background:linear-gradient(135deg,#C07A2E,#D4944A)"><div class="lv-name">一般</div><div class="lv-range">60 ~ 75 分</div></div>
+        <div class="level-item" style="background:linear-gradient(135deg,#B04A2E,#D4604A)"><div class="lv-name">预警</div><div class="lv-range">40 ~ 60 分</div></div>
+        <div class="level-item" style="background:linear-gradient(135deg,#8B1A1A,#B71C1C)"><div class="lv-name">危险</div><div class="lv-range">&lt; 40 分</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BMHI 基础版 ============ -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span>BMHI 烤房多维健康指数模型（基础版）</div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-green">基础版</span>
+        <span class="algo-name">Barn Multi-dimensional Health Index</span>
+        <span class="algo-fullname">AHP层次加权模型</span>
+      </div>
+      <div class="algo-principle">
+        采用层次分析法(AHP)确定5大部件权重，对每个部件的子部件进行「状态分×时效分×评价分」三维量化，
+        加权汇总得到0-100分的健康指数。包含附属设施(FS)部件，共5大部件。
+      </div>
+
+      <div class="formula-box">
+<span class="hl">综合健康分</span>
+BMHI = Σ(Wi × Ci),  i = JR, SR, ZK, ZT, FS
+
+<span class="hl">部件得分</span>
+Ci = α × S_status + β × S_repair + γ × S_eval
+
+<span class="hl">状态分</span>
+S_status: 正常=100, 异常=50, 损坏=0
+
+<span class="hl">时效分（线性衰减）</span>
+S_repair = max(0, 100 - Δt × k),  Δt = 当前年份 - 修复年份
+
+<span class="hl">评价分</span>
+S_eval: 较好=80, 一般=60, 较差=50, 差=30
+      </div>
+
+      <div class="weight-legend">
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#0D5D46"></span>JR 加热设备 25%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#1A6B4F"></span>SR 散热器 20%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#2E8B6A"></span>ZK 自控设备 25%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#3DA07A"></span>ZT 烤房主体 20%</div>
+        <div class="weight-legend-item"><span class="weight-swatch" style="background:#5FB292"></span>FS 附属设施 10%</div>
+      </div>
+      <div class="weight-bar">
+        <div class="weight-seg" style="width:25%;background:linear-gradient(90deg,#0D5D46,#1A6B4F)">JR 25%</div>
+        <div class="weight-seg" style="width:20%;background:linear-gradient(90deg,#1A6B4F,#2E8B6A)">SR 20%</div>
+        <div class="weight-seg" style="width:25%;background:linear-gradient(90deg,#2E8B6A,#3DA07A)">ZK 25%</div>
+        <div class="weight-seg" style="width:20%;background:linear-gradient(90deg,#3DA07A,#5FB292)">ZT 20%</div>
+        <div class="weight-seg" style="width:10%;background:linear-gradient(90deg,#5FB292,#7DC4A8)">FS 10%</div>
+      </div>
+
+      <div class="params-grid">
+        <div class="param-item"><div class="param-key">α</div><div class="param-label">状态权重</div><div class="param-default">默认 0.4</div></div>
+        <div class="param-item"><div class="param-key">β</div><div class="param-label">时效权重</div><div class="param-default">默认 0.3</div></div>
+        <div class="param-item"><div class="param-key">γ</div><div class="param-label">评价权重</div><div class="param-default">默认 0.3</div></div>
+        <div class="param-item"><div class="param-key">k</div><div class="param-label">时效衰减系数</div><div class="param-default">默认 10</div></div>
+      </div>
+
+      <div class="note-box">
+        <strong>部件数据来源：</strong>JR→kf_heater表(burner)；SR→kf_radiator表(pipe/furnace/ash_door/chimney)；
+        ZK→kf_controller表(8个子部件)；ZT→kf_oven_body表(wall_roof/beam/door)；FS默认70分。
+        无修复记录时Δt默认取5年；无部件数据时部件默认70分。
+      </div>
+
+      <div class="example-box">
+        <div class="example-title">📐 计算示例（烤房 09-420527KF00018）</div>
+        <div class="example-step">
+          <span class="calc">JR(burner, Δt=4, 正常, 较好): 0.4×100 + 0.3×60 + 0.3×80 = 82.0</span><br>
+          <span class="calc">SR(4子部件, Δt=4): 82.0</span><br>
+          <span class="calc">ZK(8子部件, Δt=4): 82.0</span><br>
+          <span class="calc">ZT(door Δt=17!, 较差): 65.0</span><br>
+          <span class="calc">BMHI = 0.25×82 + 0.20×82 + 0.25×82 + 0.20×65 + 0.10×70 = 77.4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CDCI ============ -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span>CDCI 部件退化曲线积分健康度</div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-green">推荐</span>
+        <span class="algo-name">Component Degradation Curve Integration</span>
+        <span class="algo-fullname">三段式退化函数模型</span>
+      </div>
+      <div class="algo-principle">
+        为每个子部件建立三段式退化函数：初期稳定→中期线性退化→后期加速劣化。
+        对曲线在当前时刻求值得到子部件瞬时健康度，再按部件层次加权汇总。
+        相比BMHI的线性衰减，CDCI更符合设备实际劣化规律。
+      </div>
+
+      <div class="formula-box">
+<span class="hl">三段式退化函数（L = 额定寿命）</span>
+h(Δt) = 100                              (Δt ≤ 0.2L, 稳定区)
+h(Δt) = 100 - k1×(Δt - 0.2L)             (0.2L &lt; Δt ≤ 0.7L, 线性区)
+h(Δt) = 30×e^(-k2×(Δt - 0.7L))           (Δt &gt; 0.7L, 加速劣化区)
+k1 = 100/(0.5L),  k2 = 2/L
+
+<span class="hl">子部件修正</span>
+h' = h × 状态修正 × 评价修正
+状态修正: 正常×1.0, 异常×0.5, 损坏×0.2
+评价修正: evalScore / 80
+
+<span class="hl">综合得分</span>
+CDCI = Σ(Wi × Ci)，FS特殊处理: wFs × (fsScore/100 × 50)
+      </div>
+
+      <!-- 退化曲线图 -->
+      <div class="chart-wrap">
+        <div class="chart-title">📈 CDCI 三段式退化曲线示意（额定寿命 L=10年）</div>
+        <svg viewBox="0 0 600 260" width="100%" style="max-width:600px;display:block;margin:0 auto;">
+          <!-- 网格 -->
+          <g stroke="rgba(46,139,106,0.15)" stroke-width="1">
+            <line x1="60" y1="20" x2="60" y2="220"/>
+            <line x1="60" y1="220" x2="580" y2="220"/>
+            <line x1="60" y1="20" x2="580" y2="20"/>
+            <line x1="60" y1="120" x2="580" y2="120"/>
+          </g>
+          <!-- 区域分界 -->
+          <line x1="164" y1="20" x2="164" y2="220" stroke="rgba(212,148,74,0.4)" stroke-dasharray="4,4"/>
+          <line x1="424" y1="20" x2="424" y2="220" stroke="rgba(212,148,74,0.4)" stroke-dasharray="4,4"/>
+          <!-- 稳定区 -->
+          <line x1="60" y1="40" x2="164" y2="40" stroke="#2E8B6A" stroke-width="3"/>
+          <!-- 线性区 -->
+          <line x1="164" y1="40" x2="424" y2="130" stroke="#5FB292" stroke-width="3"/>
+          <!-- 加速区 -->
+          <path d="M424 130 C 460 170, 500 205, 560 218" stroke="#D4944A" stroke-width="3" fill="none"/>
+          <!-- 标签 -->
+          <text x="112" y="30" fill="#7DC4A8" font-size="11" text-anchor="middle">稳定区</text>
+          <text x="294" y="60" fill="#7DC4A8" font-size="11" text-anchor="middle">线性退化区</text>
+          <text x="500" y="60" fill="#E8B87A" font-size="11" text-anchor="middle">加速劣化区</text>
+          <text x="164" y="238" fill="#5A8A72" font-size="10" text-anchor="middle">0.2L</text>
+          <text x="424" y="238" fill="#5A8A72" font-size="10" text-anchor="middle">0.7L</text>
+          <text x="580" y="238" fill="#5A8A72" font-size="10" text-anchor="end">L(额定寿命)</text>
+          <text x="50" y="44" fill="#5A8A72" font-size="10" text-anchor="end">100</text>
+          <text x="50" y="124" fill="#5A8A72" font-size="10" text-anchor="end">50</text>
+          <text x="50" y="224" fill="#5A8A72" font-size="10" text-anchor="end">0</text>
+          <text x="320" y="252" fill="#5A8A72" font-size="11" text-anchor="middle">使用年限 Δt（年）</text>
+        </svg>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:#2E8B6A"></span>稳定区</div>
+          <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:#5FB292"></span>线性退化区</div>
+          <div class="chart-legend-item"><span class="chart-legend-swatch" style="background:#D4944A"></span>加速劣化区</div>
+        </div>
+      </div>
+
+      <div class="params-grid">
+        <div class="param-item"><div class="param-key">stableRatio</div><div class="param-label">稳定区比例</div><div class="param-default">默认 0.2</div></div>
+        <div class="param-item"><div class="param-key">linearEndRatio</div><div class="param-label">线性区终点比例</div><div class="param-default">默认 0.7</div></div>
+        <div class="param-item"><div class="param-key">hMid</div><div class="param-label">加速区起点分</div><div class="param-default">默认 30</div></div>
+      </div>
+
+      <!-- 额定寿命表 -->
+      <table class="data-table">
+        <thead><tr><th>部件</th><th>额定寿命 L</th><th>稳定区终点 0.2L</th><th>线性区终点 0.7L</th></tr></thead>
+        <tbody>
+          <tr><td>风机 fan / 电机 motor</td><td class="num">6 年</td><td class="num">1.2 年</td><td class="num">4.2 年</td></tr>
+          <tr><td>探针 probe / 水壶 water_pot</td><td class="num">5 年</td><td class="num">1 年</td><td class="num">3.5 年</td></tr>
+          <tr><td>墙体屋顶 wall_roof</td><td class="num">15 年</td><td class="num">3 年</td><td class="num">10.5 年</td></tr>
+          <tr><td>横梁 beam</td><td class="num">20 年</td><td class="num">4 年</td><td class="num">14 年</td></tr>
+          <tr><td>门 door</td><td class="num">12 年</td><td class="num">2.4 年</td><td class="num">8.4 年</td></tr>
+          <tr><td>燃烧机 burner</td><td class="num">8 年</td><td class="num">1.6 年</td><td class="num">5.6 年</td></tr>
+          <tr><td>其他（默认）</td><td class="num">8 年</td><td class="num">1.6 年</td><td class="num">5.6 年</td></tr>
+        </tbody>
+      </table>
+
+      <div class="example-box">
+        <div class="example-title">📐 计算示例（烤房 09-420527KF00018）</div>
+        <div class="example-step">
+          <span class="calc">burner(Δt=4, L=8): 线性区, h = 100 - 25×2.4 = 40</span><br>
+          <span class="calc">door(Δt=17, L=12): 加速区, h = 30×e^(-0.167×8.6) = 7.1</span><br>
+          <span class="calc">beam(Δt=2, L=20): 稳定区, h = 100</span><br>
+          <span class="calc">CDCI = 32.0 → 映射后 48.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 其他算法 ============ -->
+  <div class="section">
+    <div class="section-title"><span class="num">4</span>其他对比算法</div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-blue">FCHE</span>
+        <span class="algo-name">模糊综合健康评价模型</span>
+        <span class="algo-fullname">Fuzzy Comprehensive Health Evaluation</span>
+      </div>
+      <div class="formula-box">
+<span class="hl">评价集</span>
+V = {优(≥90), 良(75-90), 中(60-75), 差(&lt;60)}
+
+<span class="hl">隶属度函数（以Δt为例）</span>
+μ优 = max(0, 1 - Δt/5)
+μ良 = max(0, 1 - |Δt-5|/5)
+
+<span class="hl">模糊变换（加权平均型）</span>
+B = A ∘ R
+
+<span class="hl">去模糊化</span>
+Score = Σ(bk×vk) / Σbk
+      </div>
+      <div class="example-box">
+        <div class="example-title">📐 计算示例</div>
+        <div class="example-step">
+          <span class="calc">JR(Δt=4, 较好): μ = (0.30, 0.50, 0.20, 0.00)</span><br>
+          <span class="calc">ZT(door Δt=17, 较差): μ = (0.00, 0.05, 0.25, 0.70)</span><br>
+          <span class="calc">B = (0.1525, 0.4125, 0.2750, 0.1600)</span><br>
+          <span class="calc">Score = (0.1525×90 + 0.4125×80 + 0.275×65 + 0.16×40) = 71.0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-blue">TOPSIS</span>
+        <span class="algo-name">熵权-TOPSIS健康排序法</span>
+        <span class="algo-fullname">Entropy-TOPSIS Health Ranking</span>
+      </div>
+      <div class="formula-box">
+<span class="hl">标准化</span>
+pij = xij / Σxi
+
+<span class="hl">熵值</span>
+Ej = -(1/ln n) × Σ(pij × ln(pij))
+
+<span class="hl">熵权</span>
+Wj = (1 - Ej) / Σ(1 - Ej)
+
+<span class="hl">相对贴近度</span>
+Ci = Di- / (Di+ + Di-) × 100
+      </div>
+      <div class="note-box">
+        利用信息熵计算各指标客观权重（数据越分散权重越大），再用TOPSIS法计算每栋烤房与理想最优解和最劣解的相对贴近度，
+        实现多烤房横向排序。权重由数据自动计算，无需人工设定。
+      </div>
+    </div>
+
+    <div class="algo-card">
+      <div class="algo-head">
+        <span class="algo-badge badge-blue">CRHE</span>
+        <span class="algo-name">组合赋权融合健康度</span>
+        <span class="algo-fullname">Combined Ratio Hybrid Evaluation</span>
+      </div>
+      <div class="formula-box">
+<span class="hl">组合权重（AHP主观 × 熵权客观）</span>
+Wj = (W_ahp_j × W_entropy_j) / Σ(W_ahp × W_entropy)
+
+<span class="hl">综合得分</span>
+CRHE = Σ(Wj × Ci)
+      </div>
+      <div class="note-box">
+        将AHP主观权重与信息熵客观权重通过乘法合成，既尊重专家经验又反映数据分布。AHP权重：JR=0.25, SR=0.20, ZK=0.25, ZT=0.20, FS=0.10。
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据流 -->
+  <div class="section">
+    <div class="section-title"><span class="num">5</span>算法数据流</div>
+    <div class="algo-card">
+      <div class="formula-box" style="font-size:13px;">
+<span class="hl">数据输入</span>
+kf_basedata（烤房基础信息：project_id, finish_date, use_status）
+  → kf_heater（加热设备 JR：burner_status, burner_repair_year, evaluation）
+  → kf_radiator（散热器 SR：pipe/furnace/ash_door/chimney 的 status + repair_year）
+  → kf_controller（自控设备 ZK：8个子部件的 status + repair_year）
+  → kf_oven_body（烤房主体 ZT：wall_roof/beam/door 的 status + repair_year）
+
+<span class="hl">算法执行</span>
+POST /barn/health-algo/final-apply  →  增强型BMHI计算  →  存入 health_score_final
+
+<span class="hl">结果同步</span>
+health_score_final → current_health_score（烤房列表显示）
+health_score_final → ovens.health_score + ovens.health_level（小程序共用）
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    烤房管理平台 · 健康分算法详解文档 · 生成于 2026-08-18
+  </div>
+</div>
+</body>
+</html>

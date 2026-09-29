@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烤房选址系统 — 指标体系与算法模型指南</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f7fb;
+    color: #1a2332;
+    line-height: 1.8;
+    padding: 40px 20px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    padding: 50px 55px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #1a5c2a, #2d8f47);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    font-size: 16px;
+    color: #5e6f8d;
+    border-bottom: 2px solid #eef2f7;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .subtitle span {
+    background: #eef5f0;
+    color: #1a5c2a;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a2332;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-left: 16px;
+    border-left: 5px solid #2d8f47;
+  }
+  h2:first-of-type { margin-top: 0; }
+  h3 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a2332;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  h4 { font-size: 16px; font-weight: 700; color: #2d4a3a; margin-top: 18px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; color: #2c3e50; }
+  ul, ol { padding-left: 24px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; color: #2c3e50; }
+  .highlight-box {
+    background: #f8faff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 18px 0;
+    border-left: 4px solid #2d8f47;
+  }
+  .highlight-box.gold { border-left-color: #d4a843; background: #fdfaf0; }
+  .highlight-box.blue { border-left-color: #3b7fbd; background: #f0f6fd; }
+  .highlight-box.red { border-left-color: #c0392b; background: #fdf2f0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 20px;
+    font-size: 14px;
+  }
+  th {
+    background: #1a5c2a;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #eef2f7;
+  }
+  tr:nth-child(even) { background: #f8fafc; }
+  .tag {
+    display: inline-block;
+    background: #eef5f0;
+    color: #1a5c2a;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 12px;
+    margin-right: 4px;
+  }
+  .tag.blue { background: #e8eef6; color: #2c5f8a; }
+  .tag.gold { background: #f5edda; color: #8a6d1f; }
+  .tag.red { background: #f5e4e2; color: #a93226; }
+  .formula {
+    background: #f0f6f2;
+    border: 1px solid #dcebe2;
+    border-left: 4px solid #2d8f47;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-family: 'SF Mono', Consolas, 'Courier New', monospace;
+    font-size: 13.5px;
+    color: #1a5c2a;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.9;
+  }
+  .formula .hl { color: #c0392b; font-weight: 700; }
+  .formula .cm { color: #8a9bb0; }
+  .step-box {
+    background: #fafbfd;
+    border: 1px solid #e8edf3;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 10px 0;
+  }
+  .step-box .step-title { font-weight: 700; color: #1a5c2a; margin-bottom: 6px; }
+  .footer-note {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 2px solid #eef2f7;
+    font-size: 14px;
+    color: #6b7a93;
+    text-align: center;
+  }
+  @media (max-width: 768px) {
+    .container { padding: 24px 18px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    table { font-size: 12px; }
+    td, th { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>烤房选址系统 — 指标体系与算法模型指南</h1>
+  <div class="subtitle">
+    <span>烤房选址 · 多源数据融合评价</span>
+    <span>📍 湖北省宜昌市秭归县 · 2026</span>
+  </div>
+
+  <!-- ==================== 一、系统定位 ==================== -->
+  <h2>一、系统定位</h2>
+  <p>本系统对应《智慧烤房全生命周期管理系统》方案中的 <strong>模块一：烤房新建智能选址系统</strong>，实现"地图选点 → 自动评分 → 综合排序 → 一键报告"的完整流程。系统整合 <strong>8 大一级指标、12 大类 48 项</strong> 评价指标，采用 <strong>层次分析法（AHP）+ 熵权法 + TOPSIS</strong> 综合评价模型，对秭归县候选选址点进行量化评价与排序。</p>
+  <div class="highlight-box gold">
+    <strong>🏆 技术路线：</strong>
+    <ul>
+      <li><strong>Step 1</strong> 数据预处理：多源异构数据清洗、标准化、空间化</li>
+      <li><strong>Step 2</strong> 指标量化与赋权：<strong>AHP</strong>（主观权重）+ <strong>熵权法</strong>（客观权重）主客观融合</li>
+      <li><strong>Step 3</strong> 适宜性评价：8 大指标量化打分（0-100 分）</li>
+      <li><strong>Step 4</strong> 多目标优化：<strong>TOPSIS</strong> 逼近理想解排序法综合排序</li>
+      <li><strong>Step 5</strong> 可视化呈现：WebGIS 地图展示 + 详细评分报告</li>
+    </ul>
+  </div>
+
+  <!-- ==================== 二、数据说明 ==================== -->
+  <h2>二、数据说明（测试数据）</h2>
+  <p>系统当前内置 <strong>20 个测试候选点</strong>，覆盖秭归县 7 个乡镇（两河口、杨林桥、梅家河、郭家坝、九畹溪、磨坪、茅坪），每个候选点包含完整的 8 大指标原始数据。数据来源参考项目方案中的真实产业数据：两河口镇烟田 8330 亩、杨林桥镇 6450 亩、梅家河乡肖家坪村标准化烤房 39 间等。</p>
+
+  <h3>2.1 候选点数据字段</h3>
+  <table>
+    <thead><tr><th>字段</th><th>含义</th><th>示例值</th><th>对应指标</th></tr></thead>
+    <tbody>
+      <tr><td>candidateName</td><td>候选点名称</td><td>两河口-香龙村</td><td>—</td></tr>
+      <tr><td>township / village</td><td>所属乡镇 / 村</td><td>两河口 / 香龙村</td><td>—</td></tr>
+      <tr><td>longitude / latitude</td><td>经度 / 纬度</td><td>110.452 / 30.718</td><td>—</td></tr>
+      <tr><td>altitude</td><td>海拔（米）</td><td>1050</td><td>地形地势</td></tr>
+      <tr><td>slopeDegree</td><td>坡度（度）</td><td>8</td><td>地形地势</td></tr>
+      <tr><td>distanceWater</td><td>距水源距离（米）</td><td>200</td><td>水文条件</td></tr>
+      <tr><td>distancePower</td><td>距电力线路距离（米）</td><td>500</td><td>电力保障</td></tr>
+      <tr><td>distanceRoad</td><td>距公路距离（米）</td><td>300</td><td>交通条件</td></tr>
+      <tr><td>tobaccoArea</td><td>周边烟叶种植面积（亩）</td><td>260</td><td>烟田匹配</td></tr>
+      <tr><td>landType</td><td>土地类型（平地/坡地/荒地/林地/洼地）</td><td>坡地</td><td>环境安全 / 成本经济</td></tr>
+      <tr><td>areaSqm</td><td>可用面积（平方米）</td><td>420</td><td>成本经济</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 测试候选点清单</h3>
+  <table>
+    <thead><tr><th>乡镇</th><th>候选点</th><th>海拔(m)</th><th>坡度(°)</th><th>距路(m)</th><th>距电(m)</th><th>距水(m)</th><th>烟田(亩)</th><th>土地类型</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="4">两河口<br>（烟田8330亩）</td><td>香龙村</td><td>1050</td><td>8</td><td>300</td><td>500</td><td>200</td><td>260</td><td>坡地</td></tr>
+      <tr><td>云台荒</td><td>1350</td><td>12</td><td>800</td><td>1200</td><td>400</td><td>180</td><td>坡地</td></tr>
+      <tr><td>薛家坪</td><td>900</td><td>5</td><td>150</td><td>300</td><td>150</td><td>320</td><td>平地</td></tr>
+      <tr><td>低洼地</td><td>450</td><td>20</td><td>2000</td><td>3500</td><td>100</td><td>30</td><td>洼地</td></tr>
+      <tr><td rowspan="3">杨林桥<br>（烟田6450亩）</td><td>响水洞</td><td>1100</td><td>10</td><td>400</td><td>800</td><td>300</td><td>220</td><td>坡地</td></tr>
+      <tr><td>白鹤洞</td><td>950</td><td>6</td><td>200</td><td>400</td><td>180</td><td>280</td><td>平地</td></tr>
+      <tr><td>西阳坪</td><td>1250</td><td>15</td><td>1000</td><td>1500</td><td>500</td><td>150</td><td>坡地</td></tr>
+      <tr><td rowspan="3">梅家河<br>（肖家坪39间）</td><td>肖家坪村</td><td>1000</td><td>7</td><td>350</td><td>600</td><td>250</td><td>240</td><td>坡地</td></tr>
+      <tr><td>鲁家湾</td><td>1150</td><td>11</td><td>700</td><td>1000</td><td>350</td><td>160</td><td>坡地</td></tr>
+      <tr><td>郑家岭</td><td>880</td><td>4</td><td>180</td><td>350</td><td>120</td><td>300</td><td>平地</td></tr>
+      <tr><td rowspan="2">郭家坝</td><td>西坡</td><td>1050</td><td>9</td><td>450</td><td>700</td><td>280</td><td>200</td><td>坡地</td></tr>
+      <tr><td>头道河</td><td>980</td><td>6</td><td>250</td><td>500</td><td>200</td><td>250</td><td>平地</td></tr>
+      <tr><td rowspan="2">九畹溪</td><td>周坪</td><td>1080</td><td>8</td><td>400</td><td>650</td><td>300</td><td>210</td><td>坡地</td></tr>
+      <tr><td>槐树坪</td><td>1200</td><td>13</td><td>900</td><td>1300</td><td>450</td><td>140</td><td>坡地</td></tr>
+      <tr><td rowspan="3">磨坪</td><td>柏家坪</td><td>1180</td><td>12</td><td>850</td><td>1100</td><td>400</td><td>170</td><td>坡地</td></tr>
+      <tr><td>三墩岩</td><td>950</td><td>5</td><td>220</td><td>450</td><td>180</td><td>260</td><td>平地</td></tr>
+      <tr><td>深林</td><td>1450</td><td>22</td><td>3000</td><td>5000</td><td>2500</td><td>10</td><td>林地</td></tr>
+      <tr><td rowspan="2">茅坪</td><td>陈家坝</td><td>1000</td><td>7</td><td>380</td><td>550</td><td>250</td><td>190</td><td>坡地</td></tr>
+      <tr><td>建东</td><td>1120</td><td>10</td><td>600</td><td>900</td><td>350</td><td>150</td><td>坡地</td></tr>
+    </tbody>
+  </table>
+  <div class="highlight-box red">
+    <strong>⚠️ 测试数据说明：</strong>以上为演示用测试数据，其中"低洼地""高山""深林"三个候选点刻意设置为劣势条件（海拔过低/过高、坡度大、距设施远、烟田少），用于验证算法能正确区分"高度适宜 / 适宜 / 一般 / 不适宜"四个等级。
+  </div>
+
+  <!-- ==================== 三、指标体系 ==================== -->
+  <h2>三、指标体系（8 大一级指标）</h2>
+  <p>依据项目方案，选址评价采用 <strong>8 大一级指标</strong>，覆盖地形、水文、电力、交通、烟田、环境、集群、成本 8 个维度，权重合计 100%。</p>
+  <table>
+    <thead><tr><th>一级指标</th><th>权重</th><th>二级指标</th><th>数据来源</th></tr></thead>
+    <tbody>
+      <tr><td>地形地势</td><td><strong>15%</strong></td><td>海拔高度（适宜 800-1400m）、坡度（≤15°）、地基承载力</td><td>DEM / 现场勘探</td></tr>
+      <tr><td>水文条件</td><td><strong>12%</strong></td><td>地下水位深度、雨季积水风险、排水条件</td><td>水文地质调查</td></tr>
+      <tr><td>电力保障</td><td><strong>18%</strong></td><td>距变电站距离、变压器剩余容量、供电可靠性</td><td>电网 GIS / 供电所</td></tr>
+      <tr><td>交通条件</td><td><strong>10%</strong></td><td>距主干道距离、路面状况、农机通行能力</td><td>路网数据</td></tr>
+      <tr><td>烟田匹配</td><td><strong>20%</strong></td><td>距烟田平均距离、服务烟田面积、运输损耗预估</td><td>烟田分布图</td></tr>
+      <tr><td>环境安全</td><td><strong>10%</strong></td><td>与民房/仓库距离、风向（避开下风口）、防火条件</td><td>现场调查</td></tr>
+      <tr><td>集群效益</td><td><strong>8%</strong></td><td>周边烤房密度、统一规划可行性</td><td>烤房数据库</td></tr>
+      <tr><td>成本经济</td><td><strong>7%</strong></td><td>土地获取成本、建设成本、运维成本预估</td><td>市场调研</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.1 各指标打分规则（0-100 分）</h3>
+  <table>
+    <thead><tr><th>指标</th><th>打分规则</th></tr></thead>
+    <tbody>
+      <tr><td>地形地势</td><td>海拔 800-1400m 得 100 分，向外高斯衰减；坡度 ≤15° 得 100 分，15-25° 线性递减，&gt;25° 得 30 分。综合 = 0.6×海拔分 + 0.4×坡度分</td></tr>
+      <tr><td>水文条件</td><td>距水源 ≤300m 得 95 分（水源充足且无积水），紧邻水体（≤0m）得 60 分（积水风险），&gt;3000m 得 40 分；坡地排水好 +5 分，洼地易积水 -15 分</td></tr>
+      <tr><td>电力保障</td><td>距电力线路 ≤200m 得 100 分，≤1000m 得 80 分，≤3000m 得 60 分，&gt;3000m 得 40 分</td></tr>
+      <tr><td>交通条件</td><td>距公路 ≤200m 得 100 分，≤1000m 得 80 分，≤3000m 得 60 分，&gt;3000m 得 40 分</td></tr>
+      <tr><td>烟田匹配</td><td>服务烟田面积 ≥200 亩得 100 分，逐级递减；距烟田（用距最近烤房近似）≤1km 得 100 分。综合 = 0.7×面积分 + 0.3×距离分</td></tr>
+      <tr><td>环境安全</td><td>荒地（远离民房、防火好）得 90 分，坡地 80 分，平地 65 分，林地（防火风险高）45 分</td></tr>
+      <tr><td>集群效益</td><td>周边 2km 烤房 5-20 座得 100 分，&lt;5 座按 40+数量×12 递增，&gt;20 座竞争降分</td></tr>
+      <tr><td>成本经济</td><td>荒地（获取成本低）得 100 分，坡地 80 分，平地 70 分，林地 50 分；可用面积 ≥500㎡ 得 100 分（规模经济）。综合 = 0.6×土地分 + 0.4×面积分</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== 四、算法模型 ==================== -->
+  <h2>四、算法模型（AHP + 熵权法 + TOPSIS）</h2>
+
+  <h3>4.1 层次分析法（AHP）确定主观权重</h3>
+  <p>AHP 通过专家两两比较构造判断矩阵，计算特征向量得到各指标权重。本系统采用项目方案确定的主观权重：</p>
+  <div class="formula">W<sub>ahp</sub> = [0.15, 0.12, 0.18, 0.10, 0.20, 0.10, 0.08, 0.07]
+<span class="cm">// 地形 水文 电力 交通 烟田 环境 集群 成本</span></div>
+
+  <h3>4.2 熵权法确定客观权重</h3>
+  <p>熵权法根据数据本身的离散程度确定权重——指标数据差异越大，信息量越大，权重越高。计算步骤：</p>
+  <div class="step-box">
+    <div class="step-title">① 归一化</div>
+    <div class="formula" style="margin:8px 0 0;">p<sub>ij</sub> = x<sub>ij</sub> / Σ<sub>i</sub> x<sub>ij</sub></div>
+  </div>
+  <div class="step-box">
+    <div class="step-title">② 计算熵值</div>
+    <div class="formula" style="margin:8px 0 0;">e<sub>j</sub> = -1/ln(n) × Σ<sub>i</sub> p<sub>ij</sub>·ln(p<sub>ij</sub>)</div>
+  </div>
+  <div class="step-box">
+    <div class="step-title">③ 计算客观权重</div>
+    <div class="formula" style="margin:8px 0 0;">W<sub>ent_j</sub> = (1 - e<sub>j</sub>) / Σ<sub>j</sub>(1 - e<sub>j</sub>)</div>
+  </div>
+
+  <h3>4.3 组合权重（主客观融合）</h3>
+  <div class="formula">W<sub>j</sub> = α × W<sub>ahp_j</sub> + (1 - α) × W<sub>ent_j</sub>   <span class="cm">// α = 0.6（AHP 占主导）</span></div>
+
+  <h3>4.4 TOPSIS 逼近理想解排序法</h3>
+  <p>TOPSIS 通过计算各方案与"正理想解"（最优方案）和"负理想解"（最劣方案）的距离进行排序：</p>
+  <div class="step-box">
+    <div class="step-title">① 向量归一化 + 加权</div>
+    <div class="formula" style="margin:8px 0 0;">v<sub>ij</sub> = W<sub>j</sub> × x<sub>ij</sub> / √(Σ<sub>i</sub> x<sub>ij</sub>²)</div>
+  </div>
+  <div class="step-box">
+    <div class="step-title">② 确定正负理想解（全部为效益型指标）</div>
+    <div class="formula" style="margin:8px 0 0;">V⁺<sub>j</sub> = max(v<sub>ij</sub>)，V⁻<sub>j</sub> = min(v<sub>ij</sub>)</div>
+  </div>
+  <div class="step-box">
+    <div class="step-title">③ 计算欧氏距离</div>
+    <div class="formula" style="margin:8px 0 0;">D⁺<sub>i</sub> = √(Σ<sub>j</sub>(v<sub>ij</sub> - V⁺<sub>j</sub>)²)，D⁻<sub>i</sub> = √(Σ<sub>j</sub>(v<sub>ij</sub> - V⁻<sub>j</sub>)²)</div>
+  </div>
+  <div class="step-box">
+    <div class="step-title">④ 计算贴近度（综合得分）</div>
+    <div class="formula" style="margin:8px 0 0;">C<sub>i</sub> = D⁻<sub>i</sub> / (D⁺<sub>i</sub> + D⁻<sub>i</sub>)</div>
+  </div>
+  <p>C<sub>i</sub> 越接近 1，方案越优。按 C<sub>i</sub> 从大到小排序即得综合排名。</p>
+
+  <h3>4.5 适宜等级划分</h3>
+  <table>
+    <thead><tr><th>综合得分（AHP加权分）</th><th>适宜等级</th><th>建议</th></tr></thead>
+    <tbody>
+      <tr><td>≥ 85</td><td><span class="tag">高度适宜</span></td><td>优先选址</td></tr>
+      <tr><td>70 - 85</td><td><span class="tag">适宜</span></td><td>可建</td></tr>
+      <tr><td>55 - 70</td><td><span class="tag gold">一般</span></td><td>需评估后决定</td></tr>
+      <tr><td>&lt; 55</td><td><span class="tag red">不适宜</span></td><td>不建议建设</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== 五、计算示例 ==================== -->
+  <h2>五、计算示例</h2>
+  <p>以"两河口-香龙村"为例（海拔 1050m、坡度 8°、距路 300m、距电 500m、距水 200m、烟田 260 亩、坡地、面积 420㎡）：</p>
+  <div class="highlight-box blue">
+    <strong>📊 8 大指标打分：</strong>
+    <ul>
+      <li><strong>地形地势</strong>：海拔 1050m（800-1400 区间）→ 100 分；坡度 8°（≤15°）→ 100 分；综合 = 0.6×100 + 0.4×100 = <strong>100</strong></li>
+      <li><strong>水文条件</strong>：距水 200m（≤300m）→ 95 分；坡地排水好 +5 → <strong>100</strong></li>
+      <li><strong>电力保障</strong>：距电 500m（≤1000m）→ <strong>80</strong></li>
+      <li><strong>交通条件</strong>：距路 300m（≤1000m）→ <strong>80</strong></li>
+      <li><strong>烟田匹配</strong>：烟田 260 亩（≥200）→ 100 分；距最近烤房近 → 100 分；综合 = 0.7×100 + 0.3×100 = <strong>100</strong></li>
+      <li><strong>环境安全</strong>：坡地 → <strong>80</strong></li>
+      <li><strong>集群效益</strong>：周边 2km 烤房密度适中 → <strong>100</strong></li>
+      <li><strong>成本经济</strong>：坡地 → 80 分；面积 420㎡（≥200）→ 85 分；综合 = 0.6×80 + 0.4×85 = <strong>82</strong></li>
+    </ul>
+  </div>
+  <div class="highlight-box">
+    <strong>🧮 AHP 加权综合得分：</strong>
+    <div class="formula" style="margin:8px 0 0;">Score = 0.15×100 + 0.12×100 + 0.18×80 + 0.10×80 + 0.20×100 + 0.10×80 + 0.08×100 + 0.07×82
+     = 15 + 12 + 14.4 + 8 + 20 + 8 + 8 + 5.74 = <span class="hl">91.1 分 → 高度适宜</span></div>
+  </div>
+  <p>再结合熵权法客观权重修正后，通过 TOPSIS 计算贴近度 C<sub>i</sub>，与其余 19 个候选点横向比较得到综合排名。</p>
+
+  <!-- ==================== 六、界面使用指南 ==================== -->
+  <h2>六、界面使用指南</h2>
+  <div class="step-box">
+    <div class="step-title">① 打开烤房选址界面</div>
+    <p style="margin:4px 0 0;">登录系统后，点击左侧菜单 <strong>"烤房选址"</strong>，进入秭归县选址地图。</p>
+  </div>
+  <div class="step-box">
+    <div class="step-title">② 添加候选点</div>
+    <p style="margin:4px 0 0;">方式一：点击地图任意位置，弹出新增表单，填写海拔、坡度、距路/电/水距离、烟田面积、土地类型等原始数据后保存；方式二：点击 <strong>"自动生成候选点"</strong>，按网格批量生成。</p>
+  </div>
+  <div class="step-box">
+    <div class="step-title">③ 运行选址算法</div>
+    <p style="margin:4px 0 0;">点击 <strong>"运行选址算法"</strong>，系统对全部候选点执行 AHP + 熵权法 + TOPSIS 综合评价，计算 8 大指标得分、TOPSIS 贴近度与综合排名（约需数秒至数十秒，请耐心等待）。</p>
+  </div>
+  <div class="step-box">
+    <div class="step-title">④ 查看结果</div>
+    <p style="margin:4px 0 0;">地图上候选点按等级着色（绿色=高度适宜，浅绿=适宜，橙=一般，红=不适宜）；点击任意候选点可查看 8 大指标得分、TOPSIS 贴近度与综合排名；右侧列表按排名排序展示。</p>
+  </div>
+  <div class="step-box">
+    <div class="step-title">⑤ 查看算法说明</div>
+    <p style="margin:4px 0 0;">点击 <strong>"算法说明"</strong> 可查看指标体系、算法原理、计算公式与等级划分。</p>
+  </div>
+
+  <!-- ==================== 七、结果解读 ==================== -->
+  <h2>七、结果解读与后续规划</h2>
+  <ul>
+    <li><strong>高度适宜点</strong>：地形、烟田、基础设施俱佳，可作为新建烤房首选；</li>
+    <li><strong>适宜点</strong>：整体条件良好，个别指标（如电力、交通）可通过配套改善；</li>
+    <li><strong>一般点</strong>：存在明显短板，需结合建设成本综合评估；</li>
+    <li><strong>不适宜点</strong>：如海拔过低/过高、坡度大、远离烟田与设施，不建议建设。</li>
+  </ul>
+  <div class="highlight-box gold">
+    <strong>📌 后续增强方向：</strong>接入真实 DEM 高程、电网 GIS、路网、烟田分布等空间数据；引入随机森林分类器训练适宜性模型；支持多候选点横向对比报告导出。
+  </div>
+
+  <div class="footer-note">
+    <p>📌 烤房选址系统 · 指标体系与算法模型指南</p>
+    <p style="font-size:13px;color:#8a9bb0;">数据来源：秭归县人民政府、两河口镇、杨林桥镇、梅家河乡公开数据及行业技术规范 · 生成于 2026-08-18</p>
+  </div>
+</div>
+</body>
+</html>

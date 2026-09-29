@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烤房智管 · 方法体系与创新点一键解读与提级总览</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#e4f3e2; --greenDeep:#0f241f;
+      --teal:#11888a; --teal2:#dff3f2; --orange:#d9822b; --orange2:#fff0dc;
+      --blue:#2f6fbb; --blue2:#e6f0fb; --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4;
+      --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(123,94,167,.10), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.74}
+    .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 64px}
+    .hero{background:linear-gradient(135deg,#0b3f30,#0e7658 55%,#3a3a85);color:#fff;border-radius:26px;padding:34px 38px;box-shadow:0 20px 54px rgba(20,64,49,.20);position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:380px;height:380px;border-radius:50%;right:-120px;top:-150px;background:rgba(255,255,255,.10)}
+    .eyebrow{letter-spacing:.2em;color:#c9f0d6;font-weight:800;font-size:13px}
+    h1{margin:12px 0 12px;font-size:32px;line-height:1.3}
+    .hero p{max-width:1050px;margin:0;color:#e9fff0;font-size:16px}
+    .hero-slogan{margin-top:20px;font-size:19px;font-weight:700;color:#bff0cf;
+      background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.35);border-radius:16px;padding:16px 20px;display:inline-block;max-width:100%}
+    .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}
+    .nav>div{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.13);border-radius:14px;padding:10px;text-align:center;backdrop-filter:blur(6px)}
+    .nav b{display:block;font-size:17px;color:#fff}
+    .nav span{font-size:11.5px;color:#d6f1e4}
+    section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 28px;margin-top:22px;box-shadow:var(--shadow)}
+    h2{margin:0 0 14px;font-size:22px;display:flex;align-items:center;gap:10px;color:var(--ink);flex-wrap:wrap}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:var(--blue);color:#fff}
+    h2 .s.t{background:var(--teal);color:#fff}
+    h2 .s.r{background:var(--red);color:#fff}
+    h2 .s.p{background:var(--purple);color:#fff}
+    h3{font-size:16px;margin:16px 0 8px}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf0}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}.formula .y{color:#ffe08a}.formula .p{color:#d3b8ff}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+    .pill.g{background:var(--green2);color:var(--green)}.pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}.pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.t{background:var(--teal2);color:var(--teal)}.pill.p{background:var(--purple2);color:var(--purple)}
+    .grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .sp12{grid-column:span 12}.sp6{grid-column:span 6}.sp4{grid-column:span 4}.sp8{grid-column:span 8}
+    .method{border:1px solid var(--line);border-radius:16px;background:#fbfdf9;padding:16px 18px;margin:12px 0}
+    .method .mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .method .mname{font-weight:800;font-size:16px;color:var(--green)}
+    .method .muse{font-size:12.5px;color:var(--sub)}
+    .method .pitch{margin-top:8px;font-size:13.5px;background:var(--green2);border-radius:10px;padding:8px 12px;color:var(--greenDeep)}
+    .stars{color:var(--orange);font-size:12px;white-space:nowrap}
+    .note{color:var(--sub);font-size:12.5px}
+    .lead{border-left:5px solid var(--green);background:#f0f7ee;border-radius:12px;padding:12px 16px;font-size:15px;margin:10px 0}
+    .footernote{color:var(--sub);font-size:12.5px;margin-top:6px}
+    .footer{margin-top:22px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .hlp{background:linear-gradient(120deg,#ece4ff,#dacfff);padding:0 4px;border-radius:4px}
+    .divider{height:1px;background:var(--line);margin:20px 0}
+    @media (max-width:980px){.sp4,.sp6,.sp8,.sp12,.nav{grid-column:span 12;grid-template-columns:1fr}.grid12{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:22px}h1{font-size:23px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 头部 ===== -->
+  <div class="hero">
+    <div class="eyebrow">方法体系与创新点 · 可上台讲述版</div>
+    <h1>烤房智管平台：方法全家桶与创新点总览</h1>
+    <p>
+      本页把四大业务（健康 / 寿命 / 新建选址 / 烟农画像及预警）现在用的方法<b>如实交底</b>，
+      并为每一块配上"有名、可解释、经得起追问"的<b>提级方法</b>，每个方法给一句话答辩话术。
+      原则始终是：<b>只加不改、不推翻既有结果、机理保底、数据与机理结合</b>。
+    </p>
+    <div class="hero-slogan">
+      🎯 一句话定位：&nbsp;AHP-熵权组合赋权（定权重）＋ 威布尔/生存分析（算寿命）＋ 灰色 GM(1,1)（预测寿命与规模）＋ FMEA（排风险）＋ 区位熵·最大覆盖·MILP（选新建）＋ TOPSIS（抬排序）——综合评价—可靠性—选址决策一体化平台。
+    </div>
+    <div class="nav">
+      <div><b>现状交底</b><span>四大业务都用什么</span></div>
+      <div><b>定权区</b><span>AHP·熵权</span></div>
+      <div><b>寿命区</b><span>威布尔·生存·GM</span></div>
+      <div><b>决策区</b><span>FMEA·TOPSIS·选址</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 一、现状交底 ===== -->
+  <section>
+    <h2><span class="s">现状 · 诚实交底</span> 四大业务现在分别是什么方法</h2>
+    <p class="lead">很多汇报容易"给旧工作贴高端名字"而穿帮。本方案坚持<b>先如实讲现状</b>——现有四大块本质是"主观定权 + 线性加权 + 阈值分级"的一套可解释规则体系。讲清楚这个，后面的提级才有说服力。</p>
+    <table>
+      <thead><tr><th>业务</th><th>现状计算</th><th>方法本质</th><th>缺什么</th></tr></thead>
+      <tbody>
+        <tr><td><b>健康分</b></td><td class="num">H=80%部件+10%管护+10%人工；部件 CDCI 三段退化 + 维修回春 + 5年兜底</td><td><span class="pill g">加权综合指数（主观定权）</span></td><td>权重是经验拍的，无科学验证</td></tr>
+        <tr><td><b>剩余寿命</b></td><td class="num">R_b=0.6·min+0.4·avg；RUL=R_b×(0.75+H/400)</td><td><span class="pill o">短板约束＋加权外推</span></td><td>寿命靠公式外推，未做可靠性建模</td></tr>
+        <tr><td><b>新建/选址</b></td><td class="num">V=50%烤能+30%承载+20%发展因子；状态折算+分档</td><td><span class="pill b">加权指数＋阈值</span></td><td>“够不够”“建哪、建几栋”靠人工判断</td></tr>
+        <tr><td><b>烟农画像/预警</b></td><td class="num">五维加权分级；风险 Top3；预警 4 档切阈值</td><td><span class="pill p">加权＋阈值分级</span></td><td>风险排序、预警判据偏经验</td></tr>
+      </tbody>
+    </table>
+    <div class="box blue"><span class="h">创新主线</span>
+      <p style="margin:0">把上面<b>每一个拍脑袋环节</b>，替换成<b>一个有名、有数学背书</b>的方法——不是推翻计算，而是让每个环节都"说得清为什么这样"。</p>
+    </div>
+  </section>
+
+  <!-- ===== 二、定权区 ===== -->
+  <section>
+    <h2><span class="s">定权区</span> 把"拍的权重"升级成"科学定权"——AHP + 熵权组合</h2>
+    <div class="grid12">
+
+      <div class="sp6 method">
+        <div class="mhead">
+          <span class="mname">AHP 层次分析法</span><span class="stars">★★★★★ 最有名</span>
+        </div>
+        <div class="muse">用途：给健康分 80/10/10、发展指数 50/30/20 重新科学定权</div>
+        <div class="formula">① 同一层指标两两比较打 1–9 分 → 判断矩阵 A
+② 求最大特征值 λmax 对应特征向量 → 归一化即权重 w
+③ 一致性检验：CI=(λmax−n)/(n−1)，CR=CI/RI &lt; 0.1 通过</div>
+        <div class="pitch">🗣 "健康分这三个维度 80/10/10 不是拍出来的，是 AHP 两两比较打分、通过了一致性检验算出来的。"</div>
+      </div>
+
+      <div class="sp6 method">
+        <div class="mhead">
+          <span class="mname">熵权法 + AHP-熵权组合赋权</span><span class="stars">★★★★★ 高光</span>
+        </div>
+        <div class="muse">用途：提供客观权重，与 AHP 主观权重合并，双校验</div>
+        <div class="formula">指标信息熵  e_j = −(1/ln n) Σ p_ij·ln p_ij
+客观权重  w_j = (1−e_j) / Σ(1−e_j)     // 数据离散度越大权重越高
+组合赋权  W积 = w主观^α · w客观^(1−α)    // 乘法归一，α∈[0,1]</div>
+        <div class="pitch">🗣 "我们既有人对业务的理解（AHP），又有数据自己的意见（熵权），两套权重一比对——如果对着，说明客观规律支持业务判断；要是对着我们是错的，我们也会亮出来改。"</div>
+      </div>
+
+    </div>
+    <p class="note">好处：从"老师教什么就是什么"变成"老师 + 数据互相背书"。这是最容易让评委点头的"科学性"提升点。</p>
+  </section>
+
+  <!-- ===== 三、寿命区 ===== -->
+  <section>
+    <h2><span class="s t">寿命区</span> 把"公式外推"升级成"可靠性建模说真话"——威布尔 / 生存分析 / 灰色 GM</h2>
+    <div class="grid12">
+
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">威布尔分布</span><span class="stars">★★★★★ 可靠性金标准</span></div>
+        <div class="muse">用途：逐部件寿命分布建模，直接输出"用 N 年可靠度 90%"</div>
+        <div class="formula">可靠度 R(t) = e^( −(t/η)^β )
+η 尺度参数、β 形状参数(老化类型)：
+  β&lt;1 早期失效 · β=1 随机失效 · β&gt;1 老化损耗</div>
+        <div class="pitch">🗣 "我们不只回答'还能用几年'，还回答'用 3 年可靠度还有 92%'——这是可靠性工程的标准语言。"</div>
+      </div>
+
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">生存分析</span><span class="stars">★★★★★ 高光</span></div>
+        <div class="muse">用途：用真实维修/报废时间画生存曲线，找寿命影响因素（Cox）</div>
+        <div class="formula">Kaplan-Meier 生存曲线：S(t)=∏(1 − d_j/n_j)
+Cox 风险回归：h(t)=h₀(t)·e^(β₁X₁+…+βₖXₖ)
+→ 输出"某因素每提升一档，寿命风险升高/降低多少"</div>
+        <div class="pitch">🗣 "我们把维修台账当'真实事件数据'来用——哪个部件几年后坏、坏前修了几次，生存曲线里全看得见，不用一条造假数据。"</div>
+      </div>
+
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">灰色预测 GM(1,1)</span><span class="stars">★★★★ 小样本正解</span></div>
+        <div class="muse">用途：替代 LSTM 的诚实之选——几组数据就能预测寿命/规模趋势</div>
+        <div class="formula">原始序列 x(0) → 累加生成 x(1)
+建立白化微分方程 dx(1)/dt + a·x(1) = b
+解出预测式：x̂(1)(k+1) = (x(0)(1) − b/a)·e^(−ak) + b/a
+后验差比 C 校验精度</div>
+        <div class="pitch">🗣 "我们数据量不大，所以时序预测用灰色系统理论——它专为小样本预测而生，比硬上大数据模型更诚实、也更稳。"</div>
+      </div>
+
+    </div>
+    <div class="box purple">
+      <span class="h">为什么这套"替代 LSTM"更聪明</span>
+      <p style="margin:0">LSTM 需要海量逐日/逐月时序数据，而咱只有年粒度 + 台账。威布尔/生存分析把数据<b>当成可靠性工程事件</b>用，GM(1,1) 天生小样本——三者都不需要造假造大数据，且全部有名、有教科书、评审问不倒。</p>
+    </div>
+  </section>
+
+  <!-- ===== 四、预警区 ===== -->
+  <section>
+    <h2><span class="s r">预警区</span> 把"拍 Top3"升级成工程级风险排——FMEA / 帕累托</h2>
+    <div class="grid12">
+      <div class="sp6 method">
+        <div class="mhead"><span class="mname">FMEA 失效模式与影响分析</span><span class="stars">★★★★★ 工程圈公认</span></div>
+        <div class="muse">用途：替换"风险缺口 Top3"，每个部件给风险优先数 RPN</div>
+        <div class="formula">每个部件三张分（1–10）：
+  严重度 S × 发生频度 O × 可探测度 D
+风险优先数 RPN = S × O × D   → 从大到小排序
+（对应现行 Kᵢ 风险加权：Gapᵢ × 自控1.25/加热1.15…可映射上）</div>
+        <div class="pitch">🗣 "我们不说'这部件看着重要'，而是每个部件算了 FMEA 的风险优先数（严重度×发生×探测），谁的 RPN 高就先修谁——这是汽车、装备行业的标准做法。"</div>
+      </div>
+      <div class="sp6 method">
+        <div class="mhead"><span class="mname">帕累托 ABC 分析</span><span class="stars">★★★★ 二八定律</span></div>
+        <div class="muse">用途：维修派工——20% 部件贡献 80% 风险</div>
+        <div class="formula">按 RPN 降序累计占比：
+  A 类(累≤80%) → 重点优先维修
+  B 类(80–95%) → 次重点
+  C 类(95–100%) → 日常巡检</div>
+        <div class="pitch">🗣 "我们先让 FMEA 算出风险，再用帕累托告诉您：把力量集中在 A 类那 20% 部件上，就解决 80% 的问题。"</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 五、决策/排序区 ===== -->
+  <section>
+    <h2><span class="s b">决策区</span> 把排序与选址升级成真方法——TOPSIS / 区位熵 / 最大覆盖 / MILP</h2>
+
+    <div class="method">
+      <div class="mhead"><span class="mname">TOPSIS 逼近理想解法</span><span class="stars">★★★★★ 有名</span></div>
+      <div class="muse">用途：村级新建排序、烟农画像排序</div>
+      <div class="formula">① 归一化指标矩阵
+② 找正理想解 Z+（每项最优）与负理想解 Z−（每项最差）
+③ 贴进度 Cᵢ = D⁻ / (D⁺ + D⁻)   → Cᵢ 越大越优，排序</div>
+      <div class="pitch">🗣 "我们排第一的村，不只是 50/30/20 加出来的，而是离'理想村庄'最近、离'最差村庄'最远——TOPSIS 是公认的多准则排序法。"</div>
+    </div>
+
+    <div class="grid12">
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">区位熵 LQ</span><span class="stars">★★★★★ 判"够不够"</span></div>
+        <div class="muse">用途：客观判断某村烤房相对全县是紧张还是富余</div>
+        <div class="formula">LQ = (村烤房密度 / 村烟叶需求)
+             / (全县烤房密度 / 全县烟叶需求)
+LQ &gt; 1 → 相对充足 · LQ &lt; 1 → 相对不足</div>
+        <div class="pitch">🗣 "我们先用区位熵回答'这村烤房是真缺还是假缺'，避免拿钱到处乱建。"</div>
+      </div>
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">最大覆盖选址</span><span class="stars">★★★★ 怎么建最划算</span></div>
+        <div class="muse">用途：让新建烤房尽量覆盖更多烟农</div>
+        <div class="formula">在给定要建栋数下：
+max Σ 被覆盖的烟农需求量
+s.t. 每栋容量 ∈ 可选容量档 · 位置可达距离约束</div>
+        <div class="pitch">🗣 "我们在需求最集中的位置优先建，让每栋新烤房覆盖最多的烟农户。"</div>
+      </div>
+      <div class="sp4 method">
+        <div class="mhead"><span class="mname">整数规划 MILP</span><span class="stars">★★★★★ 高光</span></div>
+        <div class="muse">用途：在预算×栋数×容量约束下给出最优补建方案</div>
+        <div class="formula">目标：min 总成本 或 max 覆盖缺口
+约束：Σ 栋数 ≤ 预算可用 · Σ 容量 ≤ 容量上限
+      每栋是否为选 yᵢ ∈ {0,1}
+求解：分支定界 → "建哪几栋、每栋多大"最优解</div>
+        <div class="pitch">🗣 "现在的'推荐新建栋数'以前靠估，现在用整数规划在预算约束里算出的，是可执行、可说明的最优方案。"</div>
+      </div>
+    </div>
+    <p class="note">衔接：现有字段 <code>recommended_new_barns</code> 即可从"估算法"平滑升级为"MILP 最优解"，不动旧表。</p>
+  </section>
+
+  <!-- ===== 六、总览表 ===== -->
+  <section>
+    <h2><span class="s">总览</span> 一张表看清：四大业务现状 → 提级方法 → 创新点</h2>
+    <table>
+      <thead><tr><th>业务</th><th>现状环节</th><th>提级方法</th><th>一句话创新点</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2"><b>定权重</b></td><td>健康分 80/10/10 权重</td><td><span class="pill g">AHP+熵权组合赋权</span></td><td>权重从"经验拍"变"主观×客观双背书"</td></tr>
+        <tr><td colspan="3" class="note" style="color:var(--sub)">公式不动，只把权重来源升级为 AHP 一致性检验 + 熵权客观校验。</td></tr>
+        <tr><td rowspan="2"><b>寿命</b></td><td>RUL 公式外推</td><td><span class="pill t">威布尔 + 生存分析 + GM(1,1)</span></td><td>寿命从"外推"变"可靠性建模+真实事件数据"</td></tr>
+        <tr><td colspan="3" class="note" style="color:var(--sub)">以可靠度 R(t) 与生存曲线输出，GM(1,1) 补小样本趋势。</td></tr>
+        <tr><td rowspan="2"><b>预警/风险</b></td><td>风险 Top3 / 阈值切档</td><td><span class="pill r">FMEA RPN + 帕累托 ABC</span></td><td>风险排序升级为工程标准"严重度×发生×探测"</td></tr>
+        <tr><td colspan="3" class="note" style="color:var(--sub)">输出从"前三"变"全体 RPN 排序 + A 类派工清单"。</td></tr>
+        <tr><td rowspan="2"><b>新建/选址</b></td><td>发展指数 50/30/20 + 估栋数</td><td><span class="pill b">区位熵 + 最大覆盖 + MILP</span></td><td>"够不够·建哪·建几栋"全有客观算法背书</td></tr>
+        <tr><td colspan="3" class="note" style="color:var(--sub)">区位熵判需求，最大覆盖定位置，MILP 给预算内最优方案。</td></tr>
+        <tr><td rowspan="2"><b>排序</b></td><td>村级/烟农人工加权排序</td><td><span class="pill p">TOPSIS</span></td><td>排序升级为"离理想解最近"的多准则决策</td></tr>
+        <tr><td colspan="3" class="note" style="color:var(--sub)">可延展到烟农画像、网点、合作社服务排序。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== 七、合成一体平台 ===== -->
+  <section>
+    <h2><span class="s o">打包</span> 合成一句话"一体化平台"给评委收尾</h2>
+    <div class="box purple">
+      <p style="font-size:16px;font-weight:700;margin:0;color:var(--greenDeep)">
+        "我们的烤房智管平台，是<b>AHP-熵权组合赋权</b>（科学定权重）＋<b>威布尔可靠度与生存分析</b>（真实算寿命）＋<b>灰色 GM(1,1)</b>（小样本预测寿命与规模）＋<b>FMEA 风险优先数</b>（工程级排风险）＋<b>区位熵·最大覆盖·整数规划</b>（客观选新建）＋<b>TOPSIS</b>（多准则排序）——一套<b>综合评价—可靠性—选址决策</b>一体化的智能管理平台。"
+      </p>
+    </div>
+    <div class="box blue">
+      <div class="h">给评委的口碑收尾（记忆点）</div>
+      <ul style="margin:4px 0 0 18px;padding:0">
+        <li>权重不是拍的 —— 是 AHP 加熵权算的；</li>
+        <li>寿命不是臆的 ---- 是可靠性工程算的；</li>
+        <li>风险不是猜的 ---- 是 FMEA 排的；</li>
+        <li>新建不是估的 ---- 是数学规划解的。</li>
+      </ul>
+      <p style="margin-top:8px">四个"不是…是…"，一句话全记住。</p>
+    </div>
+    <div class="footernote">参考：0905 健康分/寿命/千亩村发展指数三份方案、算法模型0901系列。本页为"方法与创新点包装"，不改动既有落库参数；落地时按"新增字段+新接口+新视图"增补，不碰旧表旧流程。</div>
+    <div class="footer">烤房智管 · 方法体系与创新点总览 · 2026-09-05</div>
+  </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<mxfile host="app.diagrams.net" agent="Codex">
+  <diagram id="barn-health-onepage" name="烤房健康评估模型（健康分+剩余寿命）">
+    <mxGraphModel dx="1778" dy="1036" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1050" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#23313F;fontSize=34;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="烤房健康评估模型（健康分计算＋剩余寿命预测）" vertex="1">
+          <mxGeometry height="52" width="1680" x="60" y="22" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="以单栋烤房为评价对象，将部件状态、使用年限、维修记录、管护方式和人工评价转化为健康等级、剩余寿命及风险部位" vertex="1">
+          <mxGeometry height="30" width="1680" x="60" y="76" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="whiteSpace=wrap;html=1;rounded=0;arcSize=0;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="1" width="1680" x="60" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#F4F6F8;strokeColor=#24537A;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="650" width="325" x="45" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="650" width="650" x="400" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="650" width="390" x="1085" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#FBF3E5;strokeColor=#C7923E;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="650" width="240" x="1515" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="9" edge="1" parent="1" source="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#24537A;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#24537A;strokeColor=#24537A;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;数据输入&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;基础台账＋动态业务记录&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="321" x="47" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#4F81BD;strokeColor=#4F81BD;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;逐部件计算&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;12个部件依次计算并归一化&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="631" x="412" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#2F7D61;strokeColor=#2F7D61;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;整栋综合评估&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;健康分校准剩余寿命&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="386" x="1087" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#C7923E;strokeColor=#C7923E;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;模型输出&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;支撑排查与修复决策&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="236" x="1517" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;① 基础档案&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;建成年份、烤房容量、使用状态&lt;/span&gt;" vertex="1">
+          <mxGeometry height="105" width="285" x="65" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;② 部件数据&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;状态、指导寿命、权重、最近修复年份&lt;/span&gt;" vertex="1">
+          <mxGeometry height="105" width="285" x="65" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;③ 检查与评价&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;部件检查评价 C_eval、整栋人工评价 E&lt;/span&gt;" vertex="1">
+          <mxGeometry height="105" width="285" x="65" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;④ 管护与维修&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;管护方式 M、维修动作、维修完成年、费用记录&lt;/span&gt;" vertex="1">
+          <mxGeometry height="105" width="285" x="65" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#24537A;strokeColor=#24537A;strokeWidth=1;fontColor=#FFFFFF;fontSize=15;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="当前年份作为统一计算基准" vertex="1">
+          <mxGeometry height="42" width="285" x="65" y="748" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#4F81BD;strokeWidth=2;fontColor=#23313F;fontSize=21;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;① 计算部件剩余年限&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color: rgb(35, 49, 63);&quot;&gt;已用年限 = 当前年 − max（建成年，最近维修完工年）&lt;br&gt;remainingᵢ = max〔0，（指导寿命 − 已用年限）×S_status〕&lt;br&gt;状态系数：正常1.0 · 异常0.7 · 损坏0.3 · 缺失0&lt;/span&gt;" vertex="1">
+          <mxGeometry height="155" width="608" x="435" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#6750A4;strokeWidth=2;fontColor=#23313F;fontSize=21;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;② 计算单个部件健康分&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color: rgb(35, 49, 63);&quot;&gt;R_remain = remainingᵢ ÷ 指导寿命&lt;br&gt;scoreᵢ = 100 ×（0.50S_status + 0.35R_remain +0.15C_eval）&lt;br&gt;C_eval：优良/好1.0 · 差0.5 · 缺省0.8&lt;/span&gt;" vertex="1">
+          <mxGeometry height="155" width="631" x="410" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#23313F;fontSize=21;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;③ 部件归一化与风险排序&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color: rgb(35, 49, 63);&quot;&gt;contributionᵢ = weightᵢ × scoreᵢ ÷ 100&lt;br&gt;P_norm = Σcontributionᵢ ÷ Σweightᵢ × 100&lt;br&gt;按健康缺口×部件重要度排序，提取风险部位TOP3&lt;/span&gt;" vertex="1">
+          <mxGeometry height="155" width="585" x="435" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="24" edge="1" parent="1" source="21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" edge="1" parent="1" source="22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6750A4;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="26" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#2F7D61;strokeWidth=3;fontColor=default;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;b&gt;&lt;span&gt;④ 整栋健康分 H&lt;/span&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span&gt;&lt;b&gt;H = 0.80P_norm + 0.10M + 0.10E&lt;/b&gt;&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;M：集中管护100 · 分户管护80&lt;br&gt;E：好100 · 中80 · 差50&lt;br&gt;结果限定在0—100分&lt;/span&gt;" vertex="1">
+          <mxGeometry height="230" width="340" x="1110" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="27" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#6750A4;strokeWidth=3;fontColor=default;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;b&gt;&lt;span&gt;⑤ 整栋剩余寿命 life&lt;/span&gt;&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span&gt;&lt;b&gt;life = clamp〔（0.60×短板寿命&lt;br&gt;＋0.40×部件加权平均寿命）×F_h，0，15〕&lt;/b&gt;&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;F_h = clamp（0.75＋H/400，0.60，1.10）&lt;br&gt;预计退役年 = 当前年＋ceil（life）&lt;/span&gt;" vertex="1">
+          <mxGeometry height="250" width="340" x="1110" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="28" edge="1" parent="1" source="26" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="27" value="健康分校准">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="29" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;健康结果&lt;/b&gt;&lt;br&gt;&lt;span&gt;健康分、健康等级&lt;br&gt;风险部位TOP3&lt;/span&gt;" vertex="1">
+          <mxGeometry height="112" width="200" x="1535" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="30" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;寿命结果&lt;/b&gt;&lt;br&gt;&lt;span&gt;预测剩余年限&lt;br&gt;预计退役年份&lt;/span&gt;" vertex="1">
+          <mxGeometry height="112" width="200" x="1535" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="31" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#52A36C;strokeWidth=2;fontColor=#23313F;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;健康等级&lt;/b&gt;&lt;br&gt;&lt;span&gt;≥90 优良 · ≥75 良好&lt;br&gt;≥60 一般 · ≥40 预警&lt;br&gt;&amp;lt;40 危险&lt;/span&gt;" vertex="1">
+          <mxGeometry height="125" width="228" x="1520" y="515" as="geometry" />
+        </mxCell>
+        <mxCell id="32" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#B85450;strokeWidth=2;fontColor=#23313F;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;寿命预警&lt;/b&gt;&lt;br&gt;&lt;span&gt;≤0 紧急维修&lt;br&gt;≤4 建议维修 ·&amp;nbsp;&lt;/span&gt;&lt;div&gt;&lt;span&gt;≤7 关注&lt;br&gt;&amp;gt;7 正常&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="228" x="1525" y="658" as="geometry" />
+        </mxCell>
+        <mxCell id="33" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#B8C5CF;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="165" width="1710" x="45" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#24537A;strokeColor=#24537A;strokeWidth=1;fontColor=#FFFFFF;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;12个部件参数&lt;/b&gt;&lt;br&gt;&lt;span&gt;W＝权重&lt;br&gt;L＝指导寿命（年）&lt;/span&gt;" vertex="1">
+          <mxGeometry height="161" width="210" x="47" y="852" as="geometry" />
+        </mxCell>
+        <mxCell id="35" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FBF3E5;strokeColor=#C7923E;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;加热&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;加热器 W15/L12&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="190" x="275" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="36" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;散热&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;散热管 W4/L12　炉膛 W4/L12&lt;br&gt;清灰门 W3/L12　烟囱 W4/L12&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="315" x="490" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="37" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#F3EFFA;strokeColor=#6750A4;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;自控&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;主板 W8/L6　探头 W6/L6&lt;br&gt;水壶传感 W6/L6　风机 W5/L10&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="335" x="830" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="38" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;主体&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;屋顶/墙体 W10/L15&lt;br&gt;挂烟梁柱 W5/L10　大门 W10/L10&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="535" x="1190" y="875" as="geometry" />
+        </mxCell>
+        <mxCell id="39" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FBEDEC;strokeColor=#B85450;strokeWidth=2;fontColor=#B85450;fontSize=16;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="维修完成 → 使用年限按完工年重置＋健康加分 → 重新计算健康分与剩余寿命" vertex="1">
+          <mxGeometry height="36" width="590" x="630" y="808" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

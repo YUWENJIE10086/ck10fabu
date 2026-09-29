@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新建选址沙盘演练落地实现说明</title>
+  <style>
+    :root {
+      --ink: #17342b;
+      --muted: #667a72;
+      --line: #d8e5de;
+      --bg: #eef5f1;
+      --panel: #ffffff;
+      --green: #237a5b;
+      --gold: #b87922;
+      --red: #b74335;
+      --blue: #2f6f8d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background:
+        linear-gradient(180deg, #fbfdfb 0%, var(--bg) 100%),
+        repeating-linear-gradient(90deg, rgba(35, 122, 91, .05) 0 1px, transparent 1px 42px);
+      line-height: 1.72;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 42px 28px 72px; }
+    .hero {
+      background: var(--panel);
+      border-left: 8px solid var(--green);
+      border-radius: 8px;
+      padding: 22px 26px;
+      box-shadow: 0 18px 42px rgba(34, 76, 58, .1);
+    }
+    h1 { margin: 0; font-size: 31px; letter-spacing: 0; }
+    .sub { margin-top: 8px; color: var(--muted); }
+    h2 { margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 22px; }
+    h3 { margin: 22px 0 8px; color: var(--green); font-size: 17px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .metric { font-size: 28px; font-weight: 800; color: var(--green); }
+    .label { color: var(--muted); font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin: 12px 0 18px; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #e7f2ed; color: #17342b; }
+    .formula {
+      background: #10251e;
+      color: #eafff6;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      overflow-x: auto;
+    }
+    .note {
+      background: #fff8ea;
+      border: 1px solid #ecd5a9;
+      border-left: 5px solid var(--gold);
+      border-radius: 8px;
+      padding: 13px 15px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: rgba(35, 122, 91, .1);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    @media (max-width: 760px) {
+      main { padding: 26px 16px 48px; }
+      h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>新建选址沙盘演练落地实现说明</h1>
+      <div class="sub">本版已经把“新建选址”从 1:1 复制页推进为可演示的融合沙盘：用户可以选情景、看推荐、落候选点、解释为什么优先。</div>
+    </section>
+
+    <h2>一、页面动作怎么做</h2>
+    <table>
+      <tr><th>顺序</th><th>用户动作</th><th>系统动作</th><th>解释口径</th></tr>
+      <tr><td>1</td><td>选择发展情景</td><td>在“当前规模、增长2%、增长5%、增长10%”之间切换</td><td>先明确是按现状判断，还是按未来规模增长做压力测试。</td></tr>
+      <tr><td>2</td><td>调整融合权重</td><td>滑块控制负载缺口、发展指数、规模趋势、政策管护</td><td>不同决策场景权重不同：缺烤房优先看负载，规划建设要叠加发展潜力。</td></tr>
+      <tr><td>3</td><td>查看融合推荐村</td><td>系统按融合分排序 TOP 村</td><td>不再只看“谁负载高”，而是看“谁既缺、又有发展基础”。</td></tr>
+      <tr><td>4</td><td>地图点击新增点</td><td>候选点归并到乡镇和行政村，新增数+1</td><td>把“我要在这里建一座”变成对该村供需账本的变化。</td></tr>
+      <tr><td>5</td><td>看当前候选点影响村</td><td>右侧显示负载前后、县均对比、发展指数、融合分</td><td>回答“这个点为什么有效、对哪个村有效、还缺不缺”。</td></tr>
+      <tr><td>6</td><td>输出方案</td><td>后续可导出推荐村、候选点、融合依据</td><td>形成可汇报的新建选址依据链。</td></tr>
+    </table>
+
+    <h2>二、千亩村发展指数怎么写</h2>
+    <p>页面上建议写成“发展指数/20”，并拆成五条小进度条，避免只出现一个难解释的综合分。</p>
+    <div class="formula">千亩村发展指数 = 集体经济基础 + 管护服务能力 + 政策争取能力 + 种植规模趋势 + 发展承载空间<br>每项满分4分，总分20分；百分制 = 合计 / 20 × 100</div>
+    <table>
+      <tr><th>页面字段</th><th>来自 Excel</th><th>解释</th></tr>
+      <tr><td>集体经济基础</td><td>赋分 sheet：村级集体经济收益</td><td>说明村里组织和承接项目的基础能力。</td></tr>
+      <tr><td>管护服务能力</td><td>赋分 sheet：村烤房管护服务</td><td>说明新增烤房建成后能不能稳定运维。</td></tr>
+      <tr><td>政策争取能力</td><td>赋分 sheet：村争取政策</td><td>说明项目资金和政策资源争取能力。</td></tr>
+      <tr><td>种植规模趋势</td><td>赋分 sheet + 24-26 年面积情况</td><td>说明烟叶面积和产量是否持续增长。</td></tr>
+      <tr><td>发展承载空间</td><td>赋分 sheet + 15个千亩村情景表</td><td>说明增长2%、5%、10%后，烤房承载是否还能跟上。</td></tr>
+    </table>
+
+    <h2>三、融合推荐怎么解释</h2>
+    <div class="formula">融合优先级 = 0.50 × 负载缺口得分 + 0.25 × 千亩村发展指数得分 + 0.15 × 规模趋势得分 + 0.10 × 政策管护保障得分</div>
+    <p>推荐理由要用自然语言说清楚，例如：</p>
+    <table>
+      <tr><th>推荐动作</th><th>解释句式</th></tr>
+      <tr><td><span class="tag">优先落点</span></td><td>该村在当前情景下负载率较高，且发展指数靠前，新增烤房既能缓解当前供需缺口，也具备后续承接基础。</td></tr>
+      <tr><td><span class="tag">重点比选</span></td><td>该村存在一定负载压力或发展潜力，但需和相邻村比较新增后改善幅度。</td></tr>
+      <tr><td><span class="tag">观察补点</span></td><td>该村负载接近饱和，可作为下一轮补点储备。</td></tr>
+      <tr><td><span class="tag">潜力储备</span></td><td>该村发展指数较好，但当前负载压力不强，暂不作为第一优先级。</td></tr>
+    </table>
+
+    <h2>四、这次已写进代码的界面</h2>
+    <table>
+      <tr><th>位置</th><th>已实现内容</th></tr>
+      <tr><td>顶部策略面板</td><td>新增“选择情景 → 推荐村 → 地图落点 → 看影响 → 出解释”的动作流。</td></tr>
+      <tr><td>情景控制</td><td>新增当前规模、增长2%、增长5%、增长10%切换。</td></tr>
+      <tr><td>权重控制</td><td>新增负载缺口、发展指数、规模趋势、政策管护四个滑块。</td></tr>
+      <tr><td>右侧影响村</td><td>新增发展指数、融合优先级、推荐动作和解释文案。</td></tr>
+      <tr><td>推荐榜</td><td>从“按优先级指数”改为“融合推荐村”。</td></tr>
+      <tr><td>底部分村表</td><td>新增情景后负载、发展指数、融合分、推荐动作。</td></tr>
+    </table>
+
+    <h2>五、后续代码升级路径</h2>
+    <table>
+      <tr><th>阶段</th><th>动作</th><th>原因</th></tr>
+      <tr><td>第一步</td><td>保持当前前端常量演示</td><td>快速验证页面动作和讲法是否符合汇报需求。</td></tr>
+      <tr><td>第二步</td><td>新增后端接口返回千亩村发展指数</td><td>把 Excel 三张表数据正式变成接口数据，避免前端硬编码。</td></tr>
+      <tr><td>第三步</td><td>融合推荐接口落库或实时计算</td><td>让推荐榜、导出方案和沙盘结果保持同一套口径。</td></tr>
+      <tr><td>第四步</td><td>增加导出方案按钮</td><td>把选址演练结果转成可汇报材料。</td></tr>
+    </table>
+
+    <div class="note">边界保持不变：本页的“新建选址沙盘演练”不做地形环境选址模型，重点围绕烟叶收购量、烤房承载、千亩村发展指数和政策管护保障来解释新增需求。</div>
+  </main>
+</body>
+</html>

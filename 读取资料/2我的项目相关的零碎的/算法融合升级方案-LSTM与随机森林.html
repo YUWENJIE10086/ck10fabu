@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>算法融合升级方案 · 机理内核 + LSTM时序寿命 + 随机森林预警</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#e4f3e2; --greenDeep:#0f241f;
+      --teal:#11888a; --teal2:#dff3f2; --orange:#e08628; --orange2:#fff0dc;
+      --blue:#2f6fbb; --blue2:#e6f0fb; --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4;
+      --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(137,132,230,.10), transparent 24%),var(--bg);
+      color:var(--ink);line-height:1.75}
+    .wrap{max-width:1260px;margin:0 auto;padding:28px 24px 60px}
+    .hero{background:linear-gradient(135deg,#0b3f30,#0e7658 55%,#3a3a85);color:#fff;border-radius:26px;padding:34px 38px;box-shadow:0 20px 54px rgba(20,64,49,.20);position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;right:-120px;top:-140px;background:rgba(255,255,255,.10)}
+    .eyebrow{letter-spacing:.18em;color:#c9f0d6;font-weight:800}
+    h1{margin:10px 0 12px;font-size:34px;line-height:1.25}
+    .hero p{max-width:1020px;margin:0;color:#e9fff0;font-size:16px}
+    .hero-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    .chip{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.26);font-size:13px;backdrop-filter:blur(6px)}
+    .chip b{color:#bff0cf}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+    .kpi>div{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,var(--green2));border:1px solid #d8e8d4}
+    .kpi b{display:block;font-size:22px;color:var(--green)}
+    .kpi span{font-size:12.5px;color:var(--sub)}
+    section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 28px;margin-top:22px;box-shadow:var(--shadow)}
+    h2{margin:0 0 14px;font-size:22px;display:flex;align-items:center;gap:10px;color:var(--ink)}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:var(--blue);color:#fff}
+    h2 .s.t{background:var(--teal);color:#fff}
+    h2 .s.r{background:var(--red);color:#fff}
+    h2 .s.p{background:var(--purple);color:#fff}
+    h3{font-size:16px;margin:18px 0 8px}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf0}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}.formula .y{color:#ffe08a}.formula .p{color:#d3b8ff}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill.g{background:var(--green2);color:var(--green)}.pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}.pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.t{background:var(--teal2);color:var(--teal)}.pill.p{background:var(--purple2);color:var(--purple)}
+    .grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .sp12{grid-column:span 12}.sp6{grid-column:span 6}.sp4{grid-column:span 4}.sp8{grid-column:span 8}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:8px 0}
+    .step{border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff;min-height:88px;position:relative}
+    .step .t{font-weight:700;font-size:13.5px;margin-bottom:3px}
+    .step .d{font-size:12px;color:var(--sub)}
+    .note{color:var(--sub);font-size:12.5px}
+    .footernote{color:var(--sub);font-size:12.5px;margin-top:6px}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .hlp{background:linear-gradient(120deg,#ece4ff,#dacfff);padding:0 4px;border-radius:4px}
+    .divider{height:1px;background:var(--line);margin:20px 0}
+    a{color:var(--green)}
+    @media (max-width:980px){.sp4,.sp6,.sp8,.sp12,.flow{grid-column:span 12;grid-template-columns:1fr}.kpi{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:22px}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 头部 ============ -->
+  <div class="hero">
+    <div class="eyebrow">三引擎升级 · 机理内核 + 机器学习增强</div>
+    <h1>烤房智管算法融合升级方案：<br />机理内核保留 + LSTM 时序寿命预测 + 随机森林预警分类</h1>
+    <p>
+      本方案在不改动现有 <b>健康分 / 剩余寿命 / 千亩村发展指数</b> 三大机理内核的前提下，新增两层数据驱动引擎——
+      <b>LSTM 长短时记忆</b> 做寿命时序预测、<b>随机森林</b> 做预警分类。机理模型负责"可解释地算分"，机器学习负责"自动地学习规律与分类"，
+      二者互为表里，既保住了已落地的业务口径，又把项目的技术档次从"规则模型"提升到"深度学习 + 机器学习双引擎"。
+    </p>
+    <div class="hero-chips">
+      <span class="chip">保留 · <b>健康分 80/10/10</b></span>
+      <span class="chip">保留 · <b>剩余寿命 短板6/4</b></span>
+      <span class="chip">保留 · <b>发展指数 50/30/20</b></span>
+      <span class="chip">新增 · <b>LSTM 时序寿命</b></span>
+      <span class="chip">新增 · <b>随机森林预警</b></span>
+    </div>
+  </div>
+
+  <!-- ============ 一、现状盘点 ============ -->
+  <section>
+    <h2><span class="s">第一步</span> 现状盘点：现在用的三个"机理模型"，能做什么、缺什么</h2>
+    <p class="box blue">
+      <span class="h">一句话现状</span>
+      当前系统跑的三个算法都是 <b>机理 / 规则驱动</b>（公式+阈值+查表），可解释性强、绝不玄学，但"学习能力"为 0——
+      它们是"算我们定好的公式"，不是"从数据里自己学到规律"。这既是优点（稳、可信），也是下一步升级的空间（缺"智能"）。
+    </p>
+    <table>
+      <thead><tr><th>算法</th><th>内核公式</th><th>本质</th><th>输出</th><th>升级前缺什么</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>健康分 H</b></td>
+          <td class="num">H = 0.80·P_norm + 0.10·M + 0.10·E；<br />P_norm 逐部件 Cᵢ=Wᵢ·Lᵢ·Sᵢ / 有效权重</td>
+          <td><span class="pill g">机理/规则</span></td>
+          <td>0–100 分 + 五档健康等级</td>
+          <td>没有"趋势"，只看当前一个截面</td>
+        </tr>
+        <tr>
+          <td><b>剩余寿命 RUL</b></td>
+          <td class="num">R_b = 0.6·min_r + 0.4·R_avg；<br />RUL = clamp(R_b × (0.75+H/400))</td>
+          <td><span class="pill o">解析外推</span></td>
+          <td>剩余年限 + 四档预警</td>
+          <td>寿命靠"外推曲线"，不是"学出来的"</td>
+        </tr>
+        <tr>
+          <td><b>发展指数 V</b></td>
+          <td class="num">V = 0.50·Hc + 0.30·Lc + 0.20·Dc</td>
+          <td><span class="pill b">加权指数</span></td>
+          <td>村级 0–100 + 新建需求分 N</td>
+          <td>村与村、部件间的复杂关联没被识别</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="box orange">
+      <span class="h">这版方案要不要 LSTM / 随机森林？—— 诚实结论</span>
+      <ul>
+        <li><b>现状：完全没用。</b>寿命不是时序预测，预警不是分类模型。这一点如实说明即可，不丢人，反而衬托出"升级有价值"。</li>
+        <li><b>能加、影响小：</b>我们只做"增强层"，坐在三个机理模型 <b>输出之上</b> 做特征与复核，核心公式与分数不变，既有页面与数据库结论不推翻。</li>
+        <li><b>真能用：</b>不必标榜"千万级数据"——2442 栋烤房 + 历年维修台账 + 逐部件指导寿命，足以重建每栋的年退化序列、训练分类器。小而真的模型，比空壳更抗评审追问。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 二、升级总架构 ============ -->
+  <section>
+    <h2><span class="s">第二步</span> 总体架构：机理层（算）→ 特征层（喂数据）→ 学习层（LSTM+随机森林）→ 决策融合层（给结论）</h2>
+    <div class="box purple">
+      <span class="h">核心设计一句话</span>
+      "把三个现有机理模型的输出，当作机器学习引擎的<b>特征和标签</b>；机理模型是老师，机器学习是助手——机理保底、机器学习增强、决策融合把关。"
+    </div>
+    <div class="formula">【第 0 层 · 机理内核（保留，可解释）】
+健康分 H        ——  已有
+剩余寿命 RUL_基    ——  已有
+发展指数 V        ——  已有
+
+【第 1 层 · 特征工程（从机理输出 + 台账构建）】
+单栋特征向量 X_i = [H, RUL_基, 短板部件剩余, 风险缺口Top3,
+                    近3年维修次数, 累计维修次数, 维修类型分布, 上次维修距今,
+                    容量, 房龄, 覆盖材料, 加热器类型, 数据完整率]
+村级特征向量 X_c = [V, Hc, Lc, Dc, 承载压力P, 新建需求N, 面积趋势]
+
+【第 2 层 · 学习引擎（新增，数据驱动）】
+引擎A  LSTM 寿命时序预测  ——  输入退化时间序列 → 输出 RUL_lstm
+引擎B  随机森林预警分类    ——  输入特征向量     → 输出 预警等级 + 概率 + 特征重要性
+
+【第 3 层 · 决策融合（把关，可解释）】
+RUL_final = α·RUL_lstm + (1−α)·RUL_基        （α建议 0.35）
+预警等级   = 随机森林主分类，机理阈值复核；不一致 → 标记"人工复核"</div>
+    <p class="note">关键：第 0 层 <b>永远不缺席</b>。机器学习只是加减法外的一层"经验加权"，即便模型再差，机理结果仍兜底输出，系统不会崩。</p>
+  </section>
+
+  <!-- ============ 三、机理模型如何"扯上钩" ============ -->
+  <section>
+    <h2><span class="s o">关键</span> 如何与现有三个算法"扯上钩"：机理输出当特征、历史台账当时序</h2>
+    <p>这是评审最可能追问的一句——"你说的机器学习，跟你们已有的三个算法到底什么关系？" 答案分三点：</p>
+    <div class="grid12">
+      <div class="box sp4">
+        <div class="h">1) 健康分 → LSTM 的"退化时序原料"</div>
+        <p>健康分目前是<b>单一截面</b>（只算当前 H）。我们把它<b>按年份回放</b>：用"建成年 + 逐年 CDCI 退化 + 维修台账回春"重建每栋 1980→2026 的健康分时间序列 H(t)。这条序列就是 LSTM 的输入。</p>
+      </div>
+      <div class="box sp4">
+        <div class="h">2) 寿命/健康 → 随机森林的"标签与特征"</div>
+        <p>用现有 RUL 规则生成训练<b>标签</b>（正常/需关注/建议维修/紧急维修四档），用 H、RUL、部件风险缺口、维修统计当<b>特征</b>。随机森林学到的本质是"什么特征组合会导致哪档预警"。机理模型是老师的答案。</p>
+      </div>
+      <div class="box sp4">
+        <div class="h">3) 发展指数 → 村级预警/选址的"上下文"</div>
+        <p>V、Hc、承载压力 P、新建需求 N 进入随机森林村级特征，让"该不该重点管某村 + 高压村预警"带上村级视角，而不是只看单栋孤例。</p>
+      </div>
+    </div>
+    <div class="box green" style="border-left-color:var(--green)">
+      <div class="h">给评委的一句话（怎么"扯上钩"）</div>
+      <p style="font-size:15px"><b>"我们的三个机理算法负责把业务逻辑算得清清楚楚，LSTM 和随机森林负责再从这些数里学出规律、自动分类、提前预警——机理是'规定动作'，机器学习是'自我进化'，两套引擎共享同一份台账，口径完全一致，互为印证。"</b></p>
+    </div>
+  </section>
+
+  <!-- ============ 四、LSTM 时序寿命预测 ============ -->
+  <section>
+    <h2><span class="s p">引擎 A</span> LSTM 时序寿命预测：从"退化的历史"预测"还能用几年"</h2>
+    <div class="grid12">
+      <div class="sp8 box">
+        <h3 style="margin-top:0">① 序列重建：把截面变成时间轴</h3>
+        <div class="formula">对每栋烤房、每个部件，逐年计算退化分 Lᵢ(t)：
+Lᵢ(t) = CDCI_t( Δt = t − max(建成年, 最近维修完工年) )   t = 建成年…2026
+  有维修台账且 end_date 非空的那一年 → Δt 重置（回春）
+
+整栋健康分序列 H(t) = 0.80·P_norm(t) + 0.10·M + 0.10·E
+得到 时间序列样本 → 用于训练</div>
+        <p class="note">用机理曲线"重建历史"是刻意为之：烤房没有 20 年的逐日传感器，但机理曲线给出了可信的年退化骨架，维修台账给出"回春点"，两相合成即有真量、又符合业务。这叫 <b>机理-数据混合式时序</b>，比纯随机的历史数据更稳。</p>
+      </div>
+      <div class="sp4 box">
+        <h3 style="margin-top:0">② 网络结构与输入输出</h3>
+        <div class="formula">输入窗口（滑窗长度 W=6 年，特征 6~12 维）：
+  X_t = [H(t), 四部位分(t), 各部件剩余年限(t),
+         维修次数(t), 使用状态]
+
+网络：
+  LSTM(64) → Dropout(0.2) → LSTM(32) → Dense(1)
+
+输出： 未来健康分 Ĥ(t+1 … t+k)，k=3~5 年
+
+寿命外推： RUL_lstm = 从当前分降到失效阈值40分的年数</div>
+      </div>
+    </div>
+    <h3>③ 融合机理寿命（不推翻原公式）</h3>
+    <div class="formula">RUL_final = clamp( 0.35 × RUL_lstm + 0.65 × RUL_基 , 0, 15 )
+一致度 = 1 − |RUL_lstm − RUL_基| / 15      // 一致性体检
+两者相差 > 3 年 → 标记 <span class="y">"ML 分歧，请人工复核"</span></div>
+    <p class="note">α=0.35：机理占大头、稳；LSTM 提供"随历史波动的细粒度修正"，又不越权。健康分每季度重跑一次，序列随之刷新，寿命随之更新。</p>
+  </section>
+
+  <!-- ============ 五、随机森林预警分类 ============ -->
+  <section>
+    <h2><span class="s p">引擎 B</span> 随机森林预警分类：从"阈值切一刀"到"模型学出来的四档判断"</h2>
+    <div class="grid12">
+      <div class="sp6 box">
+        <h3 style="margin-top:0">① 标签怎么来（一键标注，不用人工标）</h3>
+        <div class="formula">用现有机理寿命规则直接生成四档标签：
+  RUL &gt; 7     → 正常
+  4 &lt; RUL ≤ 7 → 需关注
+  0 &lt; RUL ≤ 4 → 建议维修
+  RUL ≤ 0     → 紧急维修
+Label_i 由此生成 → 训练时的"标准答案"</div>
+        <p class="note">不必请专家一条条标注，机理规则自动出标签，标注成本为零且口径与页面一致。</p>
+      </div>
+      <div class="sp6 box">
+        <h3 style="margin-top:0">② 模型与输出</h3>
+        <div class="formula">随机森林分类器：
+  500 棵树 · 每棵随机抽特征子集（√n）· 最多深度 12
+  输入 X_i（见特征工程，含 H / RUL_基 / 风险缺口 / 维修统计 / 村级 V·P·N）
+
+输出：
+  ① 预警等级（四档，与页面阈值同套四级）
+  ② 各类别概率 P(紧急维修)=0.82 → 置信度高
+  ③ 特征重要性排序 → "为什么给它这个预警"</div>
+      </div>
+    </div>
+    <h3>③ 与机理阈值互验</h3>
+    <div class="formula">结果对齐策略：
+  随机森林等级 == 机理阈值等级 → 高可信，直接展示
+  不一致 → 以机理为准展示，但弹橙色提示："ML 建议上调/下调，请人工复核"
+  概率 P &lt; 0.6 的样本 → 一律转人工卡片"待确认"</div>
+    <p class="box green">随机森林带来的增值：不是"改判"，而是 <b>自动批量判断 + 给出置信度 + 给出归因</b>。2442 栋烤房，人工看不完，模型先筛出高概率紧急维修的 Top 名单，维修队据此派工。</p>
+  </section>
+
+  <!-- ============ 六、特征工程总表 ============ -->
+  <section>
+    <h2><span class="s">第六步</span> 特征工程总表：喂给 LSTM 与随机森林的"料"</h2>
+    <table>
+      <thead><tr><th>特征组</th><th>维度</th><th>来源</th><th>进哪个引擎</th></tr></thead>
+      <tbody>
+        <tr><td>机理输出</td><td class="num">H、RUL_基、风险缺口 Top3、短板部件剩余年限</td><td>健康分 / 寿命模型</td><td><span class="pill p">随机森林</span></td></tr>
+        <tr><td>健康分时序</td><td class="num">H(t−5…t)、四部位分序列、部件剩余年限序列</td><td>健康分模型年度回放</td><td><span class="pill t">LSTM</span></td></tr>
+        <tr><td>维修台账</td><td class="num">近 3 年维修次数、累计次数、类型分布、上次维修距今</td><td>repair_records</td><td>两者皆用</td></tr>
+        <tr><td>结构/使用</td><td class="num">容量、房龄、建成年、覆盖材料、加热器类型、use_status、dataCompleteRatio</td><td>ovens / kf_basedata</td><td>两者皆用</td></tr>
+        <tr><td>村级上下文</td><td class="num">V、Hc、Lc、Dc、承载压力 P、新建需求 N、面积趋势</td><td>千亩村发展指数</td><td><span class="pill p">随机森林</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">"数据不完整"本身也是一个特征（dataCompleteRatio=1−兜底批/总批），模型会自动学会"缺得多的烤房预警可信度要打折"，与机理兜底条款呼应。</p>
+  </section>
+
+  <!-- ============ 七、工作流 ============ -->
+  <section>
+    <h2><span class="s">落地</span> 端到端工作流：从库到页面一键跑通</h2>
+    <div class="flow">
+      <div class="step"><div class="t">① 取数</div><div class="d">ovens + kf_basedata + repair_records，0.5s 快照</div></div>
+      <div class="step"><div class="t">② 机理层</div><div class="d">健康分 H、寿命 RUL_基、发展指数 V（既有关口不动）</div></div>
+      <div class="step"><div class="t">③ 特征/序列</div><div class="d">构建 H(t) 时序 + 特征向量 X_i / X_c</div></div>
+      <div class="step"><div class="t">④ 学习层</div><div class="d">LSTM 输出 RUL_lstm，随机森林输出预警+概率+归因</div></div>
+      <div class="step"><div class="t">⑤ 融合</div><div class="d">RUL_final + 一致度 + 分歧复核 → 写库、出页面</div></div>
+    </div>
+    <h3>训练与部署（真实可用，非空谈）</h3>
+    <div class="grid12">
+      <div class="sp6 box">
+        <div class="h">离线训练（一次性，Python）</div>
+        <div class="formula">数据： 2442 栋 × 按年重建序列 ≈ 上万条样本
+实现： sklearn.RandomForestClassifier（分类）
+     torch / keras 轻量 LSTM（回归）
+输出： 保存 model.rf.pkl / model.lstm.pt（< 几 MB）
+评估： 随机森林 5 折交叉验证，
+       与机理规则对比 一致性 & 混淆矩阵</div>
+      </div>
+      <div class="sp6 box">
+        <div class="h">在线部署（Spring Boot，Java 推理）</div>
+        <div class="formula">随机森林 → PMML（JPMML 直接 Java 加载，零依赖）
+LSTM    → ONNX Runtime（Java 推理引擎）
+两个模型文件随 jar 打包，无 GPU，CPU 毫秒级
+健康分每次重算后自动更新 ovens.health_score & lifespan，
+      并同步写 RUL_final / warn_level / ml_note</div>
+      </div>
+    </div>
+    <div class="box orange">
+      <span class="h">页面呈现升级（供大屏/管理端）</span>
+      <ul>
+        <li><b>单栋详情</b>：健康分 + 机理寿命 + ML 寿命三列并排，附"一致度"与"ML 分歧"提示；</li>
+        <li><b>预警列表</b>：随机森林四档 + 概率 + 特征归因（"主要因自控探头老化 + 近3年未修 + 村级高压"）；</li>
+        <li><b>退化曲线图</b>：画一条机理退化线 + 一条 LSTM 外推虚线，直观"蓝色是机理、紫色是预测"。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 八、能不能上、有没有坑（诚实评估） ============ -->
+  <section>
+    <h2><span class="s r">冷静评估</span> 实用性边界：能落地，但要讲清楚"小样本时序"的现实</h2>
+    <div class="grid12">
+      <div class="sp6 box" style="border-color:#bde0c6">
+        <div class="h" style="color:var(--green)">扎实可用</div>
+        <ul>
+          <li>随机森林预警：样本充足（2442 行 × 40+ 特征），分类任务成熟，指标可信，可放心上；</li>
+          <li>机理曲线重建时序：每一"年"都有明确物理含义（退化+维修回春），不是造假数据；</li>
+          <li>模型很小（几 MB）、推理毫秒级，普通服务器可跑，无成本门槛。</li>
+        </ul>
+      </div>
+      <div class="sp6 box" style="border-color:#efd0c8;background:var(--red2)">
+        <div class="h" style="color:var(--red)">如实说明的局限</div>
+        <ul>
+          <li>烤房缺<b>逐日/逐月传感器</b>，LSTM 用的是"年粒度重建设列"，精细预测能力有上限——定位为"趋势增强"而非"精准到日"；</li>
+          <li>若未来接入更多时间点数据（每年一次巡检或温湿度 IoT），LSTM 精度会显著上升；</li>
+          <li>绝不能在评审时号称"千万级时序大数据"，会失真；正确话术是"机理-数据混合、轻量落地、可成长"。见《讲解》文档。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 九、实施步骤 ============ -->
+  <section>
+    <h2><span class="s">排期</span> 建议落地步骤（新增，不动现有功能）</h2>
+    <table>
+      <thead><tr><th>阶段</th><th>内容</th><th>产出</th></tr></thead>
+      <tbody>
+        <tr><td><b>P0 数据准备</b></td><td>统一 use_status、补容量口径、抽取 repair_records 可用字段</td><td>干净特征表 feature_ovens / feature_village</td></tr>
+        <tr><td><b>P1 序列重建</b></td><td>按机理曲线回放逐年 H(t)，落一张 hist_health_series 表</td><td>退化时序数据集</td></tr>
+        <tr><td><b>P2 离线训练</b></td><td>Python 训练随机森林 + LSTM，5 折验证，导出 PMML/ONNX</td><td>两个模型文件 + 评估报告</td></tr>
+        <tr><td><b>P3 后端接入</b></td><td>Spring Boot 加 JPMML + ONNX Runtime 推理，写 RUL_final / warn_level / ml_note</td><td>新接口，不改旧表</td></tr>
+        <tr><td><b>P4 页面</b></td><td>详情三列寿命、预警归因、退化曲线图、村级预警</td><td>BI + 管理端增强视图</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 结语 ============ -->
+  <section>
+    <div class="box blue">
+      <div class="h">一句话给评委（方案落点）</div>
+      <p style="font-size:15px">
+        "我们不是推翻之前的算法，而是在<b>已经算得清的业务内核之上</b>，请了两位'新助理'——一个叫 <b>LSTM</b>，把烤房二十年的退化历史读进记忆，往前推还能用几年；一个叫 <b>随机森林</b>，把成百上千个特征放进 500 棵树的森林里，自动分辨哪栋该紧急维修。机理模型保底、机器学习增强、决策融合把关——三引擎同源、口径一致、可解释、可落地。"
+      </p>
+    </div>
+    <div class="divider"></div>
+    <p class="footernote">参考：0905 健康分（逐部件 80/10/10 + CDCI + 5年兜底）、0905-1 寿命（短板 6/4 + 健康校准）、0905 千亩村发展指数（50/30/20）、0905 融合升级方案。本方案为"新增增强层"，不改动既有落库参数与页面逻辑。</p>
+    <div class="footer">烤房智管 · 机理+机器学习三引擎融合升级方案 · 0905</div>
+  </section>
+
+</div>
+</body>
+</html>

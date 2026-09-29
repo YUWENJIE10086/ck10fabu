@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟农培育 · 答题情况与烟农画像逻辑</title>
+<style>
+  :root{
+    --primary:#1A6B4F; --primary-light:#2E8B6A; --primary-lighter:#5FB292;
+    --primary-dark:#0D5D46; --grad:linear-gradient(135deg,#0D5D46,#1A6B4F);
+    --success:#2E8B6A; --warning:#D4944A; --danger:#D4604A; --info:#5A8A7A;
+    --bg:#E8F4EE; --surface:#ffffff; --text:#0D3D30; --muted:#5A8A7A; --pale:#7A9A90;
+    --border:#E0EBE5; --radius:12px; --shadow:0 6px 20px rgba(26,107,79,.12);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif;
+    background:linear-gradient(135deg,#E8F4EE,#F0F7F3 50%,#DCEBE3);color:var(--text);line-height:1.7}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 64px}
+  /* ===== 头部 ===== */
+  header{background:var(--grad);border-radius:16px;padding:26px 30px;color:#fff;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:22px}
+  header::after{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;
+    border-radius:50%;background:rgba(255,255,255,.08)}
+  header .eyebrow{font-size:13px;letter-spacing:2px;opacity:.85;margin:0 0 6px}
+  header h1{margin:0;font-size:26px;letter-spacing:.5px}
+  header p{margin:8px 0 0;font-size:14px;opacity:.92}
+  header .tag{display:inline-block;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;
+    font-size:12px;margin-right:6px;margin-top:10px}
+  /* ===== 卡 ===== */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 26px;margin-bottom:20px}
+  .card h2{font-size:18px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .card h2 .num{width:26px;height:26px;border-radius:8px;background:var(--grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .card .sub{color:var(--muted);font-size:13px;margin:0 0 16px 34px}
+  .lead{background:#F2F8F5;border-left:4px solid var(--primary-light);padding:14px 18px;border-radius:8px;
+    font-size:15px;margin:0 0 18px}
+  /* ===== 数据流 全景 ===== */
+  .flow{display:flex;flex-direction:column;gap:10px;margin:6px 0}
+  .flow .node{border:1px solid var(--border);border-radius:10px;padding:12px 16px;background:#FBFDFC}
+  .flow .node .row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .flow .node .badge{min-width:74px;text-align:center;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+  .b-green{background:var(--primary-light)} .b-blue{background:#5A8A7A} .b-orange{background:var(--warning)}
+  .b-purple{background:#8A63B8} .b-red{background:var(--danger)}
+  .flow .node .title{font-weight:700;font-size:15px}
+  .flow .node .desc{color:var(--muted);font-size:13px}
+  .flow .arrow{text-align:center;color:var(--primary-lighter);font-size:14px;line-height:1}
+  .flow .chip{display:inline-block;background:#E0EBE5;border-radius:14px;padding:1px 9px;font-size:12px;color:var(--primary-dark);margin:2px 3px 0 0}
+  /* ===== 公式 ===== */
+  .formula{background:#F2F8F5;border:1px dashed var(--primary-lighter);border-radius:8px;
+    padding:12px 16px;margin:8px 0;font-size:15px;text-align:center;overflow-x:auto}
+  .formula code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:15px}
+  .warn{background:#FDF3E3;border-left:4px solid var(--warning);padding:10px 14px;border-radius:6px;font-size:13px;color:#7a5a20;margin-top:10px}
+  /* ===== 表格 ===== */
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{background:#F2F8F5;color:var(--primary-dark);font-weight:600;padding:9px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+  td{padding:9px 10px;border-bottom:1px solid #EFF5F1;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#F6FBF8}
+  .pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;color:#fff}
+  .p-zh{background:var(--primary-light)} .p-pt{background:#5FB292} .p-nov{background:var(--warning)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle}
+  /* ===== 权重条 ===== */
+  .wbar{display:flex;height:26px;border-radius:8px;overflow:hidden;margin:6px 0 2px;font-size:0}
+  .wbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+  .wlegend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:8px}
+  .wlegend .it{display:flex;align-items:center;gap:5px}
+  .wlegend .sq{width:12px;height:12px;border-radius:3px;display:inline-block}
+  /* ===== 维色 ===== */
+  .c-zt{color:#2E8B6A}.c-zb{color:#5FB292}.c-cf{color:#D4944A}.c-ht{color:#8A63B8}.c-zh{color:#3A6A5A}
+  /* ===== 两步决策 ===== */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:6px}
+  .steps .st{border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .steps .st h4{margin:0 0 8px;font-size:14px;display:flex;align-items:center;gap:6px}
+  .steps .st ul{margin:6px 0 0;padding-left:18px}
+  .steps .st li{font-size:13px;color:#3A6A5A;margin:4px 0}
+  footer{text-align:center;color:var(--pale);font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">烤房全周期信息化管理平台 · 烟农培育模块</p>
+    <h1>答题情况 → 烟农画像 逻辑链路</h1>
+    <p>先有「答题情况」做原始数据入库，才有「烟农画像」做分析结果。答题=输入，画像=输出。</p>
+    <span class="tag">五维权重算法</span>
+    <span class="tag">薄弱定位</span>
+    <span class="tag">培育计划</span>
+  </header>
+
+  <div class="card">
+    <h2><span class="num">1</span>全景链路</h2>
+    <p class="lead">答题情况是"逐户逐题"的原始台账；烟农画像是系统对每一户"算出来的结论"，再按村聚合得到薄弱定位与培育计划。</p>
+    <div class="flow">
+      <div class="node">
+        <div class="row">
+          <span class="badge b-green">答题情况</span>
+          <div>
+            <div class="title">问卷原始数据入库（farmer_question）</div>
+            <div class="desc">每户 × 每题 × 每维，逐条记录答对/答错（correct 0/1）</div>
+            <div>
+              <span class="chip">栽培 4题</span><span class="chip">植保 4题</span><span class="chip">采烤 4题</span>
+              <span class="chip">烘烤 5题</span><span class="chip">综合 6题</span><span class="chip">共 23 题</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼ 按户分组汇总：Σ维度答对数 ÷ 维度总题数 × 100</div>
+      <div class="node">
+        <div class="row">
+          <span class="badge b-purple">烟农画像</span>
+          <div>
+            <div class="title">个人画像（farmer_profile）</div>
+            <div class="desc">一户一行：五维知识分 K + 画像分 P + 等级 + 最弱维 + 优先级</div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow">▼ 按村聚合：算 K̄村，与全县基线 m县 比缺口</div>
+      <div class="node">
+        <div class="row">
+          <span class="badge b-orange">薄弱定位</span>
+          <span class="badge b-red">培育计划</span>
+          <div>
+            <div class="title">村×五维薄弱矩阵 + 培育计划建议</div>
+            <div class="desc">标红达标判定 → 生成现场会主题 → 排出上门辅导名单</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span>你的关键词，画像每个字段代表什么</h2>
+    <p class="sub">画像不是一张"总分表"，而是五条知识线的合成。</p>
+    <table>
+      <thead><tr><th>画像字段</th><th>算法公式</th><th>代表含义</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>五维知识分 K</b><br><span class="c-zt">栽培</span> <span class="c-zb">植保</span> <span class="c-ht">烘烤</span>…</td>
+          <td><code>K_d = 该维答对数 ÷ 该维总题数 × 100</code></td>
+          <td>烟农在某个<u>知识环节</u>的掌握度（0–100）。5 个维度 = 5 条能力线。</td>
+        </tr>
+        <tr>
+          <td><b>画像分 P</b></td>
+          <td><code>P = 0.18·栽培+0.18·植保+0.19·采烤+0.25·烘烤+0.20·综合</code></td>
+          <td>五条线按权重加权，得<u>综合知识水平</u>。维度没答全时按已答维权重重新归一，避免缺答拉低分。</td>
+        </tr>
+        <tr><td><b>等级 level</b></td><td><code>P≥85 职业 / 60≤P&lt;85 普通 / P&lt;60 新手</code></td>
+          <td>烟农的综合画像档次。</td></tr>
+        <tr><td><b>最弱维度 weak_dim</b></td><td><code>五维中得分最低的一维</code></td>
+          <td>该户的<u>短板</u>，培育时优先补。</td></tr>
+        <tr><td><b>优先级 priority</b></td><td><code>0.5×(100−最弱维) + 0.3×规模 + 0.2×承载</code></td>
+          <td>培育<u>紧迫度</u>，越弱越优先，用来排培育计划的先后。</td></tr>
+      </tbody>
+    </table>
+    <div class="warn">说明：文档完整版为 <code>P = 0.60·知识 + 0.15·培训 + 0.15·实绩 + 0.10·评价</code>。当前只接了问卷，还没有培训/实绩/评价的行为数据，故落地版退化为<u>纯问卷知识版</u>——这正是"画像完全由答题算出"的原因。待补充行为数据后按完整版扩展。</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span>五维权重与组成</h2>
+    <p class="sub">答题共 23 道知识题，拆分到 5 个维度，权重如下：</p>
+    <div class="wbar">
+      <span style="width:17.5%;background:#2E8B6A">栽培 .175</span>
+      <span style="width:17.5%;background:#5FB292">植保 .175</span>
+      <span style="width:21%;background:#D4944A">采烤 .210</span>
+      <span style="width:25%;background:#8A63B8">烘烤 .250</span>
+      <span style="width:19%;background:#3A6A5A">综合 .190</span>
+    </div>
+    <div class="wlegend">
+      <span class="it"><span class="sq" style="background:#2E8B6A"></span>栽培 4题 / 权重.18</span>
+      <span class="it"><span class="sq" style="background:#5FB292"></span>植保 4题 / 权重.18</span>
+      <span class="it"><span class="sq" style="background:#D4944A"></span>采烤 4题 / 权重.19</span>
+      <span class="it"><span class="sq" style="background:#8A63B8"></span>烘烤 5题 / 权重.25</span>
+      <span class="it"><span class="sq" style="background:#3A6A5A"></span>综合 6题 / 权重.20</span>
+    </div>
+    <p style="font-size:12px;color:var(--pale);margin:6px 0 0">注：上面的条形按"题数占比"画，代码里权重固定为 0.18/0.18/0.19/0.25/0.20，两者近似不同（题数与权重解耦）。</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span>等级怎么分</h2>
+    <p class="sub">由画像分 P 划分三档烟农类型：</p>
+    <table>
+      <thead><tr><th>等级</th><th>判定条件（当前落地）</th><th>含义</th><th>标签</th></tr></thead>
+      <tbody>
+        <tr><td>职业烟农</td><td>P ≥ 85</td><td>综合知识扎实，可作为片区标杆/示范户</td><td><span class="pill p-zh">职业</span></td></tr>
+        <tr><td>普通烟农</td><td>60 ≤ P < 85</td><td>整体合格但有可提升空间</td><td><span class="pill p-pt">普通</span></td></tr>
+        <tr><td>新手烟农</td><td>P < 60</td><td>知识薄弱，是上门辅导的重点对象</td><td><span class="pill p-nov">新手</span></td></tr>
+      </tbody>
+    </table>
+    <div class="warn">文档完整版还会叠加硬性条件：P≥85 + 种烟年限≥5年 + 面积≥20亩才算职业烟农。当前仅按 P 分，待台账字段齐全后补齐。</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">5</span>从"一个人的画像"到"一个村怎么补"</h2>
+    <p class="sub">画像不仅在单户层面，还被聚合成村域级诊断。</p>
+    <div class="steps">
+      <div class="st">
+        <h4><span class="dot" style="background:var(--primary-light)"></span>村级缺口 I</h4>
+        <code>I = 县基线 m县 − 村均值 K̄村</code>
+        <ul>
+          <li>每个村每维算出平均分，与全县基线对比</li>
+          <li>缺口越大，说明该村在该环节越拖后腿</li>
+        </ul>
+      </div>
+      <div class="st">
+        <h4><span class="dot" style="background:var(--danger)"></span>薄弱红点判定</h4>
+        <code>K̄村 &lt; 60 或 I &gt; 15 → 标红</code>
+        <ul>
+          <li>低于 60：绝对水平差</li>
+          <li>缺口 &gt; 15：相对县水平明显落后</li>
+        </ul>
+      </div>
+      <div class="st">
+        <h4><span class="dot" style="background:var(--warning)"></span>自动生成培育计划</h4>
+        <code>薄弱环节 → 主题 + 上门名单</code>
+        <ul>
+          <li>按优先级排序产出"现场会/专题培训"主题</li>
+          <li>列出该村该维得分最低的 3 户做上门辅导名单</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">6</span>两个界面各自职责</h2>
+    <table>
+      <thead><tr><th>界面</th><th>角色</th><th>回答的问题</th></tr></thead>
+      <tbody>
+        <tr><td><b>答题情况</b></td><td>台账 / 输入层</td><td>答得怎么样？谁在哪些维度薄弱？</td></tr>
+        <tr><td><b>烟农画像</b></td><td>分析 / 决策层</td><td>这户差在哪、这村补什么、先补谁、怎么补？</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-bottom:0">一句话：<b>答题情况是"输入"，烟农画像是"输出"；没有答的题，就没有画出来的像。</b></p>
+  </div>
+
+  <footer>烤房全周期信息化管理平台 · 烟农培育模块 · 算法依据《烟农画像与培育算法详解-0901》</footer>
+</div>
+</body>
+</html>

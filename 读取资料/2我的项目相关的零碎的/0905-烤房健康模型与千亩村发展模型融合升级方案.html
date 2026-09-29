@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>烤房健康模型与千亩村发展模型融合升级方案</title>
+  <style>
+    :root {
+      --ink: #173f35;
+      --muted: #64746f;
+      --green: #0b6b53;
+      --green-2: #2f9a75;
+      --orange: #d9822b;
+      --red: #c94c3c;
+      --gold: #f3b348;
+      --bg: #f4f8f4;
+      --card: rgba(255, 255, 255, 0.88);
+      --line: rgba(31, 92, 73, 0.14);
+      --shadow: 0 18px 55px rgba(30, 74, 58, 0.14);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(232, 181, 82, 0.22), transparent 28%),
+        radial-gradient(circle at 90% 8%, rgba(30, 143, 100, 0.20), transparent 30%),
+        linear-gradient(180deg, #f8faf4 0%, #eef6ee 42%, #f7f4ea 100%);
+      line-height: 1.72;
+    }
+    .page { max-width: 1280px; margin: 0 auto; padding: 34px 28px 72px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 30px;
+      padding: 42px;
+      background: linear-gradient(135deg, rgba(8, 80, 62, 0.96), rgba(18, 117, 83, 0.92));
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -140px;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.11);
+    }
+    .eyebrow { letter-spacing: 0.18em; color: #d8f2df; font-weight: 700; }
+    h1 { margin: 10px 0 14px; font-size: 40px; line-height: 1.18; }
+    .hero p { max-width: 940px; margin: 0; color: #e9fff2; font-size: 17px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .hero-card {
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 18px;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-card b { display: block; font-size: 24px; }
+    .hero-card span { color: #d6f1e4; font-size: 13px; }
+    section {
+      margin-top: 24px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 10px 34px rgba(39, 81, 62, 0.08);
+    }
+    h2 { margin: 0 0 18px; font-size: 25px; color: #0a5946; }
+    h3 { margin: 18px 0 10px; font-size: 18px; color: #17483b; }
+    p { margin: 8px 0; }
+    .lead {
+      font-size: 18px;
+      color: #224f44;
+      background: #f0f7ee;
+      border-left: 6px solid var(--green);
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .box {
+      border: 1px solid var(--line);
+      background: #fbfdf9;
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #e7f4ed;
+      color: var(--green);
+      font-weight: 700;
+      font-size: 13px;
+      margin-right: 6px;
+    }
+    .tag.orange { background: #fff1df; color: #b96517; }
+    .tag.red { background: #fdecea; color: #a33d32; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 4px;
+      overflow: hidden;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+    th, td { border: 1px solid #dce8df; padding: 10px 11px; vertical-align: top; }
+    th { background: #eaf4ed; color: #134d3d; text-align: left; }
+    tr:nth-child(even) td { background: #fbfdf9; }
+    .formula {
+      white-space: pre-wrap;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      background: #102f28;
+      color: #e9fff2;
+      border-radius: 16px;
+      padding: 18px;
+      overflow-x: auto;
+      line-height: 1.65;
+    }
+    .callout {
+      border-radius: 18px;
+      padding: 18px;
+      background: #fff7e9;
+      border: 1px solid rgba(217, 130, 43, 0.28);
+    }
+    .danger {
+      background: #fff0ed;
+      border-color: rgba(201,76,60,.28);
+    }
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 12px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fbfdf9;
+    }
+    .step:before {
+      counter-increment: step;
+      content: counter(step);
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-weight: 800;
+    }
+    .screen {
+      border-left: 5px solid var(--orange);
+      background: #fffaf1;
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin: 10px 0;
+    }
+    ul { padding-left: 20px; }
+    li { margin: 5px 0; }
+    .footer { color: var(--muted); font-size: 13px; margin-top: 22px; }
+    @media (max-width: 900px) {
+      .page { padding: 18px; }
+      h1 { font-size: 28px; }
+      .hero { padding: 26px; }
+      .hero-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">模型融合升级方案 / 先确认后实施</div>
+      <h1>烤房健康模型、寿命预测与千亩村发展指数融合方案</h1>
+      <p>
+        本方案只把现有项目算法、导出数据表、0904建模建议和截图要求融合成一套可讲、可算、可落地的升级方案。
+        目标是：明天线上讲解时，非技术人员能听懂“怎么算、为什么这么排、结果怎么用”；后续你确认后再进入代码实施。
+      </p>
+      <div class="hero-grid">
+        <div class="hero-card"><b>0-100</b><span>单栋烤房健康评分</span></div>
+        <div class="hero-card"><b>10个</b><span>风险部位排序口径</span></div>
+        <div class="hero-card"><b>18项</b><span>部件采集项兼容归并</span></div>
+        <div class="hero-card"><b>村级</b><span>千亩村发展指数</span></div>
+      </div>
+    </header>
+
+    <section>
+      <h2>一、先回答当前两个问题</h2>
+      <div class="grid-2">
+        <div class="box">
+          <h3>1. “烤房健康分”为什么点不开</h3>
+          <p>
+            当前前端菜单指向 <span class="tag">/analysis/barn-health-score</span>，路由组件是
+            <span class="tag">BarnHealthScore.vue</span>。页面文件里引入了
+            <span class="tag red">updateHealthScore3Dim</span>，但 <span class="tag">src/api/ai.ts</span>
+            里没有导出这个函数。
+          </p>
+          <p>
+            因此页面模块加载时会出现前端编译/运行错误，表现为菜单点不开或白屏。这个是入口问题，和健康模型公式本身不是一回事。
+          </p>
+          <p><b>实施时第一步：</b>补齐前端 API 函数，并在后端补齐或复用“管护制度/人工评价更新”接口。</p>
+        </div>
+        <div class="box">
+          <h3>2. 现有算法有没有用到这张表</h3>
+          <p>
+            现有最终版已经用到了 <span class="tag">kf_heater</span>、<span class="tag">kf_radiator</span>、
+            <span class="tag">kf_controller</span>、<span class="tag">kf_oven_body</span>
+            这些部件表，并读了部件状态、最新修复年度和评价。
+          </p>
+          <p>
+            但它现在主要按 4 组部件汇总：加热、散热、自控、主体；没有严格按截图建议拆成
+            “加热器、散热器、自控仪、循环风机、屋顶、挂烟梁、电源、发电机、大门、烟夹”
+            这 10 个风险部位，也没有把寿命预测按每个风险部位的指导年限分别折算。
+          </p>
+          <p><b>结论：</b>数据基础已有，算法口径需要升级。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>二、融合后的总模型结构</h2>
+      <p class="lead">
+        推荐采用“一主两辅”的讲法：主模型是烤房健康模型；寿命预测是健康模型的延伸；千亩村发展指数是村级投入决策模型。
+      </p>
+      <div class="grid-3">
+        <div class="box">
+          <h3>单栋烤房健康模型</h3>
+          <p>输入：建设年度、使用时长、部件状态、最新修复年度、管护制度、人工评价。</p>
+          <p>输出：0-100 分健康评分、健康等级、风险部位排序。</p>
+        </div>
+        <div class="box">
+          <h3>寿命预测模型</h3>
+          <p>输入：健康分、各部位指导寿命、维修记录。</p>
+          <p>输出：剩余寿命、预测退役年份、建议维修/紧急维修预警。</p>
+        </div>
+        <div class="box">
+          <h3>千亩村发展模型</h3>
+          <p>输入：村内烤房健康均分、承载压力、收购/面积趋势、管护缴费、政策资金等。</p>
+          <p>输出：村级发展指数，指数越低，新建需求越旺。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>三、烤房健康模型升级口径</h2>
+      <h3>3.1 总分结构</h3>
+      <div class="formula">烤房健康分 H = 主要部件分 P + 管护制度分 M + 人工评价分 E
+
+P 满分 80 分
+M 满分 10 分：集中管护=10，分户管护=8，未知=8
+E 满分 10 分：好=10，中=8，差=5，未知=8
+
+H = clamp(P + M + E, 0, 100)</div>
+      <p>
+        这样可以完全满足建模建议中的“主要部件 80 分 + 现行管护 10 分 + 人工评价 10 分”。
+        当前代码里的 80/10/10 结构可以保留，但要把“部件 80 分”的内部拆法升级为 10 个风险部位。
+      </p>
+
+      <h3>3.2 主要部件 80 分如何拆</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>风险部位</th>
+            <th>满分权重</th>
+            <th>对应现有数据表/字段</th>
+            <th>指导寿命建议</th>
+            <th>说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>加热器</td>
+            <td>15</td>
+            <td>kf_heater.burner_status / burner_repair_year / heater_type</td>
+            <td>外置10年，内置12年；缺类型时按12年</td>
+            <td>对应燃烧机与加热设备，是热源核心。</td>
+          </tr>
+          <tr>
+            <td>散热器</td>
+            <td>15</td>
+            <td>kf_radiator.pipe_status、furnace_status、ash_door_status、chimney_status</td>
+            <td>15年；讲解示例可按“加热散热系统12年”演示</td>
+            <td>散热管、炉膛、清灰门、烟囱取均值后形成散热器得分。</td>
+          </tr>
+          <tr>
+            <td>自控仪</td>
+            <td>20</td>
+            <td>kf_controller.control_box_status、probe_status、water_pot_status、相关修复年度</td>
+            <td>主板6年，传感器线/温湿度探头6年</td>
+            <td>权重最高，符合实际“自控仪损坏频率高、影响大”。</td>
+          </tr>
+          <tr>
+            <td>循环风机</td>
+            <td>5</td>
+            <td>kf_controller.circulation_fan_status / circulation_fan_repair_year</td>
+            <td>10年</td>
+            <td>从旧的自控设备大类中独立拆出。</td>
+          </tr>
+          <tr>
+            <td>屋顶</td>
+            <td>10</td>
+            <td>kf_oven_body.wall_roof_status / wall_roof_repair_year</td>
+            <td>未加盖6年，加盖15年；缺“加盖”字段时按15年保守估算</td>
+            <td>现有字段是墙体屋顶合并，实施时可先用 wall_roof 代表。</td>
+          </tr>
+          <tr>
+            <td>挂烟梁</td>
+            <td>5</td>
+            <td>kf_oven_body.beam_status / beam_repair_year</td>
+            <td>木材10年，钢材15年；缺材质时按10年</td>
+            <td>若后续补采材质，再细分寿命。</td>
+          </tr>
+          <tr>
+            <td>电源</td>
+            <td>5</td>
+            <td>当前无独立电线字段，先从附属设施/报修类型/维修记录映射</td>
+            <td>10年</td>
+            <td>当前数据不足，实施时建议新增字段或用维修记录兜底。</td>
+          </tr>
+          <tr>
+            <td>发电机</td>
+            <td>5</td>
+            <td>当前无独立发电机字段，先从附属设施/报修类型/维修记录映射</td>
+            <td>10年</td>
+            <td>当前数据不足，不能硬算成“正常”，要标识为“未采集”。</td>
+          </tr>
+          <tr>
+            <td>大门</td>
+            <td>10</td>
+            <td>kf_oven_body.door_status / door_repair_year</td>
+            <td>10年</td>
+            <td>直接对应装烟室门。</td>
+          </tr>
+          <tr>
+            <td>烟夹</td>
+            <td>5</td>
+            <td>当前无独立烟夹字段，先从附属设施/维修记录映射</td>
+            <td>6年；演示中可与挂烟梁合并按5年</td>
+            <td>建议实施时补一个烟夹状态字段，否则只能参与风险讲解和后续采集。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <b>18 个部件不必强行变成 18 个一级权重。</b>
+        讲解时用“4 个大部位、18 个采集项、10 个风险部位”最清楚：4 个大部位便于建档，18 个采集项便于现场录入，10 个风险部位便于健康评分和风险排序。
+      </div>
+    </section>
+
+    <section>
+      <h2>四、单个风险部位怎么赋分</h2>
+      <p>每个风险部位直接算“贡献分”，再统一归一化到0-100。数据完整按原指导寿命；数据不齐全按5年指导寿命兜底。</p>
+      <div class="formula">部位贡献分 C_i = W_i × L_i × S_i
+
+W_i：部位满分权重
+L_i：寿命剩余比例 = max(0, 指导寿命 - 已使用年限) / 指导寿命
+S_i：状态修正系数
+
+已使用年限：
+优先取 当前年份 - 修复年度
+无修复年度时按数据不齐全处理，暂按已用0年
+
+状态修正：
+正常=1.00，异常/老化=0.70，损坏/损毁=0.30，缺失=0
+
+数据不齐全兜底：
+缺状态、缺修复年度或缺部件记录时，指导寿命统一按5年；
+状态缺失按兜底可用处理，S_i=1.00；
+缺修复年度时不追溯建设/完工年度，暂按已用0年，并标记待补采。
+
+部件归一化健康分 P_norm = ΣC_i / ΣW_i × 100
+最终健康分 H = 0.80×P_norm + 0.10×管护分 + 0.10×人工评价分</div>
+      <p>
+        这样比“三段式指数衰减”更容易解释：有修复年度就按真实修复年度和指导寿命折算；缺修复年度则按5年兜底但暂不按建设年扣到很低，后续补采后再按真实寿命衰减。
+      </p>
+      <div class="grid-2">
+        <div class="box">
+          <h3>为什么不用40/40/20</h3>
+          <p>最新口径把“状态”和“寿命”相乘，不再加权平均。</p>
+          <p>好处是：部件超寿命或状态差时，贡献会直接下降，风险缺口更直观。</p>
+          <p>人工评价放到整栋烤房最后10%，避免主观判断盖过客观部件数据。</p>
+        </div>
+        <div class="box">
+          <h3>缺字段怎么处理</h3>
+          <p>没有状态或修复年度时，不再剔除该部件，也不使用“未采集=70”。</p>
+          <p>最新方案统一按5年指导寿命兜底参与；缺修复年度时暂按已用0年，页面显示该部件为“5年兜底/待补采”。第二版补采字段后再改为真实状态和真实寿命。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>五、风险部位排序怎么排</h2>
+      <p class="lead">
+        风险排序不是按“谁扣分最多”简单排，而是按“风险缺口 × 业务重要度 × 寿命紧迫度”排。这样能解释为什么自控仪通常排在前面。
+      </p>
+      <div class="formula">风险分 R_i = (100 - S_i) × 业务重要度系数 K_i × 寿命紧迫系数 T_i
+
+业务重要度系数 K_i：
+自控仪=1.25，加热器=1.15，散热器=1.15，大门=1.05，屋顶=1.05，
+循环风机=1.00，挂烟梁=1.00，烟夹=1.00，电源=1.00，发电机=0.95
+
+寿命紧迫系数 T_i：
+r ≥ 1.00：1.30
+0.70 ≤ r < 1.00：1.15
+0.50 ≤ r < 0.70：1.00
+r < 0.50：0.85
+
+按 R_i 从高到低排序，取前3个作为页面展示：
+风险部位排序 = Top3(R_i)</div>
+      <p>
+        这套排序可以回答“为什么这么排”：同样是 70 分，自控仪因为对烘烤控制影响更大，排序会高于普通附属部件；
+        同样是正常状态，若寿命已超期，风险也会上升。
+      </p>
+    </section>
+
+    <section>
+      <h2>六、演示样例：2020 年建设烤房如何自然计算</h2>
+      <p>71 分只作为材料里的示例值，不应为了凑到 71 分而反推扣减项。系统应按建设年度、使用年限、部件状态、管护制度和人工评价自然计算，算出来是多少就是多少。</p>
+      <table>
+        <thead>
+          <tr>
+            <th>部位</th>
+            <th>权重满分</th>
+            <th>指导寿命</th>
+            <th>假设状态/评价</th>
+            <th>部位健康度</th>
+            <th>贡献分</th>
+            <th>风险解释</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>加热器</td>
+            <td>15</td>
+            <td>12年</td>
+            <td>正常，中</td>
+            <td>约82</td>
+            <td>12.3</td>
+            <td>有老化但未到主要风险。</td>
+          </tr>
+          <tr>
+            <td>散热器</td>
+            <td>15</td>
+            <td>12年</td>
+            <td>正常，中</td>
+            <td>约82</td>
+            <td>12.3</td>
+            <td>与加热器合并讲为“加热散热系统”。</td>
+          </tr>
+          <tr>
+            <td>自控仪</td>
+            <td>20</td>
+            <td>6年</td>
+            <td>异常，中</td>
+            <td>约58</td>
+            <td>11.6</td>
+            <td>2020到2026已接近/达到6年寿命，状态异常，风险最高。</td>
+          </tr>
+          <tr>
+            <td>循环风机</td>
+            <td>5</td>
+            <td>10年</td>
+            <td>正常，中</td>
+            <td>约86</td>
+            <td>4.3</td>
+            <td>寿命未到，排序靠后。</td>
+          </tr>
+          <tr>
+            <td>屋顶</td>
+            <td>10</td>
+            <td>15年</td>
+            <td>正常，中</td>
+            <td>约90</td>
+            <td>9.0</td>
+            <td>主体类寿命较长。</td>
+          </tr>
+          <tr>
+            <td>挂烟梁</td>
+            <td>5</td>
+            <td>5年演示口径</td>
+            <td>异常，中</td>
+            <td>约54</td>
+            <td>2.7</td>
+            <td>与烟夹合并为“烟夹烟梁”风险。</td>
+          </tr>
+          <tr>
+            <td>电源</td>
+            <td>5</td>
+            <td>10年</td>
+            <td>正常，中</td>
+            <td>约86</td>
+            <td>4.3</td>
+            <td>正常但仍需巡检。</td>
+          </tr>
+          <tr>
+            <td>发电机</td>
+            <td>5</td>
+            <td>10年</td>
+            <td>正常，中</td>
+            <td>约86</td>
+            <td>4.3</td>
+            <td>备用保障项。</td>
+          </tr>
+          <tr>
+            <td>大门</td>
+            <td>10</td>
+            <td>10年</td>
+            <td>正常，中</td>
+            <td>约86</td>
+            <td>8.6</td>
+            <td>未到高风险。</td>
+          </tr>
+          <tr>
+            <td>烟夹</td>
+            <td>5</td>
+            <td>5年演示口径</td>
+            <td>异常，中</td>
+            <td>约54</td>
+            <td>2.7</td>
+            <td>与挂烟梁合并后排第二。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="formula">主要部件分 P = Σ(部位健康度 S_i / 100 × 部位满分权重 W_i)
+管护制度分 M = 集中管护10分 / 分户管护8分 / 未知8分
+人工评价分 E = 好10分 / 中8分 / 差5分 / 未知8分
+
+最终健康分 H = clamp(P + M + E, 0, 100)
+
+风险分 R_i = (100 - S_i) × 业务重要度系数 × 寿命紧迫系数
+风险排序 = 按 R_i 从高到低排序
+
+若某 2020 年烤房中：
+自控仪已接近6年寿命且状态异常，
+烟夹烟梁按5年口径已接近或超过寿命，
+加热散热系统按12年口径仍在中期但有老化，
+则风险排序自然会表现为：
+自控仪 ＞ 烟夹烟梁 ＞ 加热散热系统。
+
+实际健康分不固定为71分，应以真实部件状态、修复年度、管护制度和人工评价计算。</div>
+      <div class="callout">
+        <b>讲解建议：</b>不要把 71 分讲成必须复现的目标值。应讲成：模型按统一规则计算每个部位健康度，再按风险分排序；如果自控仪短寿命且异常，它自然排在前面。
+      </div>
+    </section>
+
+    <section>
+      <h2>七、寿命预测算法如何同步升级</h2>
+      <p>当前寿命预测主要使用健康分反推等效年龄，已经比单纯按建设年份合理。但要满足截图建议，应改为“分部位剩余寿命 + 整栋烤房剩余寿命”。</p>
+      <div class="formula">单部位剩余寿命 L_i = max(0, 指导寿命_i - 已使用年限_i)
+
+若该部位有最新修复年度：
+已使用年限_i = 当前年份 - 最新修复年度
+否则：
+已使用年限_i = 当前年份 - 建设/竣工年份
+
+整栋烤房剩余寿命：
+RUL = 0.50 × 健康分反推寿命 + 0.30 × 加权部位剩余寿命 + 0.20 × 关键短板寿命
+
+关键短板寿命 = min(自控仪、烟夹、挂烟梁、加热器、散热器的剩余寿命)</div>
+      <p>
+        这样能避免两个极端：老房但刚修过不应直接判死；新房但自控仪异常也不能显示寿命很长。
+      </p>
+      <table>
+        <thead>
+          <tr><th>预警等级</th><th>判定规则</th><th>页面动作</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>正常</td><td>剩余寿命 &gt; 7 年，且无高风险部位</td><td>绿色标识，纳入常规养护。</td></tr>
+          <tr><td>需关注</td><td>4-7 年，或 Top1 风险部位接近寿命</td><td>推送年度巡检。</td></tr>
+          <tr><td>建议维修</td><td>0-4 年，或健康分 &lt; 60</td><td>进入维修资金候选池。</td></tr>
+          <tr><td>紧急维修</td><td>≤0 年，或关键部位损坏/缺失</td><td>生成抢修/修复优先任务。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>八、千亩村发展模型怎么讲</h2>
+      <p class="lead">
+        千亩村发展指数回答的是“哪里最需要新建/补建烤房”。指数越低，说明现有烤房越不健康、承载越紧张、发展压力越大，新建需求越旺。
+      </p>
+      <div class="formula">村级发展指数 V = 健康平均分 A + 承载平均分 B + 发展因子 C
+
+建议采用文档新版口径：
+A 健康平均分：55分
+B 承载平均分：30分
+C 发展因子：15分
+
+V 越低 = 新建需求越旺
+新建需求分 N = 100 - V</div>
+      <table>
+        <thead>
+          <tr><th>因子</th><th>满分</th><th>计算方式</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>健康平均分 A</td>
+            <td>55</td>
+            <td>村内烤房 health_score_final 平均值 × 0.55</td>
+            <td>村里烤房越健康，越不急着新建；越低越需要投入。</td>
+          </tr>
+          <tr>
+            <td>承载平均分 B</td>
+            <td>30</td>
+            <td>在用承载70% + 闲置承载20% + 待修承载10%，再映射到0-30</td>
+            <td>承载压力越高，得分越低；要突出“有烟没房烤”。</td>
+          </tr>
+          <tr>
+            <td>发展因子 C</td>
+            <td>15</td>
+            <td>集体经济3 + 管护缴费3 + 政策争取3 + 规模趋势3 + 扩张承载3</td>
+            <td>原建议每项4分合计20分；为匹配视频稿55/30/15，压缩为每项3分。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        如果需要完全沿用旧材料“健康50、承载30、发展20”，也能做；但明天讲解建议统一成“健康55、承载30、发展15”，和视频稿一致，避免两个版本冲突。
+      </p>
+    </section>
+
+    <section>
+      <h2>九、页面如何改：智能分析下的两个模型页</h2>
+      <div class="screen">
+        <h3>烤房健康分页面</h3>
+        <p>顶部保留“总数、已计算、平均分、最低分、最高分、等级分布”。</p>
+        <p>新增一个“模型讲解卡”：展示 80+10+10，总分公式、10个部位权重、状态/寿命/人评赋分。</p>
+        <p>列表新增列：Top1风险部位、Top2风险部位、Top3风险部位、管护制度、人工评价、数据完整度。</p>
+        <p>详情弹窗展示每栋烤房的10个部位条形图，红色表示风险高，绿色表示健康。</p>
+      </div>
+      <div class="screen">
+        <h3>寿命预测算法页面</h3>
+        <p>顶部展示平均剩余寿命、紧急维修数、建议维修数、需关注数。</p>
+        <p>列表新增：关键短板寿命、最短寿命部位、预测退役年份、建议动作。</p>
+        <p>算法说明从“12年极限寿命”改为“分部位寿命 + 健康分反推 + 关键短板约束”。</p>
+      </div>
+      <div class="screen">
+        <h3>新建选址/沙盘演练页面</h3>
+        <p>右侧影响情况以“千亩村发展指数”为主，不再只讲地形环境。</p>
+        <p>地图点击村后展示：发展指数、健康均分、承载压力、近三年面积/收购趋势、新建需求分、推荐新建栋数。</p>
+        <p>下方表格展示所有千亩村，按“新建需求分”倒序，荒口坪、三台寺等低指数村排在前面。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>十、代码实施建议清单</h2>
+      <div class="steps">
+        <div class="step">
+          <div>
+            <b>修通入口</b>
+            <p>在 <span class="tag">src/api/ai.ts</span> 补齐 updateHealthScore3Dim；后端增加或确认更新管护制度、人工评价的接口。否则“烤房健康分”页面会继续点不开。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <b>新增模型映射配置</b>
+            <p>在后端健康算法里增加 10 个风险部位配置：部位名、权重、寿命、状态字段、修复年度字段、所在表。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <b>改造 health_score_final</b>
+            <p>把当前 4 组部件加权改为 10 个风险部位加权，并保留 80/10/10 总结构。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <b>新增风险排序输出</b>
+            <p>后端 final-list 返回 riskParts 数组；前端表格显示 Top3，详情页展示完整排序。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <b>改造寿命预测</b>
+            <p>life_residual_final 从“只看整栋健康分”升级为“健康分反推寿命 + 部位加权剩余寿命 + 关键短板寿命”。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div>
+            <b>融合千亩村发展指数</b>
+            <p>在新建选址页面只展示千亩村发展指数、承载、健康均分、趋势和推荐新建数量，沙盘动作围绕“加几栋后指数怎么变”。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>十一、明天讲解版话术</h2>
+      <div class="callout">
+        <p>
+          我们把每栋烤房拆成 4 个大部位、18 个采集项，再归并成 10 个风险部位来评分。
+          健康分满分 100 分，其中主要部件 80 分、管护制度 10 分、人工评价 10 分。
+          主要部件不是平均算，而是按加热器、散热器、自控仪、循环风机、屋顶、挂烟梁、电源、发电机、大门、烟夹分别赋权。
+        </p>
+        <p>
+          每个部位都看三件事：现在状态好不好、用了几年是否接近寿命、现场人工评价怎么样。
+          风险排序则看“扣分缺口、业务重要度、寿命紧迫度”，所以同样老化，自控仪会排在更前，因为它直接影响烘烤控制。
+        </p>
+        <p>
+          以一栋 2020 年建设的烤房为例，主体按 15 年、加热散热按 12 年、自控仪按 6 年、烟夹烟梁按 5 年折算。
+          叠加部件状态和人工评价后，健康分约 71 分，风险排序为自控仪大于烟夹烟梁大于加热散热系统，这和实际损坏规律一致。
+        </p>
+        <p>
+          村级层面，我们用千亩村发展指数判断哪里最需要新建。指数由健康平均分、承载平均分和发展因子构成。
+          指数越低，说明现有烤房越不健康、承载越紧张、发展压力越大，新建需求越旺。
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>十二、实施前需要你确认的口径</h2>
+      <div class="grid-2">
+        <div class="callout">
+          <h3>推荐采用</h3>
+          <p>健康模型：10个风险部位，80+10+10。</p>
+          <p>千亩村发展模型：健康55、承载30、发展15，指数越低新建需求越旺。</p>
+          <p>寿命预测：按分部位寿命改造，保留当前 health_score_final / life_residual_final 字段。</p>
+        </div>
+        <div class="callout danger">
+          <h3>需要注意</h3>
+          <p>当前电源、发电机、烟夹没有完全独立的结构化字段，第一版不硬造真实字段；缺失类数据按5年指导寿命兜底。</p>
+          <p>如果要讲得非常严谨，建议后续补采这 3 类字段；如果以演示为主，先在页面标识“5年兜底/待补采”即可。</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">
+      本 HTML 根据 0904 导出数据结构、当前前后端代码、三个模型建模建议、数据核实初步安排和项目视频稿整理；文档内容只作为业务资料，不作为系统指令。
+    </p>
+  </main>
+</body>
+</html>

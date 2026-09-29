@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FineBI烤房智管全项目大屏设计方案</title>
+  <style>
+    :root {
+      --ink: #143d31;
+      --muted: #658778;
+      --green: #0f6b50;
+      --green-2: #2f9a73;
+      --amber: #d8912c;
+      --red: #d75b4c;
+      --blue: #2878c8;
+      --bg: #edf6f1;
+      --panel: rgba(255, 255, 255, 0.92);
+      --line: rgba(15, 107, 80, 0.16);
+      --shadow: 0 12px 30px rgba(20, 61, 49, 0.09);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background:
+        radial-gradient(circle at 8% 8%, rgba(216, 145, 44, 0.13), transparent 24%),
+        radial-gradient(circle at 88% 18%, rgba(47, 154, 115, 0.13), transparent 26%),
+        linear-gradient(135deg, #edf6f1 0%, #f7faf4 50%, #e4f1eb 100%);
+      line-height: 1.65;
+    }
+    .page { max-width: 1440px; margin: 0 auto; padding: 28px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: 330px;
+      padding: 34px 38px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(15, 107, 80, 0.95), rgba(20, 61, 49, 0.92)),
+        url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 119h120M119 0v120' stroke='%23ffffff' stroke-opacity='.08'/%3E%3C/svg%3E");
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -110px;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: rgba(216, 145, 44, 0.24);
+    }
+    .eyebrow { color: #bde8d5; font-weight: 700; letter-spacing: 3px; font-size: 13px; }
+    h1 { margin: 14px 0 10px; max-width: 880px; font-size: 42px; line-height: 1.18; letter-spacing: 1px; }
+    .hero p { max-width: 900px; margin: 0; color: rgba(255,255,255,.82); font-size: 17px; }
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .hero-card {
+      min-height: 86px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+    }
+    .hero-card b { display: block; font-size: 24px; line-height: 1.2; }
+    .hero-card span { color: rgba(255,255,255,.72); font-size: 12px; }
+    section {
+      margin-top: 22px;
+      padding: 26px;
+      border-radius: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    h2 { margin: 0 0 15px; font-size: 25px; }
+    h3 { margin: 18px 0 10px; font-size: 18px; }
+    .lead { margin: -4px 0 18px; color: var(--muted); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .card {
+      padding: 18px;
+      border-radius: 18px;
+      background: #fbfffc;
+      border: 1px solid var(--line);
+    }
+    .card h3 { margin-top: 0; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(47,154,115,.1);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .tag.warn { color: #9a5b10; background: rgba(216,145,44,.14); }
+    .tag.danger { color: var(--red); background: rgba(215,91,76,.12); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      background: white;
+      font-size: 13px;
+    }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(15,107,80,.11); vertical-align: top; }
+    th { color: var(--green); text-align: left; background: rgba(47,154,115,.08); white-space: nowrap; }
+    td { color: #315f51; }
+    .screen {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 16px;
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(15,107,80,.06), rgba(216,145,44,.06));
+      border: 1px solid var(--line);
+    }
+    .screen-title {
+      padding: 14px;
+      border-radius: 16px;
+      color: white;
+      background: linear-gradient(135deg, var(--green), #164b3b);
+    }
+    .screen-title b { display: block; font-size: 20px; }
+    .screen-title span { font-size: 12px; color: rgba(255,255,255,.78); }
+    .layout {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 10px;
+    }
+    .widget {
+      min-height: 86px;
+      padding: 12px;
+      border-radius: 14px;
+      background: white;
+      border: 1px solid rgba(15,107,80,.12);
+    }
+    .widget.w2 { grid-column: span 2; }
+    .widget.w3 { grid-column: span 3; }
+    .widget.w4 { grid-column: span 4; }
+    .widget.w5 { grid-column: span 5; }
+    .widget.w6 { grid-column: span 6; }
+    .widget.w7 { grid-column: span 7; }
+    .widget.w8 { grid-column: span 8; }
+    .widget.w12 { grid-column: span 12; }
+    .widget b { display: block; margin-bottom: 4px; color: var(--ink); }
+    .widget span { color: var(--muted); font-size: 12px; }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(15,107,80,.18);
+    }
+    .metric:last-child { border-bottom: 0; }
+    .metric strong { color: var(--green); font-size: 20px; }
+    .formula {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: #102f27;
+      color: #d8f1e6;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      white-space: pre-wrap;
+      font-size: 13px;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .flow div {
+      min-height: 92px;
+      padding: 12px;
+      border-radius: 16px;
+      background: #fbfffc;
+      border: 1px solid var(--line);
+      position: relative;
+    }
+    .flow b { color: var(--green); }
+    .note {
+      padding: 14px 16px;
+      border-left: 4px solid var(--amber);
+      background: rgba(216,145,44,.1);
+      border-radius: 12px;
+      color: #5f4b27;
+    }
+    .source-list li { margin: 6px 0; }
+    .small { color: var(--muted); font-size: 12px; }
+    @media (max-width: 1100px) {
+      .hero-grid, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3, .screen { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .widget, .widget.w2, .widget.w3, .widget.w4, .widget.w5, .widget.w6, .widget.w7, .widget.w8, .widget.w12 { grid-column: span 1; }
+      .flow { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="hero">
+      <div class="eyebrow">FINEBI IMPLEMENTATION PLAN · 2026-09-04</div>
+      <h1>烤房智管全项目 FineBI 大屏与多屏看板设计方案</h1>
+      <p>设计主线采用“一个数据库、两个模型、一个协同平台、三类六个应用”：先让管理层看清烤房家底，再用健康模型和千亩村发展模型解释风险与投入方向，最后把调剂、抢修、养护、评价、资金、队伍协同全部落到可操作看板。</p>
+      <div class="hero-grid">
+        <div class="hero-card"><b>2444</b><span>烤房主数据记录</span></div>
+        <div class="hero-card"><b>1673</b><span>在用烤房</span></div>
+        <div class="hero-card"><b>72.64</b><span>平均健康分</span></div>
+        <div class="hero-card"><b>703</b><span>维修历史记录</span></div>
+        <div class="hero-card"><b>2970</b><span>烟农问卷答题</span></div>
+        <div class="hero-card"><b>805</b><span>清平传感器读数</span></div>
+      </div>
+    </div>
+
+    <section>
+      <h2>一、总体设计结论</h2>
+      <p class="lead">FineBI 不建议只做一个“烤房列表大屏”。应做成一个主控驾驶舱加 8 个业务分屏，主控板负责领导汇报和总览，业务分屏负责追问题、查原因、落动作。</p>
+      <div class="grid-4">
+        <div class="card">
+          <span class="tag">主板定位</span>
+          <h3>县域烤房智管驾驶舱</h3>
+          <p>面向局领导、现代办、烟叶生产管理人员，回答“现在家底如何、风险在哪、投入投哪、服务闭环怎么样”。</p>
+        </div>
+        <div class="card">
+          <span class="tag warn">模型定位</span>
+          <h3>健康模型 + 千亩村模型</h3>
+          <p>健康模型解释修复优先级，千亩村发展模型解释新建优先级。两者共同支撑“智投”。</p>
+        </div>
+        <div class="card">
+          <span class="tag">运营定位</span>
+          <h3>调剂、抢修、养护闭环</h3>
+          <p>围绕烟农“无房用、无人修、无钱养”三类痛点，将申请、派单、执行、验收、评价纳入看板。</p>
+        </div>
+        <div class="card">
+          <span class="tag danger">预警定位</span>
+          <h3>风险前置</h3>
+          <p>把较差/危险健康等级、损毁闲置、逾期维修、设备离线、温湿度异常、资金异常作为预警主题。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>二、FineBI 数据集设计</h2>
+      <p class="lead">建议在 FineBI 中先建“明细数据集 + 汇总数据集 + 模型结果数据集”。明细用于钻取，汇总用于大屏性能，模型结果用于解释和排序。</p>
+      <table>
+        <thead>
+          <tr><th>数据主题</th><th>FineBI 数据集</th><th>来源表</th><th>主键/关联键</th><th>主要用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>烤房资产底座</td><td>DWD_烤房一栋一档</td><td>ovens, kf_basedata</td><td>oven_id/project_id</td><td>资产总量、状态、县乡村分布、建设方式、项目类型、经纬度地图</td></tr>
+          <tr><td>四部位十八部件</td><td>DWD_部件状态明细</td><td>kf_heater, kf_radiator, kf_controller, kf_oven_body, kf_annex, oven_components</td><td>project_id/oven_id</td><td>部件损坏、缺失、修复年度、风险部位排序</td></tr>
+          <tr><td>维修闭环</td><td>DWD_维修工单闭环</td><td>repair_records, repair_requests, repair_progress, component_quotes</td><td>repair_id/oven_id</td><td>维修量、费用、进度、故障类型、逾期、配件费用</td></tr>
+          <tr><td>调剂预约</td><td>DWD_烤房预约调剂</td><td>reservations, temporary_reservations, oven_assignments, baking_records</td><td>reservation_id/assignment_id/oven_id</td><td>预约状态、烤房占用、临时调剂、烘烤周期、周转效率</td></tr>
+          <tr><td>烟农画像</td><td>DWD_烟农知识画像</td><td>farmer_profile, farmer_question, users, planting_records</td><td>user_id/farmer_phone</td><td>知识薄弱维度、培育优先级、问卷正确率、种植面积与产量</td></tr>
+          <tr><td>智能设备</td><td>DWD_清平设备读数</td><td>qingping_devices, qingping_sensor_readings, qingping_webhook_receipts</td><td>device_mac/oven_id</td><td>在线状态、温湿度曲线、电量、信号、异常监控</td></tr>
+          <tr><td>选址新建</td><td>DWD_新建选址沙盘</td><td>site_selection_candidates, site_new_build_candidates, site_new_build_tobacco_fact, site_new_build_barn_fact, site_new_build_village_stats</td><td>candidate_id/township/village</td><td>候选点适宜性、村级负载、收购量、千亩村发展指数、新建优先级</td></tr>
+          <tr><td>合作社协同</td><td>DWD_合作社用管协同</td><td>maintenance_teams, bakers, pound_groups, fund_managements, 合作社相关资料表格</td><td>team_id/pound_group_id/year</td><td>四支队伍、人员覆盖、养护基金收入支出结余、服务绩效</td></tr>
+          <tr><td>评价反馈</td><td>DWD_烟农评价反馈</td><td>evaluations, users, bakers, ovens</td><td>evaluation_id/oven_id/user_id</td><td>满意度、评价标签、烤房/烘烤师服务质量</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>三、主板：县域烤房智管驾驶舱</h2>
+      <p class="lead">主板适合放在 BI 大屏入口，参考你当前系统截图风格：左侧菜单进入 BI 大屏，主板顶部放关键 KPI，中间放地图与模型状态，底部放预警和待办。</p>
+      <div class="screen">
+        <div class="screen-title"><b>主屏 01</b><span>县域总览 / 领导汇报</span></div>
+        <div class="layout">
+          <div class="widget w2"><b>总烤房数</b><span>指标卡：2444。口径：ovens 去表头后记录数。</span></div>
+          <div class="widget w2"><b>在用烤房</b><span>指标卡：1673。可加在用率。</span></div>
+          <div class="widget w2"><b>闲置烤房</b><span>指标卡：331。点击钻取乡镇/村。</span></div>
+          <div class="widget w2"><b>损毁烤房</b><span>指标卡：439。红色预警。</span></div>
+          <div class="widget w2"><b>平均健康分</b><span>指标卡：72.64，显示较昨日/上次导出变化。</span></div>
+          <div class="widget w2"><b>待处理预警</b><span>较差、危险、离线、逾期维修合并。</span></div>
+          <div class="widget w7"><b>宜昌市-秭归县烤房资产地图</b><span>地图组件：宜昌市绿色边界、秭归县橙色边界、乡镇分层；点位按健康等级/使用状态切换。</span></div>
+          <div class="widget w5"><b>“一个数据库、两个模型、一个协同平台”流程图</b><span>流程组件或自定义图片：数据采集 → 健康评分 → 千亩村发展指数 → 调剂/抢修/养护/新建/修复决策。</span></div>
+          <div class="widget w4"><b>健康等级分布</b><span>环形图：优良343、良好861、一般764、预警414、危险61。</span></div>
+          <div class="widget w4"><b>乡镇烤房 TOP 分布</b><span>横向条形图：两河口743、磨坪675、杨林桥488、梅家河188、九畹溪181等。</span></div>
+          <div class="widget w4"><b>预警清单</b><span>明细表：烤房编号、乡镇、村、健康等级、剩余寿命、最近维修、责任技术员。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>四、分屏设计</h2>
+      <p class="lead">建议一个 FineBI 目录下建 9 个仪表板：1 个主板 + 8 个分屏。每个分屏只解决一个业务问题，避免所有图堆在一页。</p>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 02</b><span>烤房资产一栋一档</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>建设方式构成</b><span>饼图：行业投入2322、政府投入120。</span></div>
+          <div class="widget w3"><b>项目类型构成</b><span>饼图：卧式密集烤房、电能烤房。</span></div>
+          <div class="widget w3"><b>使用状态</b><span>堆叠柱：在用、闲置、损毁，支持乡镇过滤。</span></div>
+          <div class="widget w3"><b>档案完整率</b><span>指标卡：加热、散热、自控、主体、附属是否填写。</span></div>
+          <div class="widget w8"><b>烤房空间分布地图</b><span>地图点：按状态着色，点击弹出一栋一档字段，包括编号、地址、技术员、项目类型、建设方式。</span></div>
+          <div class="widget w4"><b>资产明细钻取表</b><span>表格：烤房编号、县乡村、地址、使用状态、健康分、建设方式、技术员。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 03</b><span>健康模型与风险部位</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>平均健康分</b><span>指标卡：72.64，可按乡镇/村联动。</span></div>
+          <div class="widget w3"><b>低分烤房数</b><span>健康分&lt;60 或等级=危险/预警，作为修复候选池。</span></div>
+          <div class="widget w3"><b>风险部件数</b><span>缺失/损坏部件合计，按四部位汇总。</span></div>
+          <div class="widget w3"><b>模型解释</b><span>文本组件：年限40 + 部件状态40 + 人工评价20。</span></div>
+          <div class="widget w6"><b>健康分分布</b><span>直方图或分段柱：0-60、60-70、70-80、80-90、90-100。</span></div>
+          <div class="widget w6"><b>四部位风险雷达</b><span>雷达图：加热、散热、自控、主体、附属，展示损坏率/缺失率。</span></div>
+          <div class="widget w12"><b>修复优先级清单</b><span>表格：烤房编号、健康分、风险部位、预计费用、所在村收购量、是否千亩村、推荐动作。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 04</b><span>新建选址与千亩村发展指数</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>千亩村数量</b><span>指标卡：15 个千亩村，来自千亩村统计表。</span></div>
+          <div class="widget w3"><b>候选点数量</b><span>指标卡：选址候选点798，新建候选点10。</span></div>
+          <div class="widget w3"><b>适宜候选点</b><span>指标卡：高度适宜8、适宜9、一般2、不适宜1，其余待评估。</span></div>
+          <div class="widget w3"><b>发展指数最高村</b><span>指标卡：香龙18.5，陈家淌/赵家山/荒口坪18。</span></div>
+          <div class="widget w7"><b>沙盘地图</b><span>地图：宜昌市绿色边界、秭归县橙色边界、候选点按适宜等级着色、千亩村按发展指数分层。</span></div>
+          <div class="widget w5"><b>千亩村发展指数排行</b><span>横向条形图：村级集体经济、管护服务、政策争取、规模趋势、发展承载量五项堆叠。</span></div>
+          <div class="widget w6"><b>供需承载矩阵</b><span>散点图：X=情景后负载率，Y=发展指数，气泡大小=收购量或合同面积，颜色=推荐等级。</span></div>
+          <div class="widget w6"><b>新建推荐解释表</b><span>表格：乡镇、村、发展指数、负载缺口、候选点数、融合分、推荐动作。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 05</b><span>维修抢修闭环</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>维修历史</b><span>指标卡：703 条，历史专项修复为主。</span></div>
+          <div class="widget w3"><b>预估费用</b><span>指标卡：约367.79万元。</span></div>
+          <div class="widget w3"><b>实时工单</b><span>指标卡：repair_requests 当前 10 条。</span></div>
+          <div class="widget w3"><b>抢修状态</b><span>状态卡：submitted、accepted、repairing、completed、rejected。</span></div>
+          <div class="widget w6"><b>故障类型分布</b><span>柱图：fan、power、heating、controller、structure。</span></div>
+          <div class="widget w6"><b>维修流程漏斗</b><span>漏斗：提交 → 接单 → 维修中 → 完成 → 验收/评价。</span></div>
+          <div class="widget w12"><b>逾期和高风险工单明细</b><span>表格：维修单号、故障类型、期望上门、提报距离、技术员、状态、完成时间。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 06</b><span>预约调剂与烘烤周转</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>预约总数</b><span>指标卡：15 条。</span></div>
+          <div class="widget w3"><b>平均预约天数</b><span>指标卡：20 天。</span></div>
+          <div class="widget w3"><b>临时预约</b><span>指标卡：8 条，展示极端天气等应急原因。</span></div>
+          <div class="widget w3"><b>烘烤记录</b><span>指标卡：6 条，按季节年过滤。</span></div>
+          <div class="widget w6"><b>烤房占用日历</b><span>日历热力图：日期 × 烤房，颜色表示空闲/预约/烘烤/完成。</span></div>
+          <div class="widget w6"><b>调剂推荐分解</b><span>堆叠条：负载、健康、距离、可用性，来自 temporary_reservations.score_snapshot。</span></div>
+          <div class="widget w12"><b>可调剂烤房清单</b><span>表格：烤房、当前位置、健康分、计划结束时间、可调剂窗口、推荐分。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 07</b><span>烟农画像与培育</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>画像人数</b><span>指标卡：59 人。</span></div>
+          <div class="widget w3"><b>问卷答题</b><span>指标卡：2970 条。</span></div>
+          <div class="widget w3"><b>平均画像分</b><span>指标卡：51.06。</span></div>
+          <div class="widget w3"><b>正确率</b><span>指标卡：约50.8%。</span></div>
+          <div class="widget w5"><b>薄弱维度分布</b><span>条形图：栽培18、烘烤14、综合12、采烤8、植保6。</span></div>
+          <div class="widget w7"><b>知识维度正确率</b><span>矩阵热力图：乡镇 × 维度，颜色为正确率。</span></div>
+          <div class="widget w12"><b>培育优先清单</b><span>表格：烟农、乡镇、村、k_cult/k_pp/k_hv/k_cur/k_syn、薄弱维度、优先级、建议课程。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 08</b><span>合作社用管协同</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>服务队数量</b><span>调制技术、应急抢修、日常养护、综合管理四类。</span></div>
+          <div class="widget w3"><b>维修基金收入</b><span>2025 合计107.64万元，2024 合计91.34万元。</span></div>
+          <div class="widget w3"><b>维修基金支出</b><span>2025 合计79.17万元，2024 合计99.69万元。</span></div>
+          <div class="widget w3"><b>基金结余</b><span>2025 结余93.89万元，作为合作社资金透明展示。</span></div>
+          <div class="widget w6"><b>年度收支趋势</b><span>组合图：收入柱 + 支出柱 + 结余折线，按服务队/片区筛选。</span></div>
+          <div class="widget w6"><b>四支队伍覆盖</b><span>地图或矩阵：片区 × 服务队人数，展示磨坪、柏家坪、梅家河、两河、铺庄、杨林、九畹溪。</span></div>
+          <div class="widget w12"><b>服务队绩效明细</b><span>表格：队伍、队员、片区、服务次数、抢修次数、验收通过率、评价均分、劳务费用。</span></div>
+        </div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-title"><b>屏 09</b><span>清平设备与实时预警</span></div>
+        <div class="layout">
+          <div class="widget w3"><b>设备数</b><span>指标卡：3 台。</span></div>
+          <div class="widget w3"><b>读数数</b><span>指标卡：805 条。</span></div>
+          <div class="widget w3"><b>平均温度</b><span>指标卡：31.29℃。</span></div>
+          <div class="widget w3"><b>平均湿度</b><span>指标卡：51.41%。</span></div>
+          <div class="widget w8"><b>温湿度时间曲线</b><span>折线图：reported_at 为时间轴，temperature/humidity/probe_temperature 为指标。</span></div>
+          <div class="widget w4"><b>设备在线状态</b><span>状态列表：MAC、关联烤房、离线状态、电量、信号、最近上报。</span></div>
+          <div class="widget w12"><b>实时异常明细</b><span>表格：温度过高/过低、湿度异常、电量低、信号弱、设备离线、数据延迟。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>五、关键模型在 FineBI 中如何落地</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>1. 烤房健康模型</h3>
+          <div class="formula">健康分 = 年限折算分 × 40%
+      + 部件状态分 × 40%
+      + 人工评价分 × 20%
+
+风险部位排序 = 各部位剩余寿命扣分 + 损坏/缺失扣分 + 最近维修年度扣分</div>
+          <p>FineBI 展示方式：健康分仪表盘、健康等级环形图、四部位雷达图、低分烤房明细表。点击乡镇或村后，所有组件联动刷新。</p>
+        </div>
+        <div class="card">
+          <h3>2. 千亩村发展模型</h3>
+          <div class="formula">发展指数 = 健康平均分因子 55
+        + 承载平均分因子 30
+        + 发展因子 15
+
+展示口径：指数越低，新建需求越旺盛；指数越高，发展基础和承接能力越强。</div>
+          <p>FineBI 展示方式：千亩村排行、供需承载矩阵、五项评分堆叠条、新建推荐解释表。必须同时展示“为什么推荐”和“推荐后负载是否改善”。</p>
+        </div>
+      </div>
+      <h3>3. 新建选址融合推荐</h3>
+      <div class="formula">新建推荐优先级 = 村级负载缺口 × 50%
+              + 千亩村发展指数 × 25%
+              + 规模增长趋势 × 15%
+              + 政策管护保障 × 10%</div>
+      <p>FineBI 中不要只给一个分数，要拆成四段贡献：负载缺口、发展指数、趋势、政策管护。这样领导能看到推荐不是“黑箱”。</p>
+    </section>
+
+    <section>
+      <h2>六、指标与维度清单</h2>
+      <div class="grid-2">
+        <div>
+          <h3>核心指标</h3>
+          <table>
+            <thead><tr><th>指标</th><th>口径</th><th>建议组件</th></tr></thead>
+            <tbody>
+              <tr><td>总烤房数</td><td>ovens 记录数，排除表头/异常测试数据</td><td>指标卡</td></tr>
+              <tr><td>在用率</td><td>在用烤房数 / 总烤房数</td><td>指标卡 + 趋势</td></tr>
+              <tr><td>闲置率</td><td>闲置烤房数 / 总烤房数</td><td>预警卡</td></tr>
+              <tr><td>损毁率</td><td>损毁烤房数 / 总烤房数</td><td>预警卡</td></tr>
+              <tr><td>平均健康分</td><td>AVG(health_score)</td><td>仪表盘</td></tr>
+              <tr><td>低分烤房数</td><td>健康分&lt;60 或健康等级=危险/预警</td><td>指标卡 + 明细表</td></tr>
+              <tr><td>维修费用</td><td>SUM(estimated_cost/actual_cost)</td><td>柱线组合图</td></tr>
+              <tr><td>问卷正确率</td><td>正确题数 / 总题数</td><td>指标卡 + 热力图</td></tr>
+              <tr><td>设备在线率</td><td>在线设备数 / 设备总数</td><td>状态卡</td></tr>
+              <tr><td>千亩村发展指数</td><td>健康因子 + 承载因子 + 发展因子</td><td>排行条形图</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>核心维度</h3>
+          <table>
+            <thead><tr><th>维度</th><th>字段来源</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td>时间</td><td>created_at、updated_at、apply_time、reported_at、stat_year</td><td>趋势、同比、季节筛选</td></tr>
+              <tr><td>行政区划</td><td>county、township、village</td><td>地图、排名、钻取</td></tr>
+              <tr><td>烤房状态</td><td>use_status/status/后台使用状态</td><td>资产盘点、预警</td></tr>
+              <tr><td>健康等级</td><td>health_level/health_score</td><td>健康模型与修复决策</td></tr>
+              <tr><td>部件类型</td><td>加热、散热、自控、主体、附属</td><td>风险部位分析</td></tr>
+              <tr><td>维修状态</td><td>repair_status/status</td><td>闭环进度分析</td></tr>
+              <tr><td>服务队</td><td>team_type/team_name/pound_group</td><td>合作社绩效</td></tr>
+              <tr><td>烟农画像维度</td><td>k_cult、k_pp、k_hv、k_cur、k_syn、weak_dim</td><td>培育策略</td></tr>
+              <tr><td>候选点等级</td><td>suitability_level、total_score、topsis_score</td><td>新建选址</td></tr>
+              <tr><td>设备维度</td><td>device_mac、oven_id、is_offline</td><td>实时监控</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>七、FineBI 实施步骤</h2>
+      <div class="flow">
+        <div><b>1. 导入数据</b><br />将导出0904目录的 Excel 作为第一版离线数据源。</div>
+        <div><b>2. 建公共维表</b><br />建立县、乡镇、村、烤房、烟农、服务队维表。</div>
+        <div><b>3. 建主题数据集</b><br />按资产、部件、维修、预约、问卷、设备、选址、合作社拆主题。</div>
+        <div><b>4. 写计算字段</b><br />健康等级、在用率、损毁率、正确率、逾期、低分标记。</div>
+        <div><b>5. 做主板</b><br />先完成主控驾驶舱，保证领导一屏看清项目价值。</div>
+        <div><b>6. 做分屏</b><br />每个分屏围绕一个业务动作：修、建、调、抢、养、培育。</div>
+        <div><b>7. 联动校验</b><br />按县乡村、年份、状态过滤，核对 KPI 与明细是否一致。</div>
+      </div>
+      <h3>FineBI 具体操作建议</h3>
+      <table>
+        <thead><tr><th>操作</th><th>具体做法</th><th>注意事项</th></tr></thead>
+        <tbody>
+          <tr><td>数据连接</td><td>先用 Excel 数据集，后续可换 MySQL 直连同名表。</td><td>Excel 表头存在中文和英文混用，建议在 FineBI 中统一别名。</td></tr>
+          <tr><td>字段清洗</td><td>把表头行、空行、测试数据单独过滤。</td><td>部分导出含一行英文表头或表头重复，必须排除。</td></tr>
+          <tr><td>关联关系</td><td>烤房编号统一为 oven_id/project_id，烟农统一 user_id/phone。</td><td>关联前先做字段类型统一，避免文本数字混用。</td></tr>
+          <tr><td>计算字段</td><td>在用标记、损毁标记、低分标记、逾期标记、设备离线标记。</td><td>预警口径要写在看板角落，不然解释成本高。</td></tr>
+          <tr><td>地图配置</td><td>上传宜昌市、秭归县 GeoJSON；烤房点用经纬度。</td><td>秭归县建议橙色，宜昌市绿色，点位按健康等级着色。</td></tr>
+          <tr><td>权限</td><td>县级看全局，乡镇站点只看本辖区，合作社看服务队与资金。</td><td>系统管理员看数据质量与导入状态。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>八、预警体系</h2>
+      <div class="grid-3">
+        <div class="card"><h3>红色预警</h3><p>危险健康等级、健康分低于60、损毁烤房、维修逾期、设备离线超过24小时、温湿度严重异常。</p></div>
+        <div class="card"><h3>橙色预警</h3><p>预警健康等级、闲置超过阈值、维修中超过期望上门时间、千亩村负载过高、发展指数低但无新建计划。</p></div>
+        <div class="card"><h3>绿色跟踪</h3><p>已完成维修、预约完成、养护验收通过、评价满意、设备在线、资金收支正常。</p></div>
+      </div>
+      <p class="note">建议主板右侧固定放“预警中心”：按严重程度、乡镇、责任人、处理时限排序。点击预警后跳转到对应分屏和明细表。</p>
+    </section>
+
+    <section>
+      <h2>九、数据质量与口径风险</h2>
+      <table>
+        <thead><tr><th>风险</th><th>当前发现</th><th>FineBI 处理建议</th></tr></thead>
+        <tbody>
+          <tr><td>导出表头混杂</td><td>部分表同时存在中文表头和英文表头，统计时可能多算1行。</td><td>统一建立数据清洗规则：排除 id、status 等英文表头行。</td></tr>
+          <tr><td>状态字段不统一</td><td>ovens.status 出现 idle，后台使用状态另有在用/闲置/损毁。</td><td>主口径用“后台使用状态”，英文 status 作为系统状态辅助。</td></tr>
+          <tr><td>测试数据混入</td><td>县区字段出现云浮市/云安区等非秭归数据。</td><td>主板默认过滤 county=秭归县，异常数据进数据质量分屏。</td></tr>
+          <tr><td>模型字段不全</td><td>部分维修 ROI、实际成本为空。</td><td>空值不替代为0，单独显示“缺失”。</td></tr>
+          <tr><td>设备关联不完整</td><td>清平设备存在未关联烤房编号。</td><td>设备屏单独显示未绑定设备清单。</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>十、最终推荐的 FineBI 页面目录</h2>
+      <table>
+        <thead><tr><th>序号</th><th>页面名称</th><th>核心问题</th><th>使用对象</th></tr></thead>
+        <tbody>
+          <tr><td>01</td><td>县域烤房智管驾驶舱</td><td>家底、模型、协同、预警总览</td><td>领导、现代办</td></tr>
+          <tr><td>02</td><td>烤房一栋一档资产屏</td><td>烤房在哪里、什么状态、谁负责</td><td>站所、技术员</td></tr>
+          <tr><td>03</td><td>健康模型与修复决策屏</td><td>哪些烤房该修、先修什么部件</td><td>现代办、维修队</td></tr>
+          <tr><td>04</td><td>新建选址与千亩村发展屏</td><td>哪些村该新建、为什么投这里</td><td>烟草公司、管理层</td></tr>
+          <tr><td>05</td><td>维修抢修闭环屏</td><td>工单是否及时、抢修是否闭环</td><td>维修队、合作社</td></tr>
+          <tr><td>06</td><td>预约调剂与烘烤周转屏</td><td>无房用如何调剂、周转效率如何</td><td>烟农端运营、站所</td></tr>
+          <tr><td>07</td><td>烟农画像与培育屏</td><td>烟农弱项在哪里、该培训谁</td><td>烟农培育负责人</td></tr>
+          <tr><td>08</td><td>合作社用管协同屏</td><td>四支队伍如何服务、资金是否透明</td><td>合作社、县局</td></tr>
+          <tr><td>09</td><td>清平设备与实时预警屏</td><td>设备是否在线、温湿度是否异常</td><td>技术员、值班人员</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>十一、资料来源</h2>
+      <ul class="source-list">
+        <li>导出数据目录：基础数据/导出0904，共 43 个 Excel 导出表。</li>
+        <li>方案文档：《让烤房鲜活起来——一份烟农问卷催生的烤房智管解决方案》。</li>
+        <li>方案文档：一份调查问卷引发的智与谋。</li>
+        <li>核实文档：几个数据核实及初步安排。</li>
+        <li>补充表格：合作社相关资料表格、千亩村烟叶种植情况统计表—秭归。</li>
+      </ul>
+      <p class="small">本方案是 FineBI 设计与实施说明，不是直接连接 FineBI 的导入文件。后续如果要落地成 FineBI 页面，建议先按“数据集设计”完成字段清洗与主题数据集，再按分屏逐页搭建。</p>
+    </section>
+  </main>
+</body>
+</html>

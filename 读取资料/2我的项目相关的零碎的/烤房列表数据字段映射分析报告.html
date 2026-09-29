@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烤房列表数据字段映射分析报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-card strong {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-card p {
+            color: #555;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.3s;
+        }
+
+        table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        table td {
+            padding: 14px 12px;
+            font-size: 14px;
+        }
+
+        table td:first-child {
+            font-weight: 600;
+            color: #333;
+            background: #fafafa;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-source {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .tag-db {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .tag-join {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .tag-calculated {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .field-name {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .description {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .highlight {
+            background: #fff9c4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .database-table {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .database-table strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .conclusion {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+
+        .conclusion h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .conclusion p {
+            color: #37474f;
+            line-height: 1.8;
+        }
+
+        .note {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note strong {
+            color: #ef6c00;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .note p {
+            color: #5d4037;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>烤房列表数据字段映射分析报告</h1>
+            <p>前端展示字段 ↔ 后端API返回字段 ↔ 数据库表字段</p>
+        </header>
+
+        <div class="content">
+            <!-- 概述 -->
+            <div class="section">
+                <div class="section-title">📊 数据源概述</div>
+                <div class="info-card">
+                    <strong>主要数据源</strong>
+                    <p>烤房列表数据来源于两个核心数据库表：</p>
+                    <ul style="margin-left: 20px; margin-top: 10px; color: #555;">
+                        <li><strong>kf_basedata 表</strong> - 存储烤房基础信息（地理位置、建设方式、项目类型等）</li>
+                        <li><strong>ovens 表</strong> - 存储烤房运行状态（使用状态、健康评分、温度湿度等）</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <strong>数据查询方式</strong>
+                    <p>通过 LEFT JOIN 将两个表关联，确保基础信息和运行状态数据同时返回</p>
+                </div>
+            </div>
+
+            <!-- API端点信息 -->
+            <div class="section">
+                <div class="section-title">🔌 API端点信息</div>
+                <div class="info-card">
+                    <strong>主要API接口</strong>
+                    <p><code class="field-name">GET /barn/project/list</code> - 烤房列表查询接口（分页）</p>
+                    <p><code class="field-name">GET /barn/project/assign-list</code> - 烤房分配专用列表接口</p>
+                </div>
+            </div>
+
+            <!-- 字段映射表 -->
+            <div class="section">
+                <div class="section-title">🔗 字段映射详解</div>
+
+                <!-- 基础信息字段 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">📋 基础信息字段</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">barnName</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">project_id</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">烤房编码（主键）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">projectId</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">project_id</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">烤房编码（别名）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">city</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">city</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">城市名称</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">county</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">county</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">县区名称</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">township</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">township</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">乡镇名称</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">village</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">village</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">村名称</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">detailAddress</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">detail_address</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">详细地址</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">address</code></td>
+                            <td><span class="tag tag-join">计算</span>拼接字段</td>
+                            <td>多表</td>
+                            <td class="description">完整地址（city+county+township+village+detail_address）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">projectType</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">project_type</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">项目类型（如：密集烤房、智能化烤房等）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">buildMethod</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">build_method</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">建设方式（如：新建、改建、扩建等）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">technician</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">technician_name</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">技术负责人姓名</td>
+                            <td>String</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 地理位置 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">📍 地理位置</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">latitude</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">latitude</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">纬度（用于地图定位）</td>
+                            <td>BigDecimal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">longitude</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">longitude</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">经度（用于地图定位）</td>
+                            <td>BigDecimal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">altitude</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">altitude</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">海拔高度（米）</td>
+                            <td>Integer</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 状态字段 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">⚙️ 状态字段</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">status</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">o.status</code></td>
+                            <td>ovens</td>
+                            <td class="description">烤房运行状态（baking/idle）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">useStatus</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">k.use_status</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">使用状态（在用/闲置/转用/损毁）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">facilityStatus</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">k.facility_status</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">设施现状（正常/闲置/损坏/另作他用）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">healthScore</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">k.current_health_score</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">当前健康评分（0-100）</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">currentHealthScore</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">k.current_health_score</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">当前健康评分（完整字段名）</td>
+                            <td>Integer</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 健康与寿命 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">🏥 健康与寿命</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">currentHealthScore</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">current_health_score</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">当前健康评分</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">currentLifeResidual</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">current_life_residual</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">剩余寿命（年）</td>
+                            <td>Integer</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">currentHealthAlgo</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">current_health_algo</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">当前健康评分算法</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">currentLifeAlgo</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">current_life_algo</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">剩余寿命计算算法</td>
+                            <td>String</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 运行数据 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">🌡️ 运行数据</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">temperature</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">o.temperature</code></td>
+                            <td>ovens</td>
+                            <td class="description">当前温度（℃）</td>
+                            <td>BigDecimal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">humidity</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">o.humidity</code></td>
+                            <td>ovens</td>
+                            <td class="description">当前湿度（%）</td>
+                            <td>BigDecimal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">bakerId</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">o.baker_id</code></td>
+                            <td>ovens</td>
+                            <td class="description">当前烤烟员ID</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">bakerName</code></td>
+                            <td><span class="tag tag-join">JOIN</span><code class="field-name">b.name</code></td>
+                            <td>bakers</td>
+                            <td class="description">当前烤烟员姓名（通过bakers表JOIN）</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">usageCount</code></td>
+                            <td><span class="tag tag-join">数据库</span><code class="field-name">o.usage_count</code></td>
+                            <td>ovens</td>
+                            <td class="description">累计使用次数</td>
+                            <td>Integer</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 其他信息 -->
+                <h3 style="color: #667eea; margin: 30px 0 15px 0; font-size: 18px;">📋 其他信息</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>前端显示字段</th>
+                            <th>后端返回字段</th>
+                            <th>数据库表</th>
+                            <th>字段说明</th>
+                            <th>数据类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">projectCost</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">project_cost</code></td>
+                            <td>kf_basedata</td>
+                            <td class="description">项目投资成本</td>
+                            <td>BigDecimal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">description</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">description</code></td>
+                            <td>ovens</td>
+                            <td class="description">烤房描述/备注</td>
+                            <td>String</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">createdAt</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">created_at</code></td>
+                            <td>ovens</td>
+                            <td class="description">创建时间</td>
+                            <td>LocalDateTime</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-source">前端</span><code class="field-name">updatedAt</code></td>
+                            <td><span class="tag tag-db">数据库</span><code class="field-name">updated_at</code></td>
+                            <td>ovens</td>
+                            <td class="description">更新时间</td>
+                            <td>LocalDateTime</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 数据库表结构 -->
+            <div class="section">
+                <div class="section-title">🗄️ 数据库表结构</div>
+
+                <div class="database-table">
+                    <strong>📊 kf_basedata 表（烤房基础信息）</strong>
+                    <p style="margin-top: 10px; color: #555;">
+                        <code class="field-name">project_id</code> (主键)<br>
+                        <code class="field-name">city</code>, <code class="field-name">county</code>, <code class="field-name">township</code>, <code class="field-name">village</code><br>
+                        <code class="field-name">detail_address</code>, <code class="field-name">project_type</code>, <code class="field-name">build_method</code><br>
+                        <code class="field-name">latitude</code>, <code class="field-name">longitude</code>, <code class="field-name">altitude</code><br>
+                        <code class="field-name">current_health_score</code>, <code class="field-name">current_life_residual</code><br>
+                        <code class="field-name">facility_status</code>, <code class="field-name">use_status</code>
+                    </p>
+                </div>
+
+                <div class="database-table">
+                    <strong>🌡️ ovens 表（烤房运行状态）</strong>
+                    <p style="margin-top: 10px; color: #555;">
+                        <code class="field-name">id</code> (主键, 与 kf_basedata.project_id 关联)<br>
+                        <code class="field-name">status</code> (运行状态: baking/idle)<br>
+                        <code class="field-name">health_score</code> (健康评分)<br>
+                        <code class="field-name">temperature</code>, <code class="field-name">humidity</code><br>
+                        <code class="field-name">baker_id</code>, <code class="field-name">usage_count</code><br>
+                        <code class="field-name">project_cost</code>, <code class="field-name">description</code><br>
+                        <code class="field-name">created_at</code>, <code class="field-name">updated_at</code>
+                    </p>
+                </div>
+
+                <div class="database-table">
+                    <strong>👨‍🌾 bakers 表（烤烟员信息）</strong>
+                    <p style="margin-top: 10px; color: #555;">
+                        <code class="field-name">id</code> (主键)<br>
+                        <code class="field-name">name</code> (姓名)<br>
+                        通过 <code class="field-name">bakers.id = ovens.baker_id</code> JOIN 关联
+                    </p>
+                </div>
+            </div>
+
+            <!-- 结论 -->
+            <div class="conclusion">
+                <h3>✅ 核心结论</h3>
+                <p>
+                    烤房列表数据通过 <strong>LEFT JOIN</strong> 方式从 <code class="field-name">kf_basedata</code> 和 <code class="field-name">ovens</code> 两个表获取：
+                </p>
+                <ul style="margin-left: 20px; margin-top: 15px; color: #37474f; line-height: 1.8;">
+                    <li><strong>kf_basedata 表</strong> 提供烤房的基础信息（编码、地理位置、建设方式、项目类型、健康评分等）</li>
+                    <li><strong>ovens 表</strong> 提供烤房的运行状态（使用状态、温度湿度、烤烟员、使用次数等）</li>
+                    <li><strong>bakers 表</strong> 通过 JOIN 提供烤烟员姓名信息</li>
+                    <li>前端显示字段通过后端 API 返回的映射字段实现展示</li>
+                </ul>
+            </div>
+
+            <!-- 注意事项 -->
+            <div class="note">
+                <strong>⚠️ 注意事项</strong>
+                <p>
+                    1. <strong>数据同步</strong>：kf_basedata 和 ovens 表通过 project_id 字段关联，确保数据一致性<br>
+                    2. <strong>默认值处理</strong>：当 ovens 表中某字段为空时，使用 kf_basedata 表的对应字段或默认值<br>
+                    3. <strong>状态字段</strong>：use_status（使用状态）和 facility_status（设施现状）来自 kf_basedata 表<br>
+                    4. <strong>运行状态</strong>：status（运行状态）来自 ovens 表，用于区分当前是否在烤<br>
+                    5. <strong>健康评分</strong>：优先使用 kf_basedata.current_health_score，若为空则使用 ovens.health_score
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

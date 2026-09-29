@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>千亩村发展指数计算方案</title>
+  <style>
+    :root {
+      --green: #0c6b52;
+      --deep: #143d34;
+      --tea: #f3f8ef;
+      --mint: #e7f4ea;
+      --orange: #d9852f;
+      --red: #c84f3f;
+      --muted: #62736e;
+      --line: rgba(20, 86, 66, .16);
+      --card: rgba(255,255,255,.9);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--deep);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(217,133,47,.20), transparent 28%),
+        radial-gradient(circle at 88% 4%, rgba(12,107,82,.18), transparent 32%),
+        linear-gradient(180deg, #fbfcf7 0%, #eef7ee 52%, #fff8eb 100%);
+      font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+      line-height: 1.75;
+    }
+    main { max-width: 1220px; margin: 0 auto; padding: 34px 26px 70px; }
+    header {
+      border-radius: 30px;
+      padding: 40px;
+      color: #fff;
+      background: linear-gradient(135deg, #084934, #127a5a 58%, #d9852f);
+      box-shadow: 0 22px 60px rgba(25,78,58,.18);
+      overflow: hidden;
+      position: relative;
+    }
+    header:after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      right: -110px;
+      top: -130px;
+      background: rgba(255,255,255,.13);
+    }
+    .eyebrow { letter-spacing: .2em; color: #e2f6df; font-weight: 800; }
+    h1 { margin: 10px 0 12px; font-size: 40px; line-height: 1.18; }
+    header p { max-width: 930px; margin: 0; color: #f1fff1; font-size: 17px; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 26px; }
+    .card {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 18px;
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+    }
+    .card b { display: block; font-size: 24px; }
+    .card span { color: #e5f8e8; font-size: 13px; }
+    section {
+      margin-top: 22px;
+      padding: 27px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 12px 36px rgba(27,82,60,.08);
+    }
+    h2 { margin: 0 0 16px; color: var(--green); font-size: 25px; }
+    h3 { margin: 16px 0 8px; font-size: 18px; }
+    p { margin: 7px 0; }
+    .lead {
+      border-left: 6px solid var(--green);
+      background: var(--mint);
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 17px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 17px;
+      background: #fbfdf9;
+    }
+    .formula {
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      white-space: pre-wrap;
+      color: #effff2;
+      background: #12372f;
+      border-radius: 16px;
+      padding: 18px;
+      overflow-x: auto;
+      line-height: 1.7;
+      margin: 12px 0;
+    }
+    .note {
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid rgba(217,133,47,.28);
+      background: #fff7e8;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #d9e8dc;
+      padding: 10px 11px;
+      vertical-align: top;
+    }
+    th { background: #eaf4ed; color: #114938; text-align: left; }
+    tr:nth-child(even) td { background: #fbfdf9; }
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #e7f4ed;
+      color: var(--green);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .tag.orange { background: #fff0dc; color: #b96616; }
+    .tag.red { background: #fdecea; color: var(--red); }
+    .steps { counter-reset: step; display: grid; gap: 12px; }
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdf9;
+    }
+    .step:before {
+      content: counter(step);
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      font-weight: 900;
+    }
+    .footer { color: var(--muted); font-size: 13px; margin-top: 22px; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      header { padding: 26px; }
+      h1 { font-size: 28px; }
+      .cards, .grid-2 { grid-template-columns: 1fr; }
+      section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">千亩村发展指数 / 计算公式方案</div>
+    <h1>以烤房健康分、容量承载和发展因子为核心的村级新建需求指数</h1>
+    <p>
+      本方案只梳理“千亩村发展指数”如何计算，不展开沙盘演练界面。核心思想是：
+      先算每栋烤房健康分，再按在用、闲置、损毁/待修三类烤房的“健康分 × 容量”计算村级承载质量，
+      最后叠加发展因子，得到指数和新建需求排序。
+    </p>
+    <div class="cards">
+      <div class="card"><b>50%</b><span>烤房健康与有效容量</span></div>
+      <div class="card"><b>30%</b><span>承载压力</span></div>
+      <div class="card"><b>20%</b><span>村级发展因子</span></div>
+      <div class="card"><b>use_status</b><span>判断在用/闲置/损毁</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>一、数据口径先定清楚</h2>
+    <p class="lead">
+      设施现状不要优先用 <span class="tag">facility_status</span>，因为当前导出中该字段几乎全是“正常”；
+      千亩村发展指数应优先使用 <span class="tag orange">kf_basedata.use_status</span> 判断烤房是在用、闲置还是损毁。
+    </p>
+    <div class="grid-2">
+      <div class="box">
+        <h3>烤房状态字段</h3>
+        <p><b>主字段：</b>kf_basedata.use_status</p>
+        <p><b>当前导出统计：</b>在用 1672 栋、闲置 331 栋、损毁 439 栋。</p>
+        <p><b>用途：</b>计算在用承载、闲置可盘活承载、待修/损毁短板承载。</p>
+      </div>
+      <div class="box">
+        <h3>容量字段</h3>
+        <p><b>现有字段：</b>oven_length、oven_width、oven_height。</p>
+        <p><b>建议：</b>若有设计装烟量字段，用设计装烟量；若没有，用默认容量。</p>
+        <p><b>默认值：</b>每座烤房默认 50 担，也可在页面手工改成 40/45/50/60 担或 kg。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>二、总公式：发展指数怎么构成</h2>
+    <p>
+      发展指数采用 0-100 分。分数越高，说明该村现有烤房资源越健康、越够用、发展基础越好；
+      分数越低，说明新建需求越旺。
+    </p>
+    <div class="formula">千亩村发展指数 V = 0.50 × 有效烤能指数 Hc + 0.30 × 承载匹配指数 Lc + 0.20 × 发展因子指数 Dc
+
+新建需求分 N = 100 - V
+
+V 越低：越需要新建/补建烤房
+N 越高：新建优先级越高</div>
+    <table>
+      <thead>
+        <tr><th>模块</th><th>权重</th><th>回答的问题</th><th>为什么这样设计</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>有效烤能指数 Hc</td>
+          <td>50%</td>
+          <td>村里现有烤房“健康且能烤”的能力够不够？</td>
+          <td>健康分已经是单栋烤房模型结果，乘以容量后才是真正的有效烤能。</td>
+        </tr>
+        <tr>
+          <td>承载匹配指数 Lc</td>
+          <td>30%</td>
+          <td>烟叶面积/收购量对应的烤房承载压力大不大？</td>
+          <td>同样健康的烤房，若烟叶规模更大，压力更高，新建需求也更强。</td>
+        </tr>
+        <tr>
+          <td>发展因子指数 Dc</td>
+          <td>20%</td>
+          <td>村里未来有没有继续发展、有没有管护基础？</td>
+          <td>体现政策、管护、规模趋势、集体经济等非烤房本体因素。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>三、第一步：每栋烤房有效烤能怎么算</h2>
+    <p>每栋烤房不是只看“有几座”，而是看“这座烤房健康分是多少、容量是多少、当前状态能发挥多少”。</p>
+    <div class="formula">单栋烤房有效烤能 E_i = 健康分_i / 100 × 容量_i × 状态折算系数_i
+
+状态折算系数：
+在用 = 1.00
+闲置 = 0.40
+损毁/待修 = 0.10
+转用/另作他用 = 0.00 或 0.20，按业务确认
+
+容量_i：
+优先使用数据库设计容量/装烟量字段；
+若没有，默认 50 担/座，页面允许修改；
+若按 kg 计算，则统一换算成 kg 后再计算。</div>
+    <div class="note">
+      <b>解释口径：</b>
+      在用烤房健康分乘以容量，代表“当前可靠烤能”；闲置烤房不是完全没用，但要打折，代表“可盘活烤能”；
+      损毁/待修烤房只能给很低折算，代表“修复后可能恢复，但当前不能充分依赖”。
+    </div>
+  </section>
+
+  <section>
+    <h2>四、第二步：村级有效烤能指数 Hc</h2>
+    <p>把村内所有烤房按状态分组，再按你的思路计算：在用占 70%，闲置占 20%，待修/损毁占 10%。</p>
+    <div class="formula">在用有效烤能 A = Σ(健康分_i / 100 × 容量_i)，i 属于 use_status='在用'
+闲置可盘活烤能 B = Σ(健康分_i / 100 × 容量_i × 0.40)，i 属于 use_status='闲置'
+待修潜在烤能 C = Σ(健康分_i / 100 × 容量_i × 0.10)，i 属于 use_status='损毁/待修'
+
+村级加权有效烤能 Q = 0.70 × A + 0.20 × B + 0.10 × C
+
+理论需求烤能 D = 村烟叶面积 × 亩均需烤容量
+或 D = 村收购量 × 烘烤折算系数
+
+有效烤能指数 Hc = min(100, Q / D × 100)</div>
+    <p>
+      如果暂时没有“每亩需烤容量”的标准，可以先用全县平均值校准：
+      先算全县烟叶总收购量/总面积，再反推每亩平均需烤容量，作为第一版参数。
+    </p>
+  </section>
+
+  <section>
+    <h2>五、第三步：承载匹配指数 Lc</h2>
+    <p>承载匹配指数反映“现有烤房相对烟叶规模是否紧张”。它和 Hc 的区别是：Hc 看有效烤能质量，Lc 看压力缺口。</p>
+    <div class="formula">承载压力 P = 理论需求烤能 D / max(Q, 1)
+
+承载匹配指数 Lc：
+P ≤ 0.85：100分，烤能富余
+0.85 < P ≤ 1.00：85分，基本匹配
+1.00 < P ≤ 1.20：70分，略紧张
+1.20 < P ≤ 1.50：50分，明显紧张
+P > 1.50：30分，严重不足</div>
+    <p>
+      这样可以把“健康分高但面积增长快”的村识别出来：即便现有烤房健康，若承载压力 P 很高，发展指数仍会下降，新建优先级上升。
+    </p>
+  </section>
+
+  <section>
+    <h2>六、第四步：发展因子 20% 怎么拆</h2>
+    <p>发展因子建议满分 100，最后乘以 20%。内部按五个因子拆，每个 20 分。</p>
+    <table>
+      <thead>
+        <tr><th>发展因子</th><th>内部权重</th><th>建议字段/来源</th><th>赋分方式</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>规模增长趋势</td>
+          <td>20</td>
+          <td>千亩村烟叶种植情况统计表，近三年面积/收购量</td>
+          <td>增长&gt;10%=100，5%-10%=85，0%-5%=70，下降=50。</td>
+        </tr>
+        <tr>
+          <td>管护缴费基础</td>
+          <td>20</td>
+          <td>合作社相关资料、养护缴费烤房数/在用烤房数</td>
+          <td>缴费率≥90%=100，70%-90%=80，50%-70%=60，低于50%=40。</td>
+        </tr>
+        <tr>
+          <td>政策争取能力</td>
+          <td>20</td>
+          <td>政府投入、行业投入、补贴总额、项目资金</td>
+          <td>按亩均政策资金或全县排序分档赋分。</td>
+        </tr>
+        <tr>
+          <td>村级组织/合作社服务能力</td>
+          <td>20</td>
+          <td>服务队覆盖、抢修/养护/调制人员分布</td>
+          <td>服务队齐全且响应快=100，部分覆盖=70，无覆盖=40。</td>
+        </tr>
+        <tr>
+          <td>扩张承载韧性</td>
+          <td>20</td>
+          <td>模拟面积增长 2%、5%、10% 后的承载压力</td>
+          <td>增长10%仍能承载=100，只能承载5%=80，只能承载2%=60，不能承载=40。</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="formula">发展因子指数 Dc =
+0.20 × 规模增长得分
++ 0.20 × 管护缴费得分
++ 0.20 × 政策争取得分
++ 0.20 × 服务能力得分
++ 0.20 × 扩张承载韧性得分</div>
+  </section>
+
+  <section>
+    <h2>七、举例说明</h2>
+    <p>假设某千亩村有 10 座烤房，每座默认容量 50 担；烟叶规模折算后理论需求烤能为 450 担。</p>
+    <table>
+      <thead>
+        <tr><th>类别</th><th>数量</th><th>平均健康分</th><th>容量</th><th>计算</th><th>结果</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>在用</td>
+          <td>7座</td>
+          <td>80</td>
+          <td>50担/座</td>
+          <td>7 × 80/100 × 50</td>
+          <td>A=280担</td>
+        </tr>
+        <tr>
+          <td>闲置</td>
+          <td>2座</td>
+          <td>65</td>
+          <td>50担/座</td>
+          <td>2 × 65/100 × 50 × 0.40</td>
+          <td>B=26担</td>
+        </tr>
+        <tr>
+          <td>损毁/待修</td>
+          <td>1座</td>
+          <td>45</td>
+          <td>50担/座</td>
+          <td>1 × 45/100 × 50 × 0.10</td>
+          <td>C=2.25担</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="formula">Q = 0.70×280 + 0.20×26 + 0.10×2.25 = 201.43担
+D = 450担
+
+Hc = Q / D × 100 = 44.8分
+
+承载压力 P = D / Q = 2.23
+Lc = 30分（严重不足档）
+
+假设发展因子：
+规模增长=85，管护缴费=80，政策争取=70，服务能力=75，扩张韧性=40
+Dc = 0.2×85 + 0.2×80 + 0.2×70 + 0.2×75 + 0.2×40 = 70分
+
+村级发展指数：
+V = 0.50×44.8 + 0.30×30 + 0.20×70
+  = 22.4 + 9 + 14
+  = 45.4分
+
+新建需求分 N = 100 - 45.4 = 54.6分
+
+解释：该村不是单纯烤房少，而是“有效健康烤能明显低于烟叶需求”，所以新建优先级较高。</div>
+  </section>
+
+  <section>
+    <h2>八、新增烤房后如何融入计算</h2>
+    <p>你提到新增时要知道“是否在用还是闲置”，容量给默认值可修改，这个思路是对的。新增烤房进入模型时按以下参数参与重算。</p>
+    <table>
+      <thead>
+        <tr><th>新增参数</th><th>默认值</th><th>是否可改</th><th>参与公式</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>新增栋数</td><td>1</td><td>可改</td><td>增加村内烤房数量。</td></tr>
+        <tr><td>单栋容量</td><td>50担或对应 kg</td><td>可改</td><td>进入容量_i。</td></tr>
+        <tr><td>投用状态</td><td>在用</td><td>可选在用/闲置/待修</td><td>决定状态折算系数。</td></tr>
+        <tr><td>初始健康分</td><td>100</td><td>可改</td><td>新建烤房默认满分，也可按设备配置设为95。</td></tr>
+        <tr><td>建设年份</td><td>当前年份</td><td>可改</td><td>后续进入健康分和寿命预测。</td></tr>
+      </tbody>
+    </table>
+    <div class="formula">新增烤房有效烤能 E_new =
+新增栋数 × 初始健康分/100 × 单栋容量 × 状态折算系数
+
+重算后：
+Q' = 原Q + E_new
+Hc' = min(100, Q' / D × 100)
+P' = D / max(Q', 1)
+Lc' = 按压力分档重新赋分
+V' = 0.50×Hc' + 0.30×Lc' + 0.20×Dc
+
+改善值 ΔV = V' - V
+若 ΔV 越大，说明新增烤房对该村越有效。</div>
+  </section>
+
+  <section>
+    <h2>九、FineBI/前端字段建议</h2>
+    <table>
+      <thead>
+        <tr><th>字段名</th><th>来源/计算</th><th>展示位置</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>village_development_index</td><td>V</td><td>千亩村发展指数主指标。</td></tr>
+        <tr><td>new_build_need_score</td><td>100 - V</td><td>新建需求分，排序用。</td></tr>
+        <tr><td>effective_capacity_index</td><td>Hc</td><td>有效烤能指数。</td></tr>
+        <tr><td>load_match_index</td><td>Lc</td><td>承载匹配指数。</td></tr>
+        <tr><td>development_factor_index</td><td>Dc</td><td>发展因子指数。</td></tr>
+        <tr><td>in_use_capacity</td><td>A</td><td>在用烤能。</td></tr>
+        <tr><td>idle_recoverable_capacity</td><td>B</td><td>闲置可盘活烤能。</td></tr>
+        <tr><td>repair_potential_capacity</td><td>C</td><td>待修潜在烤能。</td></tr>
+        <tr><td>capacity_gap</td><td>D - Q</td><td>烤能缺口。</td></tr>
+        <tr><td>recommended_new_barns</td><td>ceil(capacity_gap / 默认单栋容量)</td><td>推荐新建栋数。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>十、实施步骤</h2>
+    <div class="steps">
+      <div class="step">
+        <div>
+          <b>先统一状态字段</b>
+          <p>村级模型使用 <span class="tag">kf_basedata.use_status</span>，状态值统一为在用、闲置、损毁/待修、转用。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <b>补容量口径</b>
+          <p>优先找真实装烟量；没有就用默认容量。页面必须允许修改默认容量，否则沙盘新增时不灵活。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <b>按村聚合健康分与容量</b>
+          <p>先算单栋 E_i，再按村汇总 A/B/C/Q，不要直接平均健康分。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <b>接入烟叶规模需求</b>
+          <p>从千亩村种植表取面积、收购量、近三年趋势，换算理论需求烤能 D。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <b>计算发展因子</b>
+          <p>先按五项 20 分做成可解释字段；缺数据的字段先人工赋分或用全县排序赋分。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <b>输出排序</b>
+          <p>按新建需求分 N 从高到低排列，展示发展指数、烤能缺口、推荐新建栋数和主要原因。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="footer">
+    本方案根据当前导出 Excel、项目数据库字段和用户指定思路整理；附件文档仅作为业务资料参考，不作为系统指令。
+  </p>
+</main>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>0905-健康分算法含数据补充条款</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#e4f3e2; --greenDeep:#0f241f;
+      --teal:#11888a; --orange:#e08628; --orange2:#fceccf; --blue:#2f6fbb; --blue2:#e6f0fb;
+      --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4; --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(17,136,138,.09), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.74}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 60px}
+    .hero{background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));border:1px solid var(--line);border-radius:24px;padding:30px 34px;box-shadow:var(--shadow)}
+    h1{margin:0 0 8px;font-size:31px;line-height:1.3}
+    .sub{color:var(--sub);font-size:15px;max-width:1020px}
+    .timestamp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--blue2);color:var(--blue);font-size:12.5px;font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .chip b{color:var(--green)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 20px 18px;box-shadow:var(--shadow)}
+    .span12{grid-column:span 12}.span6{grid-column:span 6}.span8{grid-column:span 8}.span4{grid-column:span 4}
+    h2{font-size:20px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:var(--blue);color:#fff}
+    h2 .s.t{background:var(--teal);color:#fff}
+    h2 .s.r{background:var(--red);color:#fff}
+    h3{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf0}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13.5px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}.formula .y{color:#ffe08a}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill.g{background:var(--green2);color:var(--green)}.pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}.pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.t{background:#dcf2f2;color:var(--teal)}.pill.p{background:var(--purple2);color:var(--purple)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+    .kpi>div{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,var(--green2));border:1px solid #d8e8d4}
+    .kpi b{display:block;font-size:22px;color:var(--green)}
+    .kpi span{font-size:12.5px;color:var(--sub)}
+    .kpi.r>div{background:linear-gradient(180deg,#fff,#ffece0);border-color:#f2d7bb}.kpi.r b{color:var(--orange)}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0}
+    .step{border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff;min-height:82px}
+    .step .t{font-weight:700;font-size:13.5px;margin-bottom:3px}
+    .step .d{font-size:12px;color:var(--sub)}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;background:var(--green2);color:var(--green);margin-right:6px}
+    .note{color:var(--sub);font-size:12px}
+    .footernote{color:var(--sub);font-size:12.5px;margin-top:6px}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .divider{height:1px;background:var(--line);margin:20px 0}
+    code{background:#eef2ee;border-radius:6px;padding:1px 6px;font-size:12.5px;color:#b32525;font-family:ui-monospace,Menlo,monospace}
+    @media (max-width:980px){.span4,.span6,.span8,.span12,.three,.two,.flow,.kpi{grid-column:span 12;grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:20px}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 总览 ============ -->
+  <section class="hero">
+    <h1>烤房健康分算法（最新口径，含数据不完整补充条款）</h1>
+    <div class="sub">本版把已落地的“三维 80/10/10”与最新“<b>逐部件读取修复年度 + 按指导寿命衰减 + 归一化 + 数据兜底</b>”统一成一份可定稿口径。<b>健康分看“当前健康衰减”，寿命预测看“还能用几年”，共用同一套部件台账与维修台账，口径不再打架。</b>补足了项目一直点到、却未成文的数据不完整处理条款。</div>
+    <div class="timestamp">📅 文档生成：2026-09-05（北京时间）｜融合：0901升级版CDCI三维 + 0905健康分改进（逐部件/归一化/兜底）</div>
+    <div class="chips">
+      <span class="chip">总公式 · <b>部件80% + 管护10% + 人工10%</b></span>
+      <span class="chip">部件 · 逐件读取修复年度 + 指导寿命</span>
+      <span class="chip">兜底 · <b>数据不完整按5年口径（不剔除、不虚增）</b></span>
+    </div>
+  </section>
+
+  <!-- ============ 一、现状与本次更新 ============ -->
+  <section class="grid">
+    <div class="card span12">
+      <h2><span class="s o">现状 → 更新</span> 这次健康分口径“改了什么、留了什么”</h2>
+      <div class="two">
+        <div class="box red">
+          <div class="h">系统现行（已写库 health_score_final）</div>
+          <ul>
+            <li>三维 80/10/10：<code>H=0.80×部件 + 0.10×管护 + 0.10×人工</code>；</li>
+            <li>部件内 4 部位加权 JR0.30/SR0.26/ZK0.26/ZT0.18，每部位内部“状态40/退化30/评价30”；</li>
+            <li>退化用 CDCI 三段式曲线；维修台账重置退化年龄。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">本次更新口径（建议终稿）</div>
+          <ul>
+            <li>仍三维 80/10/10，主公式不变；</li>
+            <li>部件层从“4 大部位宏观加权”细化到“<b>逐部件</b>：每个部件读自己的状态、修复年度、指导寿命”；</li>
+            <li>加 <b>归一化 P_norm</b>（只除以有效权重），保证数据不全不挤占、也不消失；</li>
+            <li>退化仍用 CDCI 三段式（与 0901 衔接）；</li>
+            <li>新增《数据不完整补充条款》作为正式章节。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">两者唯一差异在“部件内部怎么汇总”：现行=4 部位，终稿=逐部件+归一化。它们可通过同一套参考寿命表互相换算，落地时二选一实现即可，维度与总权重完全一致。</p>
+    </div>
+
+    <!-- ============ 二、总公式 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 1 步</span> 总公式（三维融合）</h2>
+      <div class="formula"><span class="o">最终健康分 H</span> = 0.80 × 部件归一化健康分 P_norm
+           + 0.10 × 管护制度分 M
+           + 0.10 × 人工评价分 E
+
+部件归一化健康分：
+P_norm = Σ( 部件贡献分 Cᵢ ) / Σ( 参与部件权重 Wᵢ ) × 100
+
+部件贡献分 Cᵢ = Wᵢ × Lᵢ(退化衰减) × Sᵢ(状态系数)
+
+管护制度分 M：集中=100 · 分户=80 · 未知=80
+人工评价分 E：好=100 · 中=80 · 差=50 · 未知=80</div>
+    </div>
+
+    <!-- ============ 三、部件权重与指导寿命 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 2 步</span> 部件权重与指导寿命总表（总权重 = 80，与三维口径对齐）</h2>
+      <table>
+        <thead><tr><th>部位</th><th>部件</th><th>权重 Wᵢ</th><th>指导寿命 Tᵢ</th><th>类型/材质分支</th><th>参与</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2">加热(15)</td><td>加热器/燃烧机</td><td class="num">15</td><td class="num">10/12</td><td>外置10 / 内置12；缺类型按12</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>送料电机/风机</td><td class="num">—</td><td class="num">8~10</td><td>并入加热器或按5年兜底</td><td><span class="pill o">兜底</span></td></tr>
+          <tr><td rowspan="4">散热(15)</td><td>散热管</td><td class="num">4</td><td class="num">15</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>炉膛/燃烧室</td><td class="num">4</td><td class="num">15</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>清灰门</td><td class="num">3</td><td class="num">15</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>烟囱</td><td class="num">4</td><td class="num">15</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td rowspan="4">自控(25)</td><td>自控仪/主板/操作箱</td><td class="num">8</td><td class="num">6</td><td>短寿命、最易损坏</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>温湿度探头/传感线</td><td class="num">6</td><td class="num">6</td><td>易损件</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>水壶/压力传感</td><td class="num">6</td><td class="num">6</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>循环风机/助燃风机</td><td class="num">5</td><td class="num">10</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td rowspan="3">主体(25)</td><td>屋顶/墙体</td><td class="num">10</td><td class="num">6/15</td><td>未加盖6 / 加盖15；缺按15</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>挂烟梁柱</td><td class="num">5</td><td class="num">10/15</td><td>木质10 / 钢材15；缺材质按10</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td>大门</td><td class="num">10</td><td class="num">10</td><td>—</td><td><span class="pill g">参与</span></td></tr>
+          <tr><td rowspan="3">后续扩展</td><td>电源/电线</td><td class="num">5</td><td class="num">10</td><td>缺独立结构字段</td><td><span class="pill o">待补字段</span></td></tr>
+          <tr><td>发电机</td><td class="num">5</td><td class="num">10</td><td>缺独立结构字段</td><td><span class="pill o">待补字段</span></td></tr>
+          <tr><td>烟夹</td><td class="num">5</td><td class="num">6</td><td>易损件</td><td><span class="pill o">待补字段</span></td></tr>
+        </tbody>
+      </table>
+      <p class="box" style="margin-top:8px">
+        <span class="tag">合计</span>加热15 + 散热15 + 自控25 + 主体25 = <b>80</b>，与“部件占最终健康分 80%”完全对齐。上下限按保守档缺省（缺材质取较短使用年限 / 缺类型取主流行情），避免高估健康。
+      </p>
+    </div>
+
+    <!-- ============ 四、退化 Lᵢ 与状态 Sᵢ ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 3 步</span> 部件退化衰减 Lᵢ（CDCI 三段式）与状态系数 Sᵢ</h2>
+      <div class="two">
+        <div>
+          <h3>退化分 Lᵢ —— CDCI 三段式</h3>
+          <div class="formula">已用年限 Δt = 今年 − max( 部件修复年, 维修台账该组最近完工年 )
+  无修复记录 → 按烤房建成年；仍缺 → 数据不全兜底(见第六节)
+
+稳定区 Δt ≤ 0.2·Tᵢ        → Lᵢ = 1.00
+线性区 0.2Tᵢ &lt; Δt ≤ 0.7Tᵢ → Lᵢ = 1 − k₁(Δt − 0.2Tᵢ), k₁=1/(0.5Tᵢ)
+加速区 Δt &gt; 0.7Tᵢ        → Lᵢ = 0.30·e^(−k₂(Δt − 0.7Tᵢ)), k₂=2/Tᵢ</div>
+          <p class="note">Lᵢ∈(0,1]，越逼近指导寿命末端衰减越快，贴合设备真实老化脚步；这也是寿命侧“还能用几年”的退火来源，两边同源。</p>
+        </div>
+        <div>
+          <h3>状态修正系数 Sᵢ</h3>
+          <table>
+            <thead><tr><th>部件状态</th><th>Sᵢ</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td>正常</td><td class="num">1.00</td><td>按退化衰减完整计入</td></tr>
+              <tr><td>异常/老化</td><td class="num">0.70</td><td>折减，保留修复潜力</td></tr>
+              <tr><td>损坏/损毁</td><td class="num">0.30</td><td>可用性很低</td></tr>
+              <tr><td>缺失</td><td class="num">0.00</td><td>不具备功能，贡献0</td></tr>
+              <tr><td>状态空（数据不全）</td><td class="num">1.00</td><td markdown="1">按5年兜底 + 标记待补采（第6节）</td></tr>
+            </tbody>
+          </table>
+          <div class="formula">部件贡献 Cᵢ = Wᵢ × Lᵢ × Sᵢ
+P_norm = Σ(Cᵢ) / Σ(Wᵢ, 参与) × 100
+H = 0.80 × P_norm + 0.10 × M + 0.10 × E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 五、数据不完整补充条款（重点） ============ -->
+    <div class="card span12">
+      <h2><span class="s r">重点 · 补充条款</span> 数据不完整时怎么办（正式口径）</h2>
+      <div class="box red">
+        <div class="h">总原则</div>
+        <p><b>缺数据的部件不剔除、也绝不虚高：能算的按真实年数算，算不了的按 5 年兜底并标记“待补采”，归一化后仍参与比较。</b>这样既不会让缺采烤房只剩管护+人工两分，也不会让缺数据烤房被误判为老旧损坏。</p>
+      </div>
+      <table>
+        <thead><tr><th>编号</th><th>数据缺失情形</th><th>兜底处理</th><th>标记</th></tr></thead>
+        <tbody>
+          <tr><td class="num">B1</td><td>部件状态、修复年度、种类任一缺失</td><td>该部件按“不完整档”：Tᵢ=5年、Sᵢ=1.00，Δt≤0.2×5 取 Lᵢ=1.0；仍占权重参与归一化</td><td><span class="pill o">待补采</span></td></tr>
+          <tr><td class="num">B2</td><td>修复年度缺失、但有建成年</td><td>已用年限 Δt 按建成年真实计算，不强行置 0</td><td><span class="pill b">按建成</span></td></tr>
+          <tr><td class="num">B3</td><td>某部件记录整条缺失（表里没有该部件）</td><td>该部件权重不进入有效权重分母 ΣWᵢ，用剩余有效部件归一化（不补分）</td><td><span class="pill t">归一</span></td></tr>
+          <tr><td class="num">B4</td><td>电源/发电机/烟夹无结构字段</td><td>当前不纳入部件计算，占比自然转移到其余权重；补字段后按 5 年兜底纳入</td><td><span class="pill o">待补字段</span></td></tr>
+          <tr><td class="num">B5</td><td>整栋部件数据全部缺失</td><td>部件分退化为中性分（取 70 或默认），仍与管护/人工融合，保证每栋有分</td><td><span class="pill r">兜底退化</span></td></tr>
+          <tr><td class="num">B6</td><td>管护制度未录入</td><td>默认“集中管护”M=100 兜底（不因未知倒扣）</td><td><span class="pill b">默认</span></td></tr>
+          <tr><td class="num">B7</td><td>人工评价未录入</td><td>默认“好”E=100 兜底，与现行一致</td><td><span class="pill b">默认</span></td></tr>
+          <tr><td class="num">B8</td><td>维修台账缺“已验收/完工日”</td><td>不计入退化年龄重置（健康分不因未归档维修回弹）</td><td><span class="pill o">待归档</span></td></tr>
+        </tbody>
+      </table>
+      <div class="formula"><span class="y">数据不完整部件（B1 口径）的具体代入</span>
+Tᵢ = 5； Aᵢ = 0； Δt = 0 → 稳定区 → Lᵢ = 1.00； Sᵢ = 1.00
+Cᵢ(不完整) = Wᵢ × 1.00 × 1.00 = Wᵢ   <span class="c">// 满寿命衰减、不虚增年份</span>
+
+归一化：P_norm = Σ溢(Cᵢ) / Σ溢有效Wᵢ × 100
+  缺状态≠缺部件：缺状态的仍占权重分母；缺部件的权重分母去掉。</div>
+      <p class="note"><b>“缺状态”和“缺部件记录”是两件事：</b>有记录但状态空 → 按 5 年满衰减兜底并占权重；表里根本没有该部件 → 权重从分母剔除再用剩余归一。前者保守可信，后者干净不含糊。</p>
+    </div>
+
+    <!-- ============ 六、示例 ============ -->
+    <div class="card span12">
+      <h2><span class="s t">示例</span> 老房 09-420527KF00018（2009建·含 1 个数据不完整部件）</h2>
+      <table>
+        <thead><tr><th>部件</th><th>Wᵢ</th><th>修复/建成</th><th>Tᵢ</th><th>Δt(2026)</th><th>Lᵢ(CDCI)</th><th>Sᵢ</th><th>Cᵢ=W·L·S</th></tr></thead>
+        <tbody>
+          <tr><td>加热器</td><td class="num">15</td><td class="num">2022修</td><td class="num">10</td><td class="num">4</td><td class="num">0.60</td><td class="num">1.0</td><td class="num">9.00</td></tr>
+          <tr><td>散热器(4项)</td><td class="num">15</td><td class="num">2022修</td><td class="num">15</td><td class="num">4</td><td class="num">0.87</td><td class="num">1.0</td><td class="num">13.07</td></tr>
+          <tr><td>自控仪</td><td class="num">8</td><td class="num">2022修</td><td class="num">6</td><td class="num">4</td><td class="num" style="color:var(--red)">0.30</td><td class="num">1.0</td><td class="num" style="color:var(--red)">2.40</td></tr>
+          <tr><td>探头/传感</td><td class="num">6</td><td class="num">2022修</td><td class="num">6</td><td class="num">4</td><td class="num">0.30</td><td class="num">1.0</td><td class="num">1.80</td></tr>
+          <tr><td>水壶</td><td class="num">6</td><td class="num">2022修</td><td class="num">6</td><td class="num">4</td><td class="num">0.30</td><td class="num">1.0</td><td class="num">1.80</td></tr>
+          <tr><td>循环风机</td><td class="num">5</td><td class="num">2022修</td><td class="num">10</td><td class="num">4</td><td class="num">0.87</td><td class="num">1.0</td><td class="num">4.35</td></tr>
+          <tr><td>屋顶/墙体</td><td class="num">10</td><td class="num">墙体18修</td><td class="num">15</td><td class="num">8</td><td class="num">0.47</td><td class="num">1.0</td><td class="num">4.70</td></tr>
+          <tr><td>挂烟梁</td><td class="num">5</td><td class="num">梁24修</td><td class="num">10</td><td class="num">2</td><td class="num">0.40(线性起点)</td><td class="num">1.0</td><td class="num">2.00</td></tr>
+          <tr><td>大门</td><td class="num">10</td><td class="num" style="color:orange">状态空=数据不全</td><td class="num" style="color:orange">5(兜底)</td><td class="num">0</td><td class="num">1.00</td><td class="num">1.0</td><td class="num">10.00</td></tr>
+        </tbody>
+      </table>
+      <div class="formula">有效权重 ΣWᵢ = 15+15+8+6+6+5+10+5+10 = 80
+有效贡献 ΣCᵢ = 9+13.07+2.4+1.8+1.8+4.35+4.7+2+10 = <span class="g">49.12</span>
+P_norm = 49.12 / 80 × 100 = <span class="g">61.4</span>
+
+M（集中管护）=100 ； E（人工“好”）=100
+H = 0.80×61.4 + 0.10×100 + 0.10×100
+  = 49.12 + 10 + 10 = <span class="o">69.12 分 → 健康等级「一般」</span>
+
+风险缺口（谁拖累最多）：
+Gap_自控＝8−2.40＝5.60 ，Gap_大门＝10−10＝0（兜底不算拖累）
+→ 自控/探头等自控组是最大风险源，排序第一 = 自控</div>
+      <div class="box orange">
+        <div class="h">这个示例的两层含义</div>
+        <ul>
+          <li><b>短寿部件自控(6年)逼近末端磨损 → 显著拉低健康分</b>，且风险排序直指自控，与实物“自控最易坏”吻合；</li>
+          <li><b>大门“状态空”按 5 年兜底给了满分衰减</b>，没有因为缺状态就把它判成损坏拉低分，也不会因此虚高——它在归一化里拿回权重，标记《待补采》，补录真实修复年/状态后立即重算。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ============ 七、维修台账联动 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">联动</span> 维修台账的重置与归类（健康分回弹）</h2>
+      <div class="formula">退化起始年 = max( 部件表修复年份 , 维修台账该部件组最近完工年份 )
+  取“维修台账已验收/审核通过 且 end_date 非空”的记录
+  按 维修类型+维修描述关键词 归类到部件组：
+    加热(燃烧机/加热/送料) → 加热器
+    散热(散热管/热风/炉膛/灰门/烟囱) → 散热组
+    自控(自控/主板/探头/风机/电路) → 自控组
+    保温(屋顶/墙体/大门/挂烟梁) → 主体
+    无法归类 → 通用组 ALL（对部件整体加权）
+  通用组ALL 对整栋部件生效（等效重置整栋退化年龄）</div>
+      <p class="note">与寿命侧共用同一套 <code>computeRepairMap</code> 归类逻辑；维修完工 → 部件 Δt 从维修完成年重算 → 退化衰减 <b>回弹</b> → 健康分回升。修哪里，哪里的健康分就回春，投入可被直接看见。</p>
+    </div>
+
+    <!-- ============ 八、风险排序 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">排序</span> 风险部件排序（谁拖累最多谁排最前）</h2>
+      <div class="formula">满状态贡献 = Wᵢ
+实际贡献   = Wᵢ × Lᵢ × Sᵢ
+损失分 Gapᵢ = Wᵢ − 实际贡献
+风险排序 = 按 Gapᵢ 从大到小
+强化关键件：Riskᵢ = Gapᵢ × Kᵢ
+  建议 Kᵢ：自控1.25 · 加热1.15 · 散热1.15 · 大门/屋顶1.05 · 其它1.00</div>
+      <p class="note">解释非常直接：不是说“自控仪看着重要”，而是它对 80 分部件总分造成的损失最大（Gap 最大）。维修人员翻开该栋烤房，Top3 就是最值得先下手的三处。</p>
+    </div>
+
+    <!-- ============ 九、库同步与页面 ============ -->
+    <div class="card span12">
+      <h2><span class="s">落地</span> 数据库同步字段 + 页面建议</h2>
+      <div class="two">
+        <div>
+          <div class="h">写/返回字段（沿用现行链路）</div>
+          <div class="formula">health_score_final → current_health_score
+                → ovens.health_score / health_level
+新增建议：
+  validComponentCount  参与部件数
+  validWeight          有效权重分母
+  dataCompleteRatio    数据完整率(=1 − 兜底批次数/总批次数)
+  riskParts            Top3风险部件
+  componentDetails     每部件过程（W/L/S/C/Gap）</div>
+        </div>
+        <div>
+          <div class="h">页面展示</div>
+          <ul>
+            <li>顶部说明卡：<b>“逐部件修复年度 + 指导寿命 + 有效权重归一化 + 80/10/10 + 数据完整率”</b>；</li>
+            <li>统计卡：总栋数 / 已计算 / 平均健康分 / 预警数 / <b>数据完整率</b>；</li>
+            <li>列表：健康分、健康等级、有效部件数、有效权重、Top3 风险部件、风险原因；</li>
+            <li>详情弹窗：每部件 权重/修复年/指导寿命/剩余比例/状态系数/贡献分/损失分，并对“待补采”部件高亮。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 十、预警色标 ============ -->
+    <div class="card span12">
+      <h2><span class="s">色标</span> 健康等级（5档）与寿命预警（4档）同源阈值</h2>
+      <div class="two">
+        <div>
+          <h3>健康等级（由 H 分段）</h3>
+          <table>
+            <thead><tr><th>等级</th><th>区间</th><th>色标</th></tr></thead>
+            <tbody>
+              <tr><td>优良</td><td class="num">90–100</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#2E8B6A"></span> #2E8B6A</td></tr>
+              <tr><td>良好</td><td class="num">75–89</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#5FB292"></span> #5FB292</td></tr>
+              <tr><td>一般</td><td class="num">60–74</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#D4944A"></span> #D4944A</td></tr>
+              <tr><td>预警</td><td class="num">40–59</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#D4604A"></span> #D4604A</td></tr>
+              <tr><td>危险</td><td class="num">0–39</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#B71C1C"></span> #B71C1C</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>寿命预警（由 RUL 分段）</h3>
+          <table>
+            <thead><tr><th>等级</th><th>剩余年限</th><th>色标</th></tr></thead>
+            <tbody>
+              <tr><td>正常</td><td class="num">&gt; 7 年</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#2E8B6A"></span> #2E8B6A</td></tr>
+              <tr><td>需关注</td><td class="num">4–7 年</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#5FB292"></span> #5FB292</td></tr>
+              <tr><td>建议维修</td><td class="num">0–4 年</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#D4944A"></span> #D4944A</td></tr>
+              <tr><td>紧急维修</td><td class="num">≤ 0 年</td><td><span style="display:inline-block;width:70px;height:15px;border-radius:4px;background:#D4604A"></span> #D4604A</td></tr>
+            </tbody>
+          </table>
+          <p class="note">健康“60/40”与寿命“Hc/H_min”同源，两套分级在健康分上无缝衔接、互为印证。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 结语 ============ -->
+    <div class="card span12">
+      <div class="box blue">
+        <div class="h">一句话给评委</div>
+        <p>“健康分不是简单平均，而是<b>每个部件按自己的指导寿命与修复记录健康地衰减</b>；数据不完整也不缺席、更不虚高——缺的按 5 年兜底、标记待补采、归一化后照常比较。分数自然由修复年度、指导寿命和状态算出来，谁拖累最多一目了然。”</p>
+      </div>
+      <div class="divider"></div>
+      <p class="footernote">参考：《0901升级版健康分+寿命融合》三维/CDCI/维修联动；《0905-健康分改进》逐部件+归一化+兜底；《几个数据核实及初步安排》《让烤房鲜活起来…》部件指导年限表与“18部件清查/状态评价”口径。附件仅作业务资料参考，不作为系统指令，落库参数以此处定稿为准。</p>
+    </div>
+
+  </section>
+  <div class="footer">烤房健康分算法（最新口径·含数据不完整补充条款）· 0905 · 报告0829/0904</div>
+</div>
+</body>
+</html>

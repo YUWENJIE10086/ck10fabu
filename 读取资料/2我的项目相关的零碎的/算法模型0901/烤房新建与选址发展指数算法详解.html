@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烤房新建与选址发展指数算法详解</title>
+  <style>
+    :root{--bg:#f5faf5;--card:#fff;--ink:#17382f;--sub:#5f6f69;--green:#2e7d32;--green2:#dff0da;--orange:#f47721;--blue:#2f6fbb;--line:#d6e0d6;--shadow:0 8px 24px rgba(23,56,47,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#fff,rgba(255,255,255,0)),var(--bg);color:var(--ink);line-height:1.72}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 56px}.hero,.card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+    .hero{padding:28px 30px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}.card{padding:18px}
+    h1{margin:0 0 6px;font-size:34px} h2{margin:0 0 10px;font-size:22px}.sub{color:var(--sub);font-size:15px}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.chip{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .span7{grid-column:span 7}.span5{grid-column:span 5}.span6{grid-column:span 6}.span12{grid-column:span 12}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin-top:10px}
+    .box.orange{border-color:var(--orange);background:#fffaf5}.box.blue{border-color:var(--blue);background:#f7fbff}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0f241f;color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top} th{background:#eef7ea;text-align:left}
+    ul{margin:10px 0 0 18px;padding:0} li{margin:7px 0;font-size:14px}.footer{margin-top:16px;color:var(--sub);font-size:12px;text-align:center}
+    .pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#dff0da;color:#2e7d32;font-size:12px}
+  </style>
+</head>
+<body><div class="wrap">
+  <section class="hero">
+    <h1>烤房新建与选址发展指数算法详解</h1>
+    <div class="sub">这一页解决“建不建、建哪里、建多少”的问题。核心不是找一个好看的点，而是找一个能解释、能排序、能复核的村级需求指数。</div>
+    <div class="chips">
+      <span class="chip">输入：健康平均分、承载平均分、发展因子、种植面积、增长趋势</span>
+      <span class="chip">输出：村级发展指数、新建建议、候选村排序、点位数量</span>
+      <span class="chip">方法：规则赋分 + 沙盘推演 + 排序</span>
+    </div>
+  </section>
+  <section class="grid">
+    <div class="card span7">
+      <h2>1. 村级发展指数怎么构成</h2>
+      <p>你给出的建议里，村级发展指数本质上由三部分组成：烤房健康因子、烤房承载因子和发展因子。这个结构是合理的，因为它同时考虑了“现有能不能用”“现有够不够装”“未来会不会更缺”。</p>
+      <div class="formula">VillageIndex = 50% × HealthAvg + 30% × LoadAvg + 20% × GrowthFactor</div>
+      <p class="note">HealthAvg 是村内烤房平均健康分；LoadAvg 是容量负担平均分；GrowthFactor 是村级发展因子综合分。</p>
+      <div class="box blue">
+        <p>如果你想更严谨，建议把 “健康平均分” 改成“健康可用容量分”。因为健康分高不等于一定能承担更多烘烤量，最好再乘上单房容量或可用率，这样和“新建需求”更贴近。</p>
+      </div>
+    </div>
+    <div class="card span5">
+      <h2>2. 发展因子建议拆成四项</h2>
+      <table>
+        <thead><tr><th>因子</th><th>建议</th></tr></thead>
+        <tbody>
+          <tr><td>村集体经济</td><td>反映组织能力和养护投入能力</td></tr>
+          <tr><td>管护服务</td><td>反映养护费用缴纳、巡检组织能力</td></tr>
+          <tr><td>政策争取</td><td>反映项目落地能力与外部资源吸纳能力</td></tr>
+          <tr><td>规模增长趋势</td><td>反映近三年面积或烟叶规模变化</td></tr>
+        </tbody>
+      </table>
+      <div class="box orange">
+        <p>建议把“发展承载量”单独拿出来做压力测试，比如“如果本村规模增加 2%、5%、10%，现有烤房是否还能扛住”。这比只看当下更能说明为什么要新建。</p>
+      </div>
+    </div>
+    <div class="card span12">
+      <h2>3. 更推荐的新建决策流程</h2>
+      <div class="two">
+        <div>
+          <ul>
+            <li>先算村内现有健康可用容量，剔除低分和待修烤房。</li>
+            <li>再算近三年烘烤需求与种植面积变化，形成发展趋势。</li>
+            <li>再算调剂半径内是否有可共享富余容量，能调剂先调剂。</li>
+            <li>最后做沙盘推演：按 2%、5%、10% 的增长假设，看村里是否仍然短缺。</li>
+          </ul>
+        </div>
+        <div class="formula">NewDemand = max(0, ForecastDemand - HealthAvailableCapacity - SharedCapacity)
+
+VillageNeedScore = 0.5×HealthPressure + 0.3×LoadPressure + 0.2×GrowthPressure</div>
+      </div>
+      <p>这样算出来的不是“拍头新建”，而是“缺口新建”。管理者看到的是：这个村现在缺多少、未来缺多少、是否能先靠调剂和修缮顶住、再决定新建几座。</p>
+    </div>
+    <div class="card span6">
+      <h2>4. 选址建议怎么讲</h2>
+      <ul>
+        <li>优先靠近烟田集中区，缩短烟叶转运距离。</li>
+        <li>优先靠近已有道路、电力和水源，降低建设配套成本。</li>
+        <li>优先放在供需缺口明显、调剂半径内又无富余容量的村组。</li>
+        <li>优先与职业烟农、合作社和技术员服务半径对齐。</li>
+      </ul>
+    </div>
+    <div class="card span6">
+      <h2>5. 可以讲给评委听的创新点</h2>
+      <p><span class="pill">不是只看面积</span> 新建不再只是“面积大就多建”，而是把健康分、承载分、增长分、调剂能力一起放进来。</p>
+      <p><span class="pill">不是静态排序</span> 新建建议会随着烤季数据变化滚动更新，村级发展指数不是一次算完就不变。</p>
+      <p><span class="pill">不是替代人</span> 算法先给出候选村和数量，最后还要结合公司投资节奏、村级组织能力和现场条件复核。</p>
+    </div>
+    <div class="card span12">
+      <h2>6. 示例表述</h2>
+      <p>“对于某个村，我们先看现有烤房有多少栋、健康可用的有多少、能不能通过调剂先解决，再结合近三年种植面积增长和政策争取能力，形成村级发展指数。指数越高，说明这个村未来的容量缺口越大，新建优先级越高；指数越低，说明优先做养护和修缮。”</p>
+    </div>
+  </section>
+  <div class="footer">可直接作为“烤房新建”模块说明页，也适合和 BI 大屏中的村级发展指数联动展示。</div>
+</div></body>
+</html>

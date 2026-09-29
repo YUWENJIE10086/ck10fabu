@@ -1,0 +1,129 @@
+<mxfile host="app.diagrams.net" agent="Codex" compressed="false">
+  <diagram id="one-db-two-models-platform" name="一库两模型一平台总体架构">
+    <mxGraphModel dx="2223" dy="1295" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#FFFFFF;fontSize=24;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="总" vertex="1">
+          <mxGeometry height="58" width="58" x="65" y="38" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#23313F;fontSize=45;fontFamily=Microsoft YaHei;fontStyle=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="“一个数据库、两个模型、一个协同平台”总体架构" vertex="1">
+          <mxGeometry height="58" width="1320" x="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#000000;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="以烤房基础数据为底座，以分析模型辅助决策，以协同平台贯通烟农、合作社和烟草管理人员" vertex="1">
+          <mxGeometry height="34" width="1320" x="140" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="whiteSpace=wrap;html=1;rounded=0;arcSize=0;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="1" width="1460" x="70" y="124" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#FFFFFF;fontSize=27;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;b&gt;一个&lt;br&gt;协同平台&lt;/b&gt;" vertex="1">
+          <mxGeometry height="78" width="160" x="55" y="228.5" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#C7923E;strokeColor=#C7923E;strokeWidth=2;fontColor=#FFFFFF;fontSize=27;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;b&gt;两个&lt;br&gt;分析模型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="78" width="160" x="55" y="698.5" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#4F81BD;strokeColor=#4F81BD;strokeWidth=2;fontColor=#FFFFFF;fontSize=27;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;b&gt;一个&lt;br&gt;基础数据库&lt;/b&gt;" vertex="1">
+          <mxGeometry height="78" width="175" x="40" y="1130" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=20;fillColor=#F8FBFD;strokeColor=#24537A;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="235" width="1275" x="250" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#FFFFFF;fontSize=30;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;span style=&quot;font-family: 宋体;&quot;&gt;&lt;font&gt;&lt;b&gt;管家协同平台&lt;/b&gt;&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="58" width="775" x="495" y="314" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=2;fontColor=#23313F;fontSize=29;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;烟农｜微信小程序&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;烤房调剂　紧急报修　服务评价&lt;/font&gt;" vertex="1">
+          <mxGeometry height="105" width="350" x="290" y="183" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#23313F;fontSize=29;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;合作社｜网页后台&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;审核调度　四支服务队管理&lt;br&gt;统筹养护　费用核定&lt;/font&gt;" vertex="1">
+          <mxGeometry height="117" width="392.5" x="680" y="183" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FBF3E5;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=29;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;烟草管理人员｜网页后台&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;决策辅助　审核监管&lt;br&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="117" width="375" x="1110" y="183" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.505;exitY=-0.037;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="886.4" y="310.2" />
+              <mxPoint x="885.9" y="310.2" />
+            </Array>
+            <mxPoint x="886.38" y="310.23" as="sourcePoint" />
+            <mxPoint x="885.93" y="288" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" source="10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C7923E;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="13" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=2;fontColor=#23313F;fontSize=30;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;font&gt;&lt;font color=&quot;#24537a&quot;&gt;&lt;span&gt;&lt;b&gt;烤房健康评估模型&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;&lt;b&gt;输入：&lt;/b&gt;建设年份、部件状态、修复时间、检查评价&lt;br&gt;&lt;b&gt;输出：&lt;/b&gt;健康评分、风险部位排序&lt;br&gt;&lt;b&gt;用途：&lt;/b&gt;为抢修排查和修复决策提供参考&lt;/font&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="310" width="590" x="250" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#23313F;fontSize=30;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="&lt;font&gt;&lt;font color=&quot;#2f7d61&quot;&gt;&lt;span&gt;&lt;b&gt;千亩村发展导引模型&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;&lt;b&gt;输入：&lt;/b&gt;烤房健康状况、烘烤承载能力、村级发展条件&lt;br&gt;&lt;b&gt;输出：&lt;/b&gt;村级发展指数&lt;br&gt;&lt;b&gt;用途：&lt;/b&gt;为新建烤房安排提供依据&lt;/font&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="310" width="590" x="935" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=20;fillColor=#24537A;strokeColor=#24537A;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="185" width="1275" x="250" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#24537A;strokeColor=#7FA6C5;strokeWidth=2;fontColor=#FFFFFF;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;烤房基础数据库&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#DDEBF7&quot;&gt;单栋烤房｜一房一档&lt;/font&gt;" vertex="1">
+          <mxGeometry height="117" width="295" x="250" y="1103" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#B8C5CF;strokeWidth=2;fontColor=#23313F;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;基础信息&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;位置・建设年份&lt;br&gt;使用状态&lt;/font&gt;" vertex="1">
+          <mxGeometry height="145" width="205" x="555" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#B8C5CF;strokeWidth=2;fontColor=#23313F;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;部位信息&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;加热・散热&lt;br&gt;自控・主体&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="205" x="780" y="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#B8C5CF;strokeWidth=2;fontColor=#23313F;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;过程记录&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#5C6B78&quot;&gt;调剂・维修&lt;br&gt;养护・费用&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="205" x="1005" y="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="24" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#23313F;fontSize=28;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;管理结果&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#2F7D61&quot;&gt;数量清&amp;nbsp; 位置清&amp;nbsp; 状态明&lt;/font&gt;" vertex="1">
+          <mxGeometry height="110" width="270" x="1230" y="1110" as="geometry" />
+        </mxCell>
+        <mxCell id="25" edge="1" parent="1" source="19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=30;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;exitX=0.232;exitY=-0.002;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitPerimeter=0;" target="17" value="数据支撑">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="545" y="1084.71" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="26" edge="1" parent="1" source="19" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=30;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.769;exitY=0.006;exitDx=0;exitDy=0;exitPerimeter=0;" target="18" value="数据支撑">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1230" y="1085" />
+            </Array>
+            <mxPoint x="1230" y="1060" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="27" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=30;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;entryX=0.227;entryY=1.004;entryDx=0;entryDy=0;entryPerimeter=0;" target="9" value="辅助抢修与修复">
+          <mxGeometry relative="1" x="-0.1007" y="1" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points" />
+            <mxPoint x="539.42" y="570" as="sourcePoint" />
+            <mxPoint x="730" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="28" edge="1" parent="1" source="18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=30;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.769;entryY=1.006;entryDx=0;entryDy=0;entryPerimeter=0;" target="9" value="辅助新建安排">
+          <mxGeometry relative="1" x="-0.0147" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1230" y="450" />
+              <mxPoint x="1230.5" y="450" />
+            </Array>
+            <mxPoint x="1230" y="630" as="sourcePoint" />
+            <mxPoint x="1230" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="29" edge="1" parent="1" source="9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C7923E;strokeWidth=3;dashed=1;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=30;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;textDirection=vertical-lr;" target="19" value="业务办理结果持续回写">
+          <mxGeometry relative="1" x="0.0074" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="1590" y="268" />
+              <mxPoint x="1590" y="1165" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

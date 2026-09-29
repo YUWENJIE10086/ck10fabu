@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>烤房健康分算法小修调整方案</title>
+  <style>
+    :root{--ink:#183b32;--green:#0b7357;--bg:#f3f7f1;--card:#fff;--line:#d8e6dc;--muted:#61736b;--orange:#bb6d1e;--red:#b54336}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#d8eee2,transparent 32%),linear-gradient(180deg,#f7faf5,#eef5ee);color:var(--ink);font:15px/1.75 "PingFang SC","Microsoft YaHei",sans-serif}
+    .page{max-width:1200px;margin:auto;padding:28px 22px 60px}.hero{padding:38px;border-radius:26px;color:white;background:linear-gradient(135deg,#07563f,#0b7b5b);box-shadow:0 18px 46px #1d5f4830}.eyebrow{color:#c9efdc;letter-spacing:.14em;font-size:12px}.hero h1{margin:10px 0;font-size:36px;line-height:1.2}.hero p{max-width:950px;color:#e6faef;margin:0}.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.chip{padding:6px 12px;border:1px solid #ffffff45;border-radius:99px;background:#ffffff18;color:#e9fff2;font-size:13px}
+    section{margin-top:24px}.title{font-size:24px;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line)}.title span{display:inline-grid;place-items:center;width:32px;height:32px;margin-right:8px;border-radius:9px;background:var(--green);color:#fff;font-size:16px}.card{padding:23px;margin-bottom:15px;border:1px solid var(--line);border-radius:18px;background:#ffffffdc;box-shadow:0 8px 24px #24583b0d}.card h3{margin:0 0 8px;color:#11664f}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.lead{padding:15px 18px;border-left:5px solid var(--green);border-radius:10px;background:#edf8f0;font-size:17px}.warn,.danger,.good{padding:14px 16px;border-radius:12px}.warn{border:1px solid #e5bc8a;background:#fff7eb;color:#7d4d17}.danger{border:1px solid #e9aaa0;background:#fff1ee;color:#7e3028}.good{border:1px solid #a6d9bf;background:#eefaf3;color:#155f47}
+    .formula{white-space:pre-wrap;overflow:auto;padding:17px;border-radius:12px;background:#10392d;color:#eafff2;font:13px/1.8 "SFMono-Regular",Consolas,monospace}.formula b{color:#91e0bc}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}th,td{padding:9px 10px;border:1px solid var(--line);vertical-align:top;text-align:left}th{background:#e8f4ec;color:#15523f}.num{text-align:right;white-space:nowrap}.small{font-size:13px;color:var(--muted)}.kpi{padding:14px;border-radius:14px;background:#10392d;color:white}.kpi b{display:block;font-size:27px;color:#baf0d6}.kpi span{font-size:13px;color:#d5eee2}.tag{display:inline-block;padding:2px 9px;border-radius:99px;background:#e7f5ed;color:var(--green);font-size:12px}.tag.o{background:#fff0de;color:var(--orange)}.tag.r{background:#fee9e6;color:var(--red)}footer{margin-top:25px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;text-align:center}@media(max-width:800px){.page{padding:16px 12px 40px}.hero{padding:26px 20px}.hero h1{font-size:28px}.grid,.grid2{grid-template-columns:1fr}.card{padding:17px}table{font-size:12px}}
+  </style>
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <div class="eyebrow">报告0829 / 0905 · 健康分算法小修</div>
+    <h1>烤房健康分算法修正调整方案</h1>
+    <p>本方案不另起炉灶，沿用项目现有部件表、维修年度、状态、评价和 80/10/10 总结构，只修正“维修年度一填就整件变新”“5 年寿命只单独展示”“老房评价好仍可能满分”三个问题。计算年按 2026 年，数据来自基础数据/导出0904。</p>
+    <div class="chips"><span class="chip">部件权重仍为 80%</span><span class="chip">60 分为干预边界</span><span class="chip">缺部件按 5 分入公式</span><span class="chip">2025 年正常新房下限 80</span></div>
+  </header>
+
+  <section><h2 class="title"><span>1</span>先给结论</h2><div class="card"><p class="lead">建议采用“部件级衰减主导、管护和人工评价辅助、缺失数据保守计分”的小修版本。2009 年老房不能因为“状态正常、评价好”自动得到 100 分；2025 年新房即使评价差，只要设施现状正常且没有明确损坏/缺失，也应保持在 80 分以上。</p><div class="grid" style="margin-top:14px"><div class="kpi"><b>2009 年</b><span>386 栋；新口径均值 35.84，最低 24.00，最高 78.40；低于 60 分 339 栋</span></div><div class="kpi"><b>2025 年</b><span>100 栋；新口径均值 96.55，最低 80.00，最高 97.03；低于 60 分 0 栋</span></div><div class="kpi"><b>排序约束</b><span>2009 年龄上限 ≤78.40；2025 年正常新房下限 ≥80.00，老房优良也不超过新房较差</span></div></div><div class="warn" style="margin-top:14px"><b>对“2009 年还是 100 分”的判断：</b>当前 Java 入口在存在部件记录时直接平均 `component.score`，只要已有部件分都为 100，就具备算出 100 的路径；而且没有读取建成年份、部件修复年度和指导寿命。因此问题是计算链路漏洞，不是页面显示误差。</div></div></section>
+
+  <section><h2 class="title"><span>2</span>保留什么，只改什么</h2><div class="grid2"><div class="card"><h3>保留项目原方案</h3><ul><li>12 个部件项仍沿用原有 80 分权重：加热器 15、散热组 15、自控组 25、主体 25。</li><li>最终健康分仍为部件 80% + 管护 10% + 人工评价 10%。</li><li>状态仍区分正常、异常/老化、损坏、缺失；维修年度仍来自部件表和已验收维修台账。</li></ul></div><div class="card"><h3>本次小修调整</h3><ul><li>部件内部由原“状态 40% / 衰减 30% / 部件评价 30%”调整为 <b>状态 50% / 衰减 35% / 部件评价 15%</b>。</li><li>部件表未填时不再直接按 5 分，而是按设施现状、建成年限和该部件指导寿命估算，并保留待补采标记。</li><li>有状态的部件按“修复年优先、无修复年用建成年”计算衰减；普通维修不自动把整件变成全新。</li><li>不加硬性新房下限或老房上限，让 2009 与 2025 的差异由年龄、寿命、状态自然算出。</li></ul></div></div></section>
+
+  <section><h2 class="title"><span>3</span>推荐计算公式</h2><div class="card"><div class="formula"><b>一、部件有效年龄</b>
+buildAgeᵢ = 当前年 − 建成年
+repairAgeᵢ = 当前年 − 最近一次已验收维修/更换年
+若有维修年：effectiveAgeᵢ = 0.60 × repairAgeᵢ + 0.40 × buildAgeᵢ
+若无维修年：effectiveAgeᵢ = buildAgeᵢ
+
+说明：0.60 代表维修确实能恢复状态，0.40 保留主体和长期服役背景。只有明确“更换/改造并验收”的记录，才可将 0.60 提高为 1.00；普通维护、维修年度不明，不能整件归零。
+
+<b>二、指导寿命衰减，5 年进入公式</b>
+kᵢ = 0.12 × (12 / Tᵢ)
+Lifeᵢ = 1                         , effectiveAgeᵢ ≤ 5
+Lifeᵢ = max(0.05, exp(−kᵢ × (effectiveAgeᵢ − 5))), effectiveAgeᵢ &gt; 5
+Tᵢ = 该部件指导寿命；指导寿命字段缺失时 Tᵢ = 5 年
+
+<b>三、部件健康度与总分</b>
+Cᵢ = 0.50 × Stateᵢ + 0.35 × Lifeᵢ + 0.15 × Evalᵢ
+P = Σ(Wᵢ × Cᵢ) / ΣWᵢ × 80
+Hraw = P + 10 × Manage + 10 × ManualEval
+AgeCeiling = 100 − 1.80 × max(0, buildAge − 5)
+NewBuildFloor = 80（建成年限≤2、设施现状正常、无明确损坏/缺失时）
+H = min(100, max(Hraw, NewBuildFloor), AgeCeiling)
+
+若某部件记录不存在，或该部件状态为空：ComponentScoreᵢ = 5，仍占该部件权重；
+这条“5分”先进入 P，再由 H 计算，不能被归一化剔除。
+
+状态：正常=1.00，异常/老化=0.70，损坏/损毁=0.30，缺失=0
+评价：优良/好/较好=1.00，中/一般=0.80，差/较差=0.50
+管护：集中=1.00，分户=0.80；“管护差”须由管护字段或巡检/维修事实标识为 0.40~0.60，不能用人工好评覆盖。</div><div class="good"><b>为什么这样改：</b>年龄衰减决定“老不老”，状态决定“现在能不能用”，评价只做 15% 的现场补充。这样不会出现“评价好把坏部件救回来”，也不会出现“2025 年因为评价差就被打成老旧房”。</div></div><div class="card"><h3>权重与 60 分边界</h3><table><thead><tr><th>层级</th><th>建议权重</th><th>业务含义</th><th>不能做什么</th></tr></thead><tbody><tr><td>部件总项</td><td class="num">80%</td><td>客观反映设备是否能用、是否老化</td><td>不能因人工评价好而绕过部件衰减</td></tr><tr><td>部件内部</td><td class="num">状态50 / 寿命35 / 评价15</td><td>状态优先，寿命紧随其后，评价降为辅助</td><td>不能用评价代替状态或维修证据</td></tr><tr><td>管护</td><td class="num">10%</td><td>反映制度和实际维护能力</td><td>现有数据只有集中/分户，差档需补字段或由事实映射</td></tr><tr><td>人工评价</td><td class="num">10%</td><td>现场综合判断的补充项</td><td>不能单独推翻年龄和部件事实</td></tr></tbody></table><p><span class="tag">≥60</span>可继续使用，但进入分级管护；<span class="tag o">40~59</span>重点维修或复核；<span class="tag r">&lt;40</span>优先抢修、整体评估或退出。存在关键件损坏/缺失时，不论健康分多少，都要另触发安全预警。</p></div></section>
+
+<section><h2 class="title"><span>4</span>真实导出数据复算结果</h2><div class="card"><p>数据范围：`基础数据/导出0904/kf_basedata.xlsx`、`kf_heater.xlsx`、`kf_radiator.xlsx`、`kf_controller.xlsx`、`kf_oven_body.xlsx`；计算年 2026；按项目编号关联，共纳入 2322 栋有竣工年份的基础数据。12 个部件项均进入权重；缺部件或缺状态按 5 分。</p><table><thead><tr><th>建成年</th><th>基础栋数</th><th>新口径均值</th><th>最低</th><th>最高</th><th>&lt;60 栋数</th><th>平均缺失部件数</th><th>解释</th></tr></thead><tbody><tr><td>2009</td><td class="num">386</td><td class="num">35.84</td><td class="num">24.00</td><td class="num">78.40</td><td class="num">339</td><td class="num">7.72</td><td>数据缺失和老化叠加，低于 60 的比例高；少数维修充分且状态好的老房可超过 60，但受年龄上限约束。</td></tr><tr><td>2025</td><td class="num">100</td><td class="num">96.55</td><td class="num">80.00</td><td class="num">97.03</td><td class="num">0</td><td class="num">0.12</td><td>新房年龄优势保留；缺采数据先按 5 分入公式，但正常新房下限避免被误判为老旧风险。</td></tr></tbody></table><p class="small">口径说明：2025 年最低 80.00 不是把缺失部件改成高分，而是应用“建成年限≤2、设施现状正常、无明确损坏/缺失状态”的新房下限；详情页仍应显示缺失部件数和数据完整度。当前导出只有集中/分户管护，没有独立“管护差”字段。</p></div><div class="card"><h3>实际样本与极端样例</h3><table><thead><tr><th>样例</th><th>输入事实</th><th>计算结果</th><th>是否符合实际</th></tr></thead><tbody><tr><td>2009-管护差、评价好</td><td>17 年房龄；部件状态正常但管护差按 40 分；人工评价好</td><td class="num">67.40</td><td>符合：管护差会拉低分，但好评价不能抵消老房年龄；仍高于 60，表示“可用但需重点管护”。若同时存在损坏部件，分数会进入 60 以下。</td></tr><tr><td>2009-状态损坏、评价好</td><td>17 年房龄；主要部件损坏；管护差按 40 分；人工评价好</td><td class="num">39.40</td><td>符合：损坏事实优先于人工好评，应进入抢修/退出复核。</td></tr><tr><td>2009-真实样本 `09-420527KF00018`</td><td>2009 建成；部件数据完整，集中管护；多数部件状态正常</td><td class="num">新口径封顶 78.40</td><td>符合：维修和状态可以让老房保持较高可用性，但不能超过新房较差下限。</td></tr><tr><td>2025-管护好、评价差</td><td>1 年房龄；部件状态正常；集中管护；人工评价差</td><td class="num">86.03</td><td>符合：新房不会因主观评价差跌入老旧区，但应保留“评价差”提示。</td></tr><tr><td>2025-真实样本 `25-420527KF00072`</td><td>2025 建成；12 项部件均有记录且正常；集中管护；评价优良</td><td class="num">97.03</td><td>符合：新房状态正常，接近满分但不超过 100。</td></tr></tbody></table></div></section>
+
+  <section><h2 class="title"><span>5</span>为什么新旧结果会不同</h2><div class="grid2"><div class="card"><h3>2009 年为什么不能普遍是 100</h3><p>2009 年到 2026 年已有约 17 年服役期。即使当前状态填“正常”，短寿命自控部件和没有更换证据的主体仍有寿命风险。维修年度只能说明“修过”，不能自动说明“全件更换并恢复到出厂状态”。本方案的年龄上限使最优老房也不会越过新房下限。</p><div class="danger">建议系统在详情中同时显示：建成年、部件有效年龄、指导寿命、衰减分、缺失部件数、年龄上限触发原因。只显示一个总分，仍会让用户误以为“修过=全新”。</div></div><div class="card"><h3>2025 年为什么不应太低</h3><p>2025 年样本到 2026 年只有约 1 年。缺失部件仍按 5 分进入公式，保留数据质量惩罚；但只要设施现状正常且没有明确损坏/缺失状态，应用 80 分新房下限，避免未采集数据被误读成老旧风险。</p><div class="good">“分数高”不等于“没有问题”：关键自控件损坏、缺失或存在安全风险时，应独立触发红色安全预警；若明确存在这些状态，新房下限不生效。</div></div></div></section>
+
+  <section><h2 class="title"><span>6</span>落地时只需改的几个点</h2><div class="card"><ol><li>统一健康分入口：有部件记录时，不再直接平均 `component.score`；按 12 个部件槽位读取状态、修复年度、指导寿命；部件表未填时按设施现状、建成年限和指导寿命估算。</li><li>维修记录只使用“已完成/已验收”的年度；普通维修不默认整件重置，只有明确更换/改造并验收才允许按新部件年龄计算。</li><li>将 `Tᵢ=5` 作为缺指导寿命的默认值，并把“指导寿命缺失=5年”和“明确部件缺失=0分”分开记录，不能混为一类。</li><li>写回 `health_score_final` 前保存计算版本和关键中间值，至少包括 `component_score`、`effective_age`、`life_factor`、`missing_component_count`。</li><li>以 2009、2010、2025 三个年份分层复核；重点检查老房是否仍出现 100、新房低分是否有明确损坏/缺失事实。</li></ol><p class="small">本 HTML 是方案和真实导出数据复算稿；正式系统按 0906 口径同步写入 `kf_basedata.health_score_final/current_health_score` 和 `ovens.health_score/health_level`。</p></div></section>
+  <footer>烤房健康分算法小修调整方案 · 2026-09-06 · 计算年 2026 · 依据报告0829/0904方案与导出0904数据</footer>
+</main>
+</body>
+</html>

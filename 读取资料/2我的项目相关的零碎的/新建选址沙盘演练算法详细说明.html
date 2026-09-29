@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新建选址沙盘演练算法详细说明</title>
+  <style>
+    :root {
+      --ink: #18332b;
+      --muted: #64756f;
+      --line: #d9e6df;
+      --panel: #f7faf8;
+      --brand: #1f7a5a;
+      --accent: #b87922;
+      --warn: #b64032;
+      --bg: #eef5f1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background: linear-gradient(180deg, #f9fcfa 0%, var(--bg) 100%);
+      line-height: 1.72;
+    }
+    .page { max-width: 1180px; margin: 0 auto; padding: 42px 28px 64px; }
+    .hero { border-left: 8px solid var(--brand); padding: 18px 24px; background: #fff; box-shadow: 0 14px 38px rgba(33, 80, 63, .08); }
+    h1 { margin: 0; font-size: 30px; letter-spacing: 0; }
+    .subtitle { margin-top: 8px; color: var(--muted); font-size: 15px; }
+    h2 { margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 22px; }
+    h3 { margin: 24px 0 8px; font-size: 17px; color: var(--brand); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .metric { font-size: 26px; font-weight: 700; color: var(--brand); }
+    .label { color: var(--muted); font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; background: #fff; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #e9f3ee; color: #14372b; }
+    code { background: #edf5f1; padding: 2px 6px; border-radius: 4px; }
+    .note { background: #fff8e9; border: 1px solid #ecd2a5; border-left: 5px solid var(--accent); padding: 12px 14px; border-radius: 6px; }
+    .danger { background: #fff3f1; border-color: #efc1ba; border-left-color: var(--warn); }
+    .formula { font-family: "SFMono-Regular", Consolas, monospace; background: #0f241d; color: #e9fff6; padding: 14px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>新建选址沙盘演练算法详细说明</h1>
+      <div class="subtitle">基于现有项目代码的负载均衡推演拆解，不引入地形环境指标</div>
+    </section>
+    
+    <h2>一、现有沙盘演练算法拆解</h2>
+    <div class="grid">
+      <div class="card"><div class="metric">3</div><div class="label">数据表：烟叶、烤房、候选点</div></div>
+      <div class="card"><div class="metric">5000kg</div><div class="label">默认单座烤房设计产能</div></div>
+      <div class="card"><div class="metric">村级</div><div class="label">最小计算单元：乡镇 + 行政村归一化</div></div>
+      <div class="card"><div class="metric">实时</div><div class="label">新增/删除候选点后重算负载</div></div>
+    </div>
+    <h3>核心结论</h3>
+    <p>当前“烤房新建点沙盘演练”不是地形环境选址模型，而是一个村级供需负载推演模型。它把现有烤房、烟叶收购量和地图上新增候选点放进同一张村级账本里，计算新增前后每个村的烤房承载压力变化。</p>
+    <div class="formula">村负载率 = 村实际收购量kg / (村在用烤房数 × 单座设计产能kg)<br>县基准负载率 = 县实际收购总量kg / (县在用烤房总数 × 单座设计产能kg)<br>村新建优先级 = 村负载率 - 县基准负载率<br>新增后负载率 = 村实际收购量kg / ((村在用烤房数 + 新增候选点数) × 单座设计产能kg)</div>
+    <h3>现有流程</h3>
+    <table><tr><th>步骤</th><th>输入</th><th>处理</th><th>输出</th></tr>
+      <tr><td>1</td><td>2025年烟叶收购数据</td><td>收购数量按担转公斤，乘以50</td><td>村级实际收购量kg</td></tr>
+      <tr><td>2</td><td>烤房使用明细</td><td>按乡镇+村统计“在用”烤房数</td><td>村级供给能力</td></tr>
+      <tr><td>3</td><td>地图候选点</td><td>先按乡镇+村匹配，匹配不到用经纬度就近映射</td><td>村级新增烤房数</td></tr>
+      <tr><td>4</td><td>单座产能</td><td>默认5000kg，可由页面输入修改</td><td>新增前后负载率</td></tr>
+      <tr><td>5</td><td>县基准与村负载</td><td>比较村负载与县均，按优先级排序</td><td>推荐优先新建村、地图着色、表格明细</td></tr>
+    </table>
+    <h3>分级规则</h3>
+    <table><tr><th>负载率</th><th>等级</th><th>含义</th></tr>
+      <tr><td>&gt; 1.2</td><td>严重超负荷</td><td>烟叶量显著超过现有烤房能力，应优先补点</td></tr>
+      <tr><td>1.0 - 1.2</td><td>超负荷</td><td>供给偏紧，新增烤房能明显缓解</td></tr>
+      <tr><td>0.8 - 1.0</td><td>饱和</td><td>接近满负荷，需结合发展趋势观察</td></tr>
+      <tr><td>0.6 - 0.8</td><td>正常</td><td>供需较匹配</td></tr>
+      <tr><td>&lt; 0.6</td><td>富余</td><td>现有烤房能力相对充足</td></tr>
+    </table>
+    <div class="note danger">边界说明：现有沙盘演练没有真正使用地形、坡度、水文、电力、道路、土地类型等环境地形变量。后端虽然保留了候选点评估的 AHP + 熵权法 + TOPSIS 代码，但沙盘演练的负载推演主线只使用收购量、烤房数、新增点数和单座产能。</div>
+    
+  </main>
+</body>
+</html>
