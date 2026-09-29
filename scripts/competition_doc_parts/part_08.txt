@@ -1,0 +1,78 @@
+    add_heading(doc,'三、PPT逐页配合方案',1); add_ppt_plan(doc,name)
+    add_heading(doc,'四、双人正式发布稿',1); add_script(doc,items)
+    add_heading(doc,'五、排练重点',1)
+    for txt in [
+        'A不要用“论文答辩”的语速读算法名。每讲一个技术名词，必须紧跟一句“它解决什么问题”。',
+        'B只负责提问、转场、案例落地和关键句复述，不要连续讲大段技术，才能保持A约70%的主讲结构。',
+        '“AHP+熵权、区位熵、TOPSIS”建议只出现一次；评委若追问，再在答辩环节展开公式和参数。',
+        '主讲稿中最需要重音的不是算法名，而是：维修可以续命但不能回春；有效烤能；先盘活、再修复、仍有缺口才新建；两个模型前后耦合。',
+        '视频必须展示“模型结果如何改变业务动作”，不要只录页面切换。'
+    ]:
+        p=doc.add_paragraph(style=None); p.style=doc.styles['Normal']; p.paragraph_format.left_indent=Cm(0.7); p.paragraph_format.first_line_indent=Cm(-0.35)
+        r=p.add_run('• '); set_run_font(r,BODY_FONT,Pt(14),True)
+        r=p.add_run(txt); set_run_font(r,BODY_FONT,Pt(14))
+    path=OUT/f'{idx:02d}_{name}.docx'; doc.save(path); return path
+
+# create individual docs
+individual=[]
+for idx,(name,items) in enumerate(versions,1): individual.append(create_version_doc(name,items,idx))
+
+# Master doc
+master=Document(); setup_doc(master)
+add_title(master,'智烤管家——湖北省创客大赛决赛双人发布材料','五版8分钟发布稿 · 双模型创新强化版 · 2026-09-29')
+add_callout(master,'使用定位：','本文件按省级决赛竞争强度设计，目标是把“健康评估模型＋新建沙盘推演模型”作为项目技术主角，把“智用、智投、智管”作为模型落地场景。奖项结果取决于现场表现、PPT、视频、评审偏好等多因素，本材料不对获奖结果作保证。')
+
+add_heading(master,'0. 结论先行：这次必须改什么',1)
+for t in [
+ '不要再把“智用、智投、智管”讲成三个并列功能。决赛主线应改成“两个模型驱动三个场景”：健康模型管存量，新建沙盘管增量，平台负责执行。',
+ '最核心的创新不是“我们也用了AHP、熵权、TOPSIS”，而是“健康模型的结果进一步折算为有效烤能，进入新建模型”，两个模型前后耦合。',
+ '健康模型必须讲出“为什么比普通评分高级”：结构硬约束＋功能件状态＋维修折损＋健康校准，避免老房换新部件后出现“假年轻”。',
+ '新建模型必须讲出“为什么叫沙盘”：不是静态排序，而是切换当前/增长2%/5%/10%情景，重新计算负载、缺口与推荐，并观察新增后的改善幅度。',
+ '舞台上技术名词控制在3–5个，每一个技术名词都要对应一个业务问题，否则就会显得炫技、AI味重。'
+]: add_body(master,t,bold_phrases=['两个模型驱动三个场景','有效烤能','结构硬约束','增长2%/5%/10%','不是静态排序'])
+
+add_heading(master,'1. 对2025年决赛优秀稿的拆解',1)
+for h,b in analysis_points:
+    add_heading(master,h,2); add_body(master,b)
+
+add_heading(master,'2. 你的项目最应该被评委记住的五个创新点',1)
+for h,b in core_innovations:
+    add_heading(master,h,2); add_body(master,b,bold_phrases=['前后耦合','有效烤能','维修可以续命，但不能回春','可推演的决策沙盘','先修后建','数据—模型—决策—执行—反馈'])
+
+add_heading(master,'3. 两个模型到底怎样讲，既高级又不难懂',1)
+# model table
+mt=master.add_table(rows=1,cols=5); mt.style='Table Grid'; mt.alignment=WD_TABLE_ALIGNMENT.CENTER
+headers=['模型','评委要听懂的问题','核心技术只讲这些','输出','业务动作']
+for i,h in enumerate(headers): set_cell_text(mt.rows[0].cells[i],h,True,9,HEAD_FONT); set_cell_shading(mt.rows[0].cells[i],'D9EAD3')
+rows=[
+('健康评估模型','这栋房现在怎么样、还能用多久、先修哪里','AHP专家赋权＋熵权客观校验；结构硬约束；功能件加权；维修折损/健康校准','健康分、等级、剩余寿命、风险部件','修复优先级、风险预警、维修资金投向'),
+('新建沙盘推演模型','这个村真缺吗、未来还缺吗、建哪里更值','有效烤能折算；区位熵横向对标；AHP+熵权；TOPSIS；2%/5%/10%情景推演','村级负载、缺口、融合优先级、候选点排序、情景改善','先盘活/修复，再决定新建及优先区域')]
+for row in rows:
+    cells=mt.add_row().cells
+    for i,val in enumerate(row): set_cell_text(cells[i],val,False,9)
+
+add_heading(master,'4. 五版发布稿怎么选',1)
+ct=master.add_table(rows=1,cols=5); ct.style='Table Grid'; ct.alignment=WD_TABLE_ALIGNMENT.CENTER
+for i,h in enumerate(['版本','风格','最大优势','适合PPT','风险控制']): set_cell_text(ct.rows[0].cells[i],h,True,9,HEAD_FONT); set_cell_shading(ct.rows[0].cells[i],'FCE4D6')
+comp=[
+('V1 双模型硬核版','3D智慧对标式','模型逻辑最完整、技术和业务最平衡','架构图＋模型图＋沙盘','不要念公式'),
+('V2 体检处方版','医疗隐喻','最容易听懂、记忆点强','体检报告视觉','避免表演过度'),
+('V3 一栋烤房的一生','生命周期故事','自然体现“用投管”闭环','时间轴','技术密度略低'),
+('V4 双模四步法','数创方法论','创新高度最高、最像省决赛技术稿','四步流程＋沙盘','要求A技术表达稳定'),
+('V5 县域数字棋局','地图沙盘视觉','现场冲击力和PPT联动最好','大地图＋动态气泡','需要PPT动画配合')]
+for row in comp:
+    cells=ct.add_row().cells
+    for i,val in enumerate(row): set_cell_text(cells[i],val,False,9)
+
+add_heading(master,'5. 统一的8分钟时间控制',1); add_timing_table(master,versions[0][1])
+
+for idx,(name,items) in enumerate(versions,1):
+    master.add_page_break()
+    add_title(master,f'第{idx}版发布稿',name)
+    a,b,total,ratio=stats(items)
+    add_callout(master,'口播统计：',f'约{total}个汉字；A约{a}字（{ratio*100:.1f}%），B约{b}字（{(1-ratio)*100:.1f}%）。建议实际排练目标7分30秒–7分50秒。')
+    add_heading(master,'PPT逐页方案',1); add_ppt_plan(master,name)
+    add_heading(master,'正式双人发布稿',1); add_script(master,items)
+
+master.add_page_break()
+add_heading(master,'附录A：视频统一脚本建议（35–40秒）',1)
