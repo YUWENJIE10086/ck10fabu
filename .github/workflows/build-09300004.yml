@@ -22,6 +22,8 @@ jobs:
         run: pip install python-docx
       - name: Generate final Word files
         run: python scripts/build_09300004.py
+      - name: Apply final formatting and rationale patch
+        run: python scripts/patch_09300004.py
       - name: Clean temporary source extraction
         shell: bash
         run: |
