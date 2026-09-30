@@ -1,0 +1,14 @@
+name: Inspect official style sizes 09300950
+on:
+  push:
+    paths:
+      - 'scripts/INSPECT_STYLES_09300950_READY'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install python-docx
+      - run: python scripts/inspect_styles_09300950.py
