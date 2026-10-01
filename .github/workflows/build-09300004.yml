@@ -1,0 +1,41 @@
+name: Build 09300004 competition release docs
+
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_09300004_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Word generator
+        run: pip install python-docx
+      - name: Generate final Word files
+        run: python scripts/build_09300004.py
+      - name: Apply final formatting and rationale patch
+        run: python scripts/patch_09300004.py
+      - name: Clean temporary source extraction
+        shell: bash
+        run: |
+          git rm -rf --ignore-unmatch .analysis_extract_0930
+          git rm -rf --ignore-unmatch scripts/extract_competition_sources
+          git rm -rf --ignore-unmatch scripts/rewrite_09300004
+          git rm -f --ignore-unmatch .github/workflows/extract-competition-sources.yml
+      - name: Commit final release
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/09300004发布稿"
+          git commit -m "Add 09300004 final competition release drafts" || exit 0
+          git push

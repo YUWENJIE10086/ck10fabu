@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新建选址融合升级方案：千亩村发展指数</title>
+  <style>
+    :root {
+      --ink: #18332b;
+      --muted: #64756f;
+      --line: #d9e6df;
+      --panel: #f7faf8;
+      --brand: #1f7a5a;
+      --accent: #b87922;
+      --warn: #b64032;
+      --bg: #eef5f1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background: linear-gradient(180deg, #f9fcfa 0%, var(--bg) 100%);
+      line-height: 1.72;
+    }
+    .page { max-width: 1180px; margin: 0 auto; padding: 42px 28px 64px; }
+    .hero { border-left: 8px solid var(--brand); padding: 18px 24px; background: #fff; box-shadow: 0 14px 38px rgba(33, 80, 63, .08); }
+    h1 { margin: 0; font-size: 30px; letter-spacing: 0; }
+    .subtitle { margin-top: 8px; color: var(--muted); font-size: 15px; }
+    h2 { margin: 34px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 22px; }
+    h3 { margin: 24px 0 8px; font-size: 17px; color: var(--brand); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .metric { font-size: 26px; font-weight: 700; color: var(--brand); }
+    .label { color: var(--muted); font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; background: #fff; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #e9f3ee; color: #14372b; }
+    code { background: #edf5f1; padding: 2px 6px; border-radius: 4px; }
+    .note { background: #fff8e9; border: 1px solid #ecd2a5; border-left: 5px solid var(--accent); padding: 12px 14px; border-radius: 6px; }
+    .danger { background: #fff3f1; border-color: #efc1ba; border-left-color: var(--warn); }
+    .formula { font-family: "SFMono-Regular", Consolas, monospace; background: #0f241d; color: #e9fff6; padding: 14px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>新建选址融合升级方案：千亩村发展指数</h1>
+      <div class="subtitle">基于 Excel 三个 sheet 的村级发展指数与现有沙盘负载推演融合</div>
+    </section>
+    
+    <h2>一、三张 Excel 的使用方式</h2>
+    <div class="grid">
+      <div class="card"><div class="metric">29</div><div class="label">全村年度面积/收购数据行数</div></div>
+      <div class="card"><div class="metric">16</div><div class="label">千亩村及新区村明细行数</div></div>
+      <div class="card"><div class="metric">16</div><div class="label">发展指数赋分行数</div></div>
+      <div class="card"><div class="metric">17.1</div><div class="label">发展指数平均分，满分20</div></div>
+    </div>
+    <p>本次升级方案把三张表全部接入同一套村级口径：以行政村为主键，去除“村、村委会、村民委员会”等后缀后匹配。第一张表提供 2024-2026 面积与收购趋势，第二张表提供重点村烤房数量、烤能、政策投入和 2%/5%/10% 增长情景，第三张表提供“千亩村发展指数”的五项人工或业务赋分。</p>
+    <h2>二、千亩村发展指数</h2>
+    <div class="formula">千亩村发展指数 = 村级集体经济收益 + 村烤房管护服务 + 村争取政策 + 规模增长趋势 + 发展承载量<br>每项满分4分，总分20分；可换算为百分制 = 合计 / 20 × 100</div>
+    <table><tr><th>排名靠前村</th><th>发展指数/20</th><th>百分制</th></tr><tr><td>香龙</td><td>18.5</td><td>92.5</td></tr><tr><td>陈家淌</td><td>18.0</td><td>90.0</td></tr><tr><td>赵家山</td><td>18.0</td><td>90.0</td></tr><tr><td>荒口坪</td><td>18.0</td><td>90.0</td></tr><tr><td>磨坪</td><td>17.5</td><td>87.5</td></tr></table>
+    <h2>三、与现有沙盘演练融合</h2>
+    <p>融合时不引入环境地形，不再把坡度、水文、电力、道路等作为主判断项。升级后的“新建选址”仍以收购量和烤房承载为主，只把“千亩村发展指数”作为需求可信度和持续性修正项，避免只看某一年收购量导致误判。</p>
+    <div class="formula">融合优先级 = 0.50 × 负载缺口得分 + 0.25 × 千亩村发展指数得分 + 0.15 × 规模增长趋势得分 + 0.10 × 政策管护保障得分</div>
+    <table><tr><th>分项</th><th>来源</th><th>计算说明</th><th>作用</th></tr>
+      <tr><td>负载缺口得分</td><td>现有沙盘 + 第二张表</td><td>使用2026合同产量kg / (在用烤房 × 5000kg)，并与县均负载比较</td><td>判断哪里最缺烤房</td></tr>
+      <tr><td>千亩村发展指数得分</td><td>赋分 sheet</td><td>合计/20×100</td><td>判断该村发展基础是否扎实</td></tr>
+      <tr><td>规模增长趋势得分</td><td>第一张表 + 第二张表</td><td>结合2024-2026面积变化和2%/5%/10%情景</td><td>判断需求是否会持续增长</td></tr>
+      <tr><td>政策管护保障得分</td><td>第二张表 + 赋分 sheet</td><td>亩均政策投入、村争取政策分、管护服务分</td><td>判断新建后的落地和运维保障</td></tr>
+    </table>
+    <h2>四、数据测算摘要</h2>
+    <div class="grid">
+      <div class="card"><div class="metric">24,468</div><div class="label">重点村2026合同面积合计</div></div>
+      <div class="card"><div class="metric">3,248,100</div><div class="label">重点村2026合同产量合计kg</div></div>
+      <div class="card"><div class="metric">1,410</div><div class="label">重点村在用烤房数</div></div>
+      <div class="card"><div class="metric">3,191,315</div><div class="label">三年政策投入合计</div></div>
+    </div>
+    <h3>按5000kg/座测算的高负载村</h3>
+    <table><tr><th>行政村</th><th>在用烤房</th><th>2026合同产量kg</th><th>负载率</th><th>发展指数/20</th></tr><tr><td>白鹤洞</td><td>81</td><td>226,500</td><td>0.559</td><td>16.5</td></tr><tr><td>文家岩</td><td>50</td><td>133,000</td><td>0.532</td><td>15.5</td></tr><tr><td>肖家坪村</td><td>59</td><td>153,450</td><td>0.520</td><td>16.5</td></tr><tr><td>陈家淌村</td><td>54</td><td>136,550</td><td>0.506</td><td>18.0</td></tr><tr><td>赵家山</td><td>67</td><td>165,300</td><td>0.493</td><td>18.0</td></tr></table>
+    <h3>融合数据明细</h3>
+    <table><tr><th>行政村</th><th>在用烤房</th><th>2026合同产量kg</th><th>负载率</th><th>亩均政策投入</th><th>发展指数/20</th></tr><tr><td>香龙村</td><td>127</td><td>305,000</td><td>0.480</td><td>152.9</td><td>18.5</td></tr><tr><td>陈家淌村</td><td>54</td><td>136,550</td><td>0.506</td><td>132.8</td><td>18.0</td></tr><tr><td>赵家山</td><td>67</td><td>165,300</td><td>0.493</td><td>86.1</td><td>18.0</td></tr><tr><td>磨坪村</td><td>123</td><td>291,880</td><td>0.475</td><td>147.0</td><td>17.5</td></tr><tr><td>白庙岭村</td><td>100</td><td>213,350</td><td>0.427</td><td>241.2</td><td>17.5</td></tr><tr><td>罗圈荒</td><td>72</td><td>146,240</td><td>0.406</td><td>154.8</td><td>17.5</td></tr><tr><td>柏家坪村</td><td>182</td><td>447,850</td><td>0.492</td><td>117.9</td><td>17.0</td></tr><tr><td>二甲村</td><td>143</td><td>292,210</td><td>0.409</td><td>227.0</td><td>17.0</td></tr><tr><td>鼓锣坪</td><td>70</td><td>133,050</td><td>0.380</td><td>0.0</td><td>17.0</td></tr><tr><td>肖家坪村</td><td>59</td><td>153,450</td><td>0.520</td><td>160.0</td><td>16.5</td></tr><tr><td>西阳坪</td><td>78</td><td>136,300</td><td>0.349</td><td>133.9</td><td>16.5</td></tr><tr><td>眉毛山</td><td>70</td><td>163,450</td><td>0.467</td><td>44.5</td><td>16.5</td></tr><tr><td>白鹤洞</td><td>81</td><td>226,500</td><td>0.559</td><td>36.3</td><td>16.5</td></tr><tr><td>龙潭坪村</td><td>104</td><td>236,970</td><td>0.456</td><td>130.4</td><td>16.0</td></tr><tr><td>文家岩</td><td>50</td><td>133,000</td><td>0.532</td><td>120.9</td><td>15.5</td></tr><tr><td>荒口坪村（新区）</td><td>30</td><td>67,000</td><td>0.447</td><td>52.0</td><td>-</td></tr></table>
+    <h2>五、落到“新建选址”页面的升级方向</h2>
+    <p>页面保持现有沙盘交互：地图点选、候选点列表、村级负载明细和推荐村列表。升级后推荐排序应从单一“负载率高于县均”扩展为“负载缺口 + 千亩村发展指数 + 增长情景 + 政策管护保障”的融合排序。这样仍然符合你强调的业务边界：不把地形环境作为主要依据，而是围绕收购量、烤房供给、千亩村发展潜力来决策。</p>
+    <div class="note">实施建议：先新增后端只读接口，例如 <code>/new-site-selection/development-index</code>，读取三张表或入库后的同结构数据，输出村级融合排序；前端“新建选址”复用现有沙盘，只增加发展指数列和融合优先级列。</div>
+    
+  </main>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>当前寿命预测算法说明</title>
+  <style>
+    :root {
+      --green: #0a624d;
+      --deep: #163c34;
+      --muted: #63756f;
+      --orange: #d9822b;
+      --red: #bf4c3d;
+      --line: rgba(18, 88, 66, .16);
+      --card: rgba(255,255,255,.9);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--deep);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(217,130,43,.20), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(10,98,77,.18), transparent 32%),
+        linear-gradient(180deg, #fbfcf7 0%, #eef7ee 54%, #fff8ed 100%);
+      font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+      line-height: 1.72;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 34px 26px 70px; }
+    header {
+      padding: 40px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #0a4438, #0e7658 62%, #d9822b);
+      color: white;
+      box-shadow: 0 20px 58px rgba(21, 76, 56, .18);
+    }
+    .eyebrow { letter-spacing: .18em; color: #ddf4e4; font-weight: 800; }
+    h1 { margin: 10px 0 12px; font-size: 39px; line-height: 1.18; }
+    header p { max-width: 910px; margin: 0; color: #f2fff3; font-size: 17px; }
+    section {
+      margin-top: 22px;
+      padding: 27px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 12px 34px rgba(31, 82, 62, .08);
+    }
+    h2 { margin: 0 0 16px; color: var(--green); font-size: 25px; }
+    h3 { margin: 16px 0 8px; font-size: 18px; }
+    p { margin: 7px 0; }
+    .lead {
+      padding: 14px 18px;
+      border-left: 6px solid var(--green);
+      border-radius: 14px;
+      background: #e8f4ec;
+      font-size: 17px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdf9;
+    }
+    .formula {
+      white-space: pre-wrap;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      color: #effff2;
+      background: #12372f;
+      border-radius: 16px;
+      padding: 18px;
+      overflow-x: auto;
+      line-height: 1.68;
+      margin: 12px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    th, td { border: 1px solid #d8e8dc; padding: 10px 11px; vertical-align: top; }
+    th { background: #eaf4ed; color: #104b3d; text-align: left; }
+    tr:nth-child(even) td { background: #fbfdf9; }
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      color: var(--green);
+      background: #e7f4ed;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .note {
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,130,43,.30);
+      background: #fff7e8;
+    }
+    .footer { color: var(--muted); font-size: 13px; margin-top: 22px; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      header { padding: 26px; }
+      h1 { font-size: 28px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">当前项目已有算法 / 仅说明不修改</div>
+    <h1>烤房寿命预测算法说明</h1>
+    <p>
+      本文件梳理当前项目代码中已经存在的寿命预测算法，说明它们怎么预测、公式是什么、默认参数是什么、示例怎么算。
+      本次代码只修改健康分算法和风险排序，寿命预测算法暂不改动。
+    </p>
+  </header>
+
+  <section>
+    <h2>一、系统里现在有哪几类寿命算法</h2>
+    <table>
+      <thead>
+        <tr><th>算法</th><th>页面/接口</th><th>核心思想</th><th>结果字段</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>EDRL 指数衰减</td>
+          <td>/barn/health-algo/life-apply?algo=edrl</td>
+          <td>健康度随时间按指数曲线下降。</td>
+          <td>life_edrl</td>
+        </tr>
+        <tr>
+          <td>WRRL 威布尔可靠性</td>
+          <td>/barn/health-algo/life-apply?algo=wrrl</td>
+          <td>用可靠性工程的威布尔分布描述耗损失效。</td>
+          <td>life_wrrl</td>
+        </tr>
+        <tr>
+          <td>BDRL 双段退化</td>
+          <td>/barn/health-algo/life-apply?algo=bdrl</td>
+          <td>前期线性退化，后期加速劣化，并考虑维修延寿。</td>
+          <td>life_bdrl</td>
+        </tr>
+        <tr>
+          <td>GPLE 灰色预测</td>
+          <td>/barn/health-algo/life-apply?algo=gple</td>
+          <td>用健康分历史序列拟合趋势，适合少数据场景。</td>
+          <td>life_gple</td>
+        </tr>
+        <tr>
+          <td>最终版 BDRL</td>
+          <td>/barn/health-algo/life-final-apply</td>
+          <td>读取 health_score_final，用健康分和物理房龄共同推算剩余寿命。</td>
+          <td>life_residual_final / current_life_residual / ovens.predicted_life_years</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>二、最终版 BDRL 当前怎么计算</h2>
+    <p class="lead">
+      当前前端“寿命预测算法”页面默认使用最终版 BDRL。它不是直接按烤房建成年份判死，而是读取最新健康分 <span class="tag">health_score_final</span>，再结合房龄判断剩余寿命。
+    </p>
+    <div class="formula">输入：
+当前年份 currentYear
+建设/竣工年份 buildYear
+物理房龄 age = currentYear - buildYear
+当前健康分 h0 = kf_basedata.health_score_final，缺失时默认70
+
+默认参数：
+Tc = 8 年，退化转折点
+Hc = 60 分，转折点健康分
+Tend = 12 年，理论寿命终点
+H_min = 40 分，失效阈值
+repairExtend = 2.5 年，估算维修延寿
+
+维修次数：
+repairCount = floor(age / 8)
+TendAdj = Tend + repairCount × repairExtend</div>
+    <h3>2.1 房龄在前段时</h3>
+    <div class="formula">如果 age ≤ Tc：
+k1 = (100 - Hc) / Tc
+tEnd = (100 - H_min) / k1
+residual = tEnd - age</div>
+    <h3>2.2 房龄在后段时</h3>
+    <div class="formula">如果 age > Tc：
+ratio = sqrt(1 - H_min / Hc)
+tEnd = Tc + ratio × (TendAdj - Tc)
+residual = tEnd - age</div>
+    <h3>2.3 健康分回弹修正</h3>
+    <div class="formula">理论健康分 theoreticalH：
+若 age ≤ Tc：
+theoreticalH = 100 - k1 × age
+若 age > Tc：
+theoreticalH = Hc × [1 - ((age - Tc) / (TendAdj - Tc))²]
+
+如果实际健康分 h0 > theoreticalH：
+boostRatio = h0 / theoreticalH
+residual = residual × boostRatio
+
+最终结果：
+RUL = clamp(residual, 0, 12)</div>
+    <div class="note">
+      <b>解释：</b>
+      如果一栋老烤房实际健康分比理论曲线高，系统认为它可能经历过维修或维护较好，因此按比例延长剩余寿命。
+      但最终上限锁定为 12 年，避免无限延寿。
+    </div>
+  </section>
+
+  <section>
+    <h2>三、最终版 BDRL 示例</h2>
+    <p>假设当前年份为 2026 年，一栋烤房 2020 年竣工，健康分最终结果为 78 分。</p>
+    <div class="formula">age = 2026 - 2020 = 6年
+Tc = 8，Hc = 60，H_min = 40
+
+因为 age ≤ Tc，使用前段线性退化：
+k1 = (100 - 60) / 8 = 5 分/年
+tEnd = (100 - 40) / 5 = 12 年
+residual = 12 - 6 = 6 年
+
+理论健康分：
+theoreticalH = 100 - 5 × 6 = 70 分
+
+实际健康分 h0 = 78 分，高于理论健康分70：
+boostRatio = 78 / 70 = 1.114
+residual = 6 × 1.114 = 6.68 年
+
+最终剩余寿命 RUL = 6.7 年
+预警等级：需关注</div>
+  </section>
+
+  <section>
+    <h2>四、旧版四种寿命算法公式</h2>
+    <div class="grid-2">
+      <div class="box">
+        <h3>EDRL 指数衰减</h3>
+        <div class="formula">H(t) = H0 × e^(-λt)
+λ = -ln(H0 / 100) / age
+剩余寿命 = [ln(H0) - ln(H_min)] / λ
+
+默认：
+H_min=40
+H_maint=60
+policyMax=20</div>
+      </div>
+      <div class="box">
+        <h3>WRRL 威布尔可靠性</h3>
+        <div class="formula">R(t) = e^(-(t/η)^β)
+H(t) = R(t) × 100
+求 R(t)=R_min 时的 t
+剩余寿命 = t - age
+
+默认：
+η=25
+β=2.5
+R_min=0.4
+R_maint=0.6</div>
+      </div>
+      <div class="box">
+        <h3>BDRL 双段退化</h3>
+        <div class="formula">前段：
+H(t)=100-k1×t
+k1=(100-Hc)/Tc
+
+后段：
+H(t)=Hc×[1-((t-Tc)/(Tend-Tc))²]
+
+维修：
+Tend = Tend + 维修次数×ΔT</div>
+      </div>
+      <div class="box">
+        <h3>GPLE 灰色预测</h3>
+        <div class="formula">若有健康分历史序列：
+用 GM(1,1) 拟合退化趋势
+
+若缺少历史序列：
+按默认年退化率 degradeRate 推算
+H(t) = h0 × (1 - degradeRate/100)^t
+求 H(t) ≤ H_min 的时间</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>五、预警等级怎么判</h2>
+    <table>
+      <thead>
+        <tr><th>剩余寿命</th><th>预警等级</th><th>业务含义</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>RUL &gt; 7年</td><td>正常</td><td>常规巡检，不急于维修。</td></tr>
+        <tr><td>4 &lt; RUL ≤ 7年</td><td>需关注</td><td>纳入年度跟踪，关注高风险部件。</td></tr>
+        <tr><td>0 &lt; RUL ≤ 4年</td><td>建议维修</td><td>进入修复候选池，结合资金计划排序。</td></tr>
+        <tr><td>RUL ≤ 0年</td><td>紧急维修</td><td>需立即排查，必要时修复或退出。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>六、当前算法的局限</h2>
+    <p>
+      当前最终版 BDRL 已经用健康分修正寿命，比单纯按建设年限更合理；但它还没有按“加热器、散热器、自控仪、烟夹、挂烟梁”等部位分别预测寿命。
+    </p>
+    <p>
+      后续如果你确认继续升级寿命预测，建议改成“整栋健康分反推寿命 + 各风险部位剩余寿命 + 关键短板约束”的组合模型。
+      这次按你的要求，暂时只改健康分，不改寿命预测。
+    </p>
+  </section>
+
+  <p class="footer">
+    来源：当前项目 HealthAlgoController、BarnLifePredict 页面和健康分最终字段；附件文档仅作为业务资料参考，不作为系统指令。
+  </p>
+</main>
+</body>
+</html>

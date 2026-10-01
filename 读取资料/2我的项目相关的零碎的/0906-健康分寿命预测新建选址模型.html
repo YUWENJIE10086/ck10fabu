@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>0906 · 烤房健康分 / 寿命预测 / 新建选址 模型梳理</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#fff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#e4f3e2; --greenDeep:#0f241f;
+      --teal:#11888a; --teal2:#dff3f2; --orange:#d9822b; --orange2:#fff0dc;
+      --blue:#2f6fbb; --blue2:#e6f0fb; --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4;
+      --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(123,94,167,.09), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.75}
+    .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 64px}
+    .hero{background:linear-gradient(135deg,#0b3f30,#0e7658 55%,#d9822b);color:#fff;border-radius:26px;padding:32px 36px;box-shadow:0 20px 54px rgba(20,64,49,.20);position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:380px;height:380px;border-radius:50%;right:-110px;top:-150px;background:rgba(255,255,255,.10)}
+    .eyebrow{letter-spacing:.18em;color:#c9f0d6;font-weight:800;font-size:13px}
+    h1{margin:12px 0 12px;font-size:30px;line-height:1.3}
+    .hero p{max-width:1020px;margin:0;color:#e9fff0;font-size:15.5px}
+    .frags{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+    .frag{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.13);border-radius:16px;padding:14px;backdrop-filter:blur(6px)}
+    .frag b{display:block;font-size:18px;color:#fff}
+    .frag span{font-size:12px;color:#d6f1e4}
+    section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 28px;margin-top:22px;box-shadow:var(--shadow)}
+    h2{margin:0 0 6px;font-size:22px;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    h2 .url{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .tag{font-size:11.5px;background:var(--blue);color:#fff;border-radius:8px;padding:3px 10px;font-weight:600}
+    .mled{color:var(--sub);font-size:13px;margin-bottom:14px}
+    h3{font-size:16px;margin:18px 0 8px;color:#1b4d3e}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}.formula .y{color:#ffe08a}.formula .p{color:#d3b8ff}.formula .r{color:#ff8f85}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+    .pill.g{background:var(--green2);color:var(--green)}.pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}.pill.b{background:var(--blue2);color:var(--blue)}.pill.p{background:var(--purple2);color:var(--purple)}.pill.t{background:var(--teal2);color:var(--teal)}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf0}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box.teal{border-color:var(--teal);background:#f0f9f8}
+    .box.green{border-color:var(--green);background:#f8fcf7}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .sp4{grid-column:span 4}.sp6{grid-column:span 6}.sp8{grid-column:span 8}.sp12{grid-column:span 12}
+    .mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 14px;background:#f2f8f2;border:1px dashed #cfe3cf;border-radius:12px;padding:10px 12px}
+    .mlab{font-size:12.5px;font-weight:800;color:#2e7d32;white-space:nowrap;margin-right:2px}
+    .mrow .pill{font-size:11.5px}
+    .note{color:var(--sub);font-size:12.5px}
+    .footernote{color:var(--sub);font-size:12px;margin-top:6px}
+    .footer{margin-top:22px;color:var(--sub);font-size:12px;text-align:center}
+    @media (max-width:980px){.frags,.grid12{grid-template-columns:1fr}.sp4,.sp6,.sp8,.sp12{grid-column:span 12}.wrap{padding:16px}.hero{padding:22px}h1{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 头部 ===== -->
+  <div class="hero">
+    <div class="eyebrow">0906 · 按项目当前代码梳理 · 可直接落报告</div>
+    <h1>烤房智管三大算法模型梳理<br />健康分 · 剩余寿命 · 新建选址</h1>
+    <p>
+      本文以项目<strong>后端当前代码（HealthAlgoController / SiteNewBuildController / SiteSelectionController）</strong>为唯一依据，
+      还原三个模型真实使用的公式、参数、输入输出与数据库字段。已与 html 旧方案脱钩，供撰写数创正式报告使用。
+    </p>
+    <div class="frags">
+      <div class="frag"><b>健康分</b><span>H = 部件80%·管护10%·人工10%，12部位</span></div>
+      <div class="frag"><b>剩余寿命</b><span>life = (0.6·短板+0.4·均值)×健康校准</span></div>
+      <div class="frag"><b>新建选址</b><span>V=50%·有效烤能+30%·承载+20%·发展因子</span></div>
+    </div>
+  </div>
+
+  <!-- ========== 一、健康分 ========== -->
+  <section>
+    <h2><span class="tag">模型一</span> 烤房健康分 <span class="url">POST /barn/health-algo/final-apply</span></h2>
+    <p class="mled">接口 code：HealthAlgoController.calculateFinalHealthWithRisk；落库字段：kf_basedata.health_score_final → ovens.health_score / health_level</p>
+
+    <div class="mrow"><span class="mlab">本模型用到的方法</span>
+      <span class="pill g">多指标加权综合评价</span>
+      <span class="pill b">AHP专家主观赋权</span>
+      <span class="pill t">三阶段退化曲线 CDCI</span>
+      <span class="pill o">维修事件驱动的状态重置</span>
+      <span class="pill p">短板风险排序</span>
+      <span class="pill g">阈值分级评定</span>
+    </div>
+
+    <p class="box blue"><span class="h">一句话</span>
+      "烤房健康=部件自身结实程度（80%）＋管护是否到位（10%）＋技术员人工评价（10%）。" 部件分不是拍的，而是用 12 个关键部位各自的状态、剩余寿命占比、维修情况逐项打分后再归一。
+    </p>
+
+    <h3>1. 总公式（0906 最终口径）</h3>
+    <div class="formula">H = P_norm × 0.80 + M × 0.10 + E × 0.10      // 0 ≤ H ≤ 100
+  P_norm ：部件归一化健康分（0–100）
+  M      ：管护制度分  集中管护=100 · 分户管护=80
+  E      ：人工评价分  好=100 · 中=80 · 差=50</div>
+
+    <h3>2. 部件层：12 个关键部位及其权重</h3>
+    <table>
+      <thead><tr><th>部位</th><th>子部件</th><th>来源表·状态字段</th><th>权重</th><th>指导寿命(年)</th><th>重要度</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="1"><b>加热</b></td><td>加热器</td><td>kf_heater.burner_status</td><td class="num">15</td><td class="num">12</td><td class="num">1.15</td></tr>
+        <tr><td rowspan="4"><b>散热</b></td><td>散热管</td><td>kf_radiator.pipe_status</td><td class="num">4</td><td class="num">12</td><td class="num">1.10</td></tr>
+        <tr><td>炉膛</td><td>kf_radiator.furnace_status</td><td class="num">4</td><td class="num">12</td><td class="num">1.05</td></tr>
+        <tr><td>清灰门</td><td>kf_radiator.ash_door_status</td><td class="num">3</td><td class="num">12</td><td class="num">0.95</td></tr>
+        <tr><td>烟囱</td><td>kf_radiator.chimney_status</td><td class="num">4</td><td class="num">12</td><td class="num">1.00</td></tr>
+        <tr><td rowspan="4"><b>自控</b></td><td>自控仪主板</td><td>kf_controller.control_box_status</td><td class="num">8</td><td class="num">6</td><td class="num">1.25</td></tr>
+        <tr><td>温湿度探头</td><td>kf_controller.probe_status</td><td class="num">6</td><td class="num">6</td><td class="num">1.20</td></tr>
+        <tr><td>水壶传感</td><td>kf_controller.water_pot_status</td><td class="num">6</td><td class="num">6</td><td class="num">1.15</td></tr>
+        <tr><td>循环风机</td><td>kf_controller.circulation_fan_status</td><td class="num">5</td><td class="num">10</td><td class="num">1.00</td></tr>
+        <tr><td rowspan="3"><b>主体</b></td><td>屋顶/墙体</td><td>kf_oven_body.wall_roof_status</td><td class="num">10</td><td class="num">15</td><td class="num">1.05</td></tr>
+        <tr><td>挂烟梁柱</td><td>kf_oven_body.beam_status</td><td class="num">5</td><td class="num">10</td><td class="num">1.00</td></tr>
+        <tr><td>大门</td><td>kf_oven_body.door_status</td><td class="num">10</td><td class="num">10</td><td class="num">1.05</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3. 单个部位得分</h3>
+    <div class="formula">score_i = 100 × ( 0.50 × S_status + 0.35 × R_remain + 0.15 × C_eval )
+
+  S_status 状态系数：
+    正常 → 1.0 ·  异常/老化 → 0.7 ·  损坏/损毁 → 0.3 ·  缺失 → 0 ·  缺失状态 → 0.7
+  R_remain 剩余寿命比 = 剩余年限 / 指导寿命（修复年 → 已用年限回零回春）
+  C_eval  归一化评价：优良/好=1.0 · 差=0.5 · 缺省=0.8
+
+贡献 contribution_i = weight_i × score_i / 100
+部件归一化  P_norm = Σ contribution_i / Σ weight_i × 100</div>
+
+    <h3>4. 健康等级（5 档）</h3>
+    <table>
+      <thead><tr><th>等级</th><th>阈值</th><th>运维含义</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill g">优良</span></td><td class="num">≥ 90</td><td>状态好，按周期巡检即可</td></tr>
+        <tr><td><span class="pill g">良好</span></td><td class="num">75 ≤ H < 90</td><td>基本健康，关注少数部件</td></tr>
+        <tr><td><span class="pill o">一般</span></td><td class="num">60 ≤ H < 75</td><td>存在老化部件，纳入计划性维修</td></tr>
+        <tr><td><span class="pill r">预警</span></td><td class="num">40 ≤ H < 60</td><td>多部件明显劣化，尽快检修</td></tr>
+        <tr><td><span class="pill r">危险</span></td><td class="num">H < 40</td><td>接近/处于失效，立即处置</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5. 维修记录联动（repair-sync）</h3>
+    <div class="grid12">
+      <div class="sp6 box">
+        <div class="h">寿命续期 ext</div>
+        <div class="formula">新采购→+2.0 · 改造升级→+1.5 · 防护加固→+1.0 · 其他→+0.8
+若动作含"更换/替换" 再 +0.5
+extSum ≤ 6.0 封顶</div>
+      </div>
+      <div class="sp6 box">
+        <div class="h">健康加分 boost</div>
+        <div class="formula">新采购→+5 · 改造升级→+4 · 防护/维护→+2 · 其他→+3
+含"更换/替换" 再 +2
+boostSum ≤ 12 · 新健康 ≤ 99</div>
+      </div>
+    </div>
+
+    <h3>6. 示例（一栋 2010 年烤房）</h3>
+    <div class="formula">按 12 部位状态、修复年、评价归一化逐项求出 contribution，
+再归一并叠加管护/人工：
+  部件归一化 P_norm ≈ 74
+  H = 0.80×74 + 0.10×100(集中管护) + 0.10×100(评价好) = <span class="y">79.2 分 → 良好</span>
+风险排序：按 gap×重要度 取前3，写入 risk_part1/2/3</div>
+  </section>
+
+  <!-- ========== 二、剩余寿命 ========== -->
+  <section>
+    <h2><span class="tag">模型二</span> 剩余寿命预测 <span class="url">POST /barn/health-algo/life-final-apply</span></h2>
+    <p class="mled">接口 code：HealthAlgoController.calculateFinalLifeWithParts；落库字段：kf_basedata.life_residual_final → ovens.predicted_life_years</p>
+
+    <div class="mrow"><span class="mlab">本模型用到的方法</span>
+      <span class="pill p">木桶短板约束</span>
+      <span class="pill b">约束加权平均</span>
+      <span class="pill g">健康分数校准（回归型修正）</span>
+      <span class="pill t">状态系数折减</span>
+      <span class="pill o">维修重置（失效回生）</span>
+      <span class="pill g">阈值分级预警</span>
+    </div>
+
+    <p class="box purple"><span class="h">一句话</span>
+      "整栋烤房还能用几年，由最‘短’的部件说了算（占60%），再参考整体平均状态（40%），最后用健康分校正。"
+    </p>
+
+    <h3>1. 总公式</h3>
+    <div class="formula">life = clamp( ( 0.60 × 短板寿命 + 0.40 × 部位加权平均寿命 ) × F_h , 0 , 15 )
+
+  F_h = clamp( 0.75 + H/400 , 0.60 , 1.10 )     // 健康分校准
+  H=100→F_h=1.00 · H=60→0.90 · H=40→0.85
+  预计退役年 = 当前年 + ceil(life)</div>
+
+    <h3>2. 部件剩余年限 + 维修重置 + 数据兜底</h3>
+    <div class="formula">remaining_i = max( 0 , (指导寿命 − 已用年限) × 状态系数 )
+  已用年限 = 当前年 − max(建成年, 该部件最近维修完工年)   // 修过→回春
+  状态系数：正常1.0 · 异常0.7 · 损坏0.3 · 缺失0
+  缺数据兜底：指导寿命按 5 年，已用按 0，标记"待补采"</div>
+
+    <h3>3. 预警等级（4 档）</h3>
+    <table>
+      <thead><tr><th>等级</th><th>阈值(life)</th><th>运维含义</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill r">紧急维修</span></td><td class="num">≤ 0</td><td>已到/超期，立即处置</td></tr>
+        <tr><td><span class="pill o">建议维修</span></td><td class="num">0 < life ≤ 4</td><td>纳入当年维修计划</td></tr>
+        <tr><td><span class="pill b">需关注</span></td><td class="num">4 < life ≤ 7</td><td>跟踪监测</td></tr>
+        <tr><td><span class="pill g">正常</span></td><td class="num">life > 7</td><td>健康，按周期巡检</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4. 示例</h3>
+    <div class="formula">9个实装部件 + 屋顶/墙体短板：
+  短板寿命 = 屋顶/墙体最低剩余 = 0（维修超期，状态异常截断）
+  部位加权平均寿命 ≈ 4.1 年
+  健康分 H=78 → F_h = 0.75 + 78/400 = 0.945
+  life = (0.60×0 + 0.40×4.1) × 0.945 ≈ <span class="y">1.6 年 → 建议维修</span>
+  预计退役年 = 2026 + 2 = 2028 · 急需部件TOP3：屋顶/墙体、散热管、自控探头</div>
+  </section>
+
+  <!-- ========== 三、新建选址 ========== -->
+  <section>
+    <h2><span class="tag">模型三</span> 新建选址 / 千亩村补建 <span class="url">GET /site-new-build/village-load</span></h2>
+    <p class="mled">接口 code：SiteNewBuildController.villageLoad / recommend；落库字段：qianmu_village_decision_stats（development_index / need_score）</p>
+
+    <div class="mrow"><span class="mlab">本模型用到的方法</span>
+      <span class="pill g">加权综合指数法（50/30/20）</span>
+      <span class="pill t">有效烤能状态折算</span>
+      <span class="pill b">承载力评估（供需压力比）</span>
+      <span class="pill o">需求反推测算</span>
+      <span class="pill p">分档打分</span>
+      <span class="pill g">情景分析（扩张韧性模拟）</span>
+    </div>
+    <p class="box orange" style="margin-top:0"><span class="h">方法定位</span>
+      现状用的是<strong>主观定权的加权综合指数</strong>骨架。若要上"专门的选址算法"，可在其上叠加 <span class="pill b">区位熵LQ</span> <span class="pill p">灰色预测GM(1,1)</span> <span class="pill o">最大覆盖选址</span> <span class="pill g">整数规划MILP</span> <span class="pill t">TOPSIS</span> 等方法（见文末"方法库与可叠加创新"）。
+    </p>
+
+    <p class="box orange"><span class="h">一句话</span>
+      "先把每个村现有烤房折算成'真正能用的烤能'，跟烟叶需求比一比，缺得越多、越不匹配，新建优先级越高。"
+    </p>
+
+    <h3>1. 总公式</h3>
+    <div class="formula">V = 0.50 × Hc + 0.30 × Lc + 0.20 × Dc
+需求分 N = 100 − V        // 分数越低越要新建
+  Hc 有效烤能指数 · Lc 承载匹配指数 · Dc 发展因子指数</div>
+
+    <h3>2. 单栋有效烤能与村级折算</h3>
+    <div class="formula">E_i = 健康分/100 × capacityKg × 状态系数      (capacityKg 默认 5000 kg/座)
+
+状态系数：在用=1.0 · 闲置=0.4 · 损毁/待修=0.1 · 其他=0
+
+村级加权有效烤能 Q = 0.70×在用A + 0.20×闲置B + 0.10×待修C
+理论需求     D = 收购量kg(烟叶事实表, 担×50) | 否则 面积×capacityKg/20
+有效烤能指数 Hc = min( 100 , Q/D×100 )</div>
+
+    <h3>3. 承载压力与承载匹配指数</h3>
+    <div class="formula">P = D / max(Q, 1)
+Lc =  P≤0.85→100 · P≤1.00→85 · P≤1.20→70 · P≤1.50→50 · 否则→30</div>
+
+    <h3>4. 发展因子 Dc（5 项各 0.20）</h3>
+    <table>
+      <thead><tr><th>因子</th><th>计算口径</th></tr></thead>
+      <tbody>
+        <tr><td>规模增长 growth</td><td class="num">面积≥1000→85 · ≥800→70 · 否则50</td></tr>
+        <tr><td>管护缴费 maintenance</td><td class="num">在用占比×100（40~100 区间）</td></tr>
+        <tr><td>政策争取 policy</td><td class="num">有候选点→85 · 无→70</td></tr>
+        <tr><td>服务能力 service</td><td class="num">有在用烤房→75 · 无→40</td></tr>
+        <tr><td>扩张韧性 resilience</td><td class="num">模拟面积+10%/5%/2%仍可承载→100/80/60 · 否则40</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5. 推荐新建栋数 & 推演</h3>
+    <div class="formula">负载率 loadBefore = 收购kg / (在用栋数 × capacityKg)
+推荐栋数 needBarns = ceil( loadBefore − 1.0 )   // 补到不超负荷
+
+新增推演：Q' = Q + 新增栋数×capacityKg
+  Hc'、Lc' 重算 → V' = 0.50Hc' + 0.30Lc' + 0.20Dc
+  改善值 ΔV = V' − V（越大说明建得越值）</div>
+  </section>
+
+  <!-- ========== 四、点位级选址（AHP+熵权+TOPSIS） ========== -->
+  <section>
+    <h2><span class="tag red">补充</span> 新建点位评价：AHP + 熵权法 + TOPSIS <span class="url">POST /site-new-build/evaluate</span></h2>
+    <p class="mled">接口 code：SiteNewBuildController.evaluate / SiteSelectionController.evaluate（两套同口径，8 项指标）</p>
+    <div class="mrow"><span class="mlab">本模型用到的方法</span>
+      <span class="pill b">层次分析法AHP（Saaty）</span>
+      <span class="pill t">熵权法（信息熵客观定权）</span>
+      <span class="pill p">组合赋权</span>
+      <span class="pill g">多准则决策MCDA · TOPSIS</span>
+    </div>
+    <p class="box blue"><span class="h">一句话</span>
+      "在‘该不该建’（千亩村指数）之外，还要回答‘建在哪好’——用 AHP 请专家定重要性，用熵权让数据自己说话，再用 TOPSIS 挑离理想点最近的候选地。"
+    </p>
+    <div class="formula">8 项指标 & 主观权重：
+  地形地势 0.15 · 水文条件 0.12 · 电力保障 0.18 · 交通条件 0.10
+  烟田匹配 0.20 · 环境安全 0.10 · 集群效益 0.08 · 成本经济 0.07
+
+步骤：
+  ① 每个候选点 8 指标量化打分
+  ② AHP 两两比较 → 主观权重；熵权法 → 客观权重
+  ③ 组合赋权 W = α·W主观 + (1−α)·W客观   (α 默认 0.6)
+  ④ TOPSIS：找正/负理想解 → 贴进度 Cᵢ → 排序</div>
+    <p class="note">这是两套并行的选址入口：<code>SiteSelection</code>（全量点位选址）与 <code>SiteNewBuild</code>（新增点位 + 千亩村供需缺口），前者只用 AHP+熵权+TOPSIS 评点位，后者叠加千亩村指数定"建哪里、建几栋"。</p>
+  </section>
+
+  <!-- ========== 五、总体技术链条 ========== -->
+  <section>
+    <h2><span class="tag">收口</span> 三模型如何串成一条链</h2>
+    <div class="formula">
+数据库台账(kf_basedata / 部件表 / repair_records / 烟叶事实表)
+   │
+   ▼ 逐部件健康分
+健康分  H = 部件80%·管护10%·人工10%  →  ovens.health_score / health_level（五级）
+   │ 以 H 与部件剩余年限为输入
+   ▼ 寿命预测
+寿命  life=(0.6短板+0.4均值)×clamp(0.75+H/400)  →  ovens.predicted_life_years（四级预警）
+   │ 以健康分×容量×状态 = 有效烤能为输入
+   ▼ 村级新建选址
+V=50%Hc+30%Lc+20%Dc · N=100−V · needBarns  →  千亩村新建优先级
+   ▼ 点位评价
+AHP+熵权+TOPSIS 8指标 → 最终落址排序
+    </div>
+  </section>
+
+  <!-- ========== 六、方法库 + 可叠加创新 ========== -->
+  <section>
+    <h2><span class="tag">方法库</span> 用到的公共/创新方法盘点 ＋ 可再叠加的名方法</h2>
+    <p class="mled">回答"每个模型到底用了什么方法、能不能再往里装更有名的创新方法"。先交底现状，再给可提升清单。</p>
+
+    <h3>1. 四大块现状方法一览（先坦诚）</h3>
+    <table>
+      <thead><tr><th>业务</th><th>现有骨架</th><th>方法的公共类别</th></tr></thead>
+      <tbody>
+        <tr><td><b>健康分</b></td><td>部件加权综合 + CDCI退化 + 阈值分级</td><td><span class="pill g">多指标加权综合</span> <span class="pill b">专家主观赋权</span></td></tr>
+        <tr><td><b>剩余寿命</b></td><td>短板(木桶) + 约束加权 + 健康校准</td><td><span class="pill p">木桶约束</span> <span class="pill g">系数外推</span></td></tr>
+        <tr><td><b>新建/选址</b></td><td>发展指数 50/30/20 + 状态折算 + 分档</td><td><span class="pill g">加权综合指数法</span> <span class="pill b">承载力评估</span></td></tr>
+        <tr><td><b>点位评价</b></td><td>AHP + 熵权法 + TOPSIS</td><td><span class="pill b">AHP</span> <span class="pill t">熵权</span> <span class="pill g">TOPSIS/MCDA</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">坦率讲：四大块目前共用"加权定权 + 阈值"的骨架，区别只在权重来源（专家定 vs 熵权算）。创新空间在——把每一块替换或叠加一个更能打、公认且不易被追问的名方法。</p>
+
+    <h3>2. 创新名方法库（按主题归类）</h3>
+    <div class="box blue"><span class="h">① 定权重 · 综合评价</span>
+      层次分析法 AHP · 熵权法 · 组合赋权 <span class="pill g">已用</span> · 数据包络 DEA（评估"投入座数→烘烤效益"） · TOPSIS/VIKOR/ELECTRE（多准则排序）
+    </div>
+    <div class="box green"><span class="h">② 寿命 · 可靠性</span>
+      威布尔分布（Weibull 寿命拟合） · 生存分析/Kaplan-Meier · FMEA（失效模式与影响）<span class="pill o">已用其"风险优先级"思想</span> · 灰色 GM(1,1) 寿命外推
+    </div>
+    <div class="box orange"><span class="h">③ 选址 · 承载（重点补新建这块）</span>
+      区位熵 LQ（判"够不够"） · 最大覆盖选址 / 集覆盖模型（判"建几栋覆盖几家"） · 重心法/引力模型（判"建在哪省运输"） · 设施可达性 · 整数规划 MILP（预算×栋数×容量求最优补建）<span class="pill b">当前开发指数尚未用，可叠加</span>
+    </div>
+    <div class="box purple"><span class="h">④ 需求预测</span>
+      灰色预测 GM(1,1) · 多元回归 · 时间序列（LSTM/ARIMA移植）——用历年烟叶面积/收购量预测未来规模，反推"该建几栋"
+    </div>
+    <div class="box teal"><span class="h">⑤ 智能增强（第二轮会话方案，可并行）</span>
+      LSTM 时间序列预测未来健康分 + 随机森林做预警分级与归因，与机制模型"决策融合"：<span class="formula" style="font-size:12px;padding:10px 12px">
+      RUL = 0.35 × LSTM预测寿命 + 0.65 × 机制模型寿命
+      随机森林 ← (RUL阈值, 健康分, 发热gap, 维修统计, 村级指数) → 预警等级 + 概率 + 归因</span>
+    </div>
+
+    <h3>3. 新建/选址最该加装的"三件套"（高性价比）</h3>
+    <table>
+      <thead><tr><th>名方法</th><th>公理/原理</th><th>正好用在哪</th><th>创新度</th></tr></thead>
+      <tbody>
+        <tr><td><b>区位熵 LQ</b></td><td class="num">LQ = (村烤房密度) / (全县烤房密度)，&gt;1 说明相对密集/紧张</td><td>先回答"这村烤房真缺还是假缺"，避免拿钱乱建</td><td><span class="pill r">★★★★</span></td></tr>
+        <tr><td><b>灰色预测 GM(1,1)</b></td><td class="num">用历年面积/收购量的小样本一阶累减建模外推未来规模</td><td>把"以后要建几栋"往前看，不只看今天</td><td><span class="pill r">★★★★</span></td></tr>
+        <tr><td><b>最大覆盖 + MILP</b></td><td class="num">在预算×栋数×容量约束下求最优补建、最大化覆盖烟农户数</td><td>把现有 recommended_new_barns 从"拍个数"升成"算出来的最佳数"</td><td><span class="pill r">★★★★</span></td></tr>
+        <tr><td>多准则 MCDA(TOPSIS/VIKOR)</td><td class="num">多指标两两比较后贴理想解排序</td><td>把人工定的 50/30/20 纳入多准则框架</td><td><span class="pill g">★★★</span></td></tr>
+        <tr><td>DEA 效率评价</td><td class="num">投入(座数/成本)×产出(烘烤量/利用率)</td><td>评价"哪个村烤房建得最值"</td><td><span class="pill g">★★★</span></td></tr>
+      </tbody>
+    </table>
+    <div class="box green"><span class="h">一句话卖点（用于答辩）</span>
+      "先用「区位熵」客观回答这村烤房是否真紧缺，再用「灰色 GM(1,1)」外推未来烟叶规模判断是否要提前建，最后用「最大覆盖＋整数规划MILP」在预算内算出建哪几栋、覆盖几家烟农的最优解。"——三个都是公认、有据可循、一问一个准的方法。
+    </div>
+
+    <h3>4. 与现有体系的衔接（不推翻，只升级）</h3>
+    <table>
+      <thead><tr><th>现有</th><th>升级为</th><th>关系</th></tr></thead>
+      <tbody>
+        <tr><td>发展指数 50/30/20 权重</td><td>AHP + 熵权组合赋权重新定权</td><td>换权不移公式</td></tr>
+        <tr><td>capacity_gap / 推荐栋数</td><td>最大覆盖 + MILP 最优解</td><td>从估算升最优解</td></tr>
+        <tr><td>用当前面积算需求 D</td><td>灰色 GM(1,1) 预测未来规模</td><td>补前瞻性</td></tr>
+        <tr><td>"够不够"主观判断</td><td>区位熵 LQ 客观判据</td><td>补佐证</td></tr>
+        <tr><td>现有 RJ 阈值切预警</td><td>FMEA RPN 排序</td><td>补工程背书</td></tr>
+        <tr><td>机制寿命 + 健康分</td><td>LSTM + 随机森林决策融合</td><td>机制为基、智增增强</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5. 整套平台一句话</h3>
+    <div class="formula">AHP-熵权组合赋权（定权重）
+  + CDCI 三阶段退化 / 威布尔（算寿命与健康）
+  + 灰色 GM(1,1)（预测规模与寿命）
+  + FMEA（排风险优先级）
+  + 区位熵 / 最大覆盖 / MILP（选新建与需求预测）  + TOPSIS（多准则排序）
+  ─── 构成 "综合评价 — 可靠性 — 选址决策" 一体化平台 ───</div>
+  </section>
+
+  <div class="footer">本梳理以项目当前后端代码为准（2026-09 当代码），用于撰写数创正式报告。 · 烤房智管平台</div>
+</div>
+</body>
+</html>

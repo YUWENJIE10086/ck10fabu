@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>0905-寿命预测升级融合方案</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#e4f3e2; --greenDeep:#0f241f;
+      --teal:#11888a; --orange:#e08628; --orange2:#fceccf; --blue:#2f6fbb; --blue2:#e6f0fb;
+      --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4; --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(17,136,138,.09), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.74}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 60px}
+    .hero{background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));border:1px solid var(--line);border-radius:24px;padding:30px 34px;box-shadow:var(--shadow)}
+    h1{margin:0 0 8px;font-size:31px;line-height:1.3}
+    .sub{color:var(--sub);font-size:15px;max-width:1020px}
+    .timestamp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--blue2);color:var(--blue);font-size:12.5px;font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .chip b{color:var(--green)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 20px 18px;box-shadow:var(--shadow)}
+    .span12{grid-column:span 12}.span6{grid-column:span 6}.span4{grid-column:span 4}.span8{grid-column:span 8}
+    h2{font-size:20px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:var(--blue);color:#fff}
+    h2 .s.t{background:var(--teal);color:#fff}
+    h3{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf0}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13.5px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}.formula .y{color:#ffe08a}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill.g{background:var(--green2);color:var(--green)}.pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}.pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.t{background:#dcf2f2;color:var(--teal)}.pill.p{background:var(--purple2);color:var(--purple)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+    .kpi>div{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,var(--green2));border:1px solid #d8e8d4}
+    .kpi b{display:block;font-size:22px;color:var(--green)}
+    .kpi span{font-size:12.5px;color:var(--sub)}
+    .kpi.r>div{background:linear-gradient(180deg,#fff,#ffece0);border-color:#f2d7bb}.kpi.r b{color:var(--orange)}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0}
+    .step{border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff;min-height:86px}
+    .step .t{font-weight:700;font-size:13.5px;margin-bottom:3px}
+    .step .d{font-size:12px;color:var(--sub)}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;background:var(--green2);color:var(--green);margin-right:6px}
+    .note{color:var(--sub);font-size:12px}
+    .footernote{color:var(--sub);font-size:12.5px;margin-top:6px}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .divider{height:1px;background:var(--line);margin:20px 0}
+    code{background:#eef2ee;border-radius:6px;padding:1px 6px;font-size:12.5px;color:#b32525;font-family:ui-monospace,Menlo,monospace}
+    @media (max-width:980px){.span3,.span4,.span5,.span6,.span7,.span8,.span12,.three,.two,.flow,.kpi{grid-column:span 12;grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:20px}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 总览 ============ -->
+  <section class="hero">
+    <h1>烤房寿命预测 · 从“整栋反推”升级为“逐部件短板融合”</h1>
+    <div class="sub"><b>针对项目现状设计的一版寿命预测升级方案：健康分已定稿（三维 80/10/10），全部指导寿命已核定</b>，因此寿命预测不再满足于“拿整栋健康分反推一条曲线”，而是<b>把每个部件的指导寿命、修复年度、状态逐一算进来，用“短板约束”决定整栋剩余寿命</b>，同时保留整栋健康分做校验与主观判断留口。本方案只写设计，供 0905 定稿。</div>
+    <div class="timestamp">📅 文档生成：2026-09-05（北京时间）｜面向：寿命预测界面升级 ｜ 参考：0901升级版BDRL + 0905健康分口径 + 主要部件指导年限表</div>
+    <div class="chips">
+      <span class="chip">现有 · 整栋健康分 h₀ 反推等效年龄（BDRL升级版）</span>
+      <span class="chip">新增 · <b>逐部件指导寿命 + 修复年度 → 部件剩余寿命</b></span>
+      <span class="chip">合成 · 健康分反推 ⊗ 部件短板 ⊗ 主观修正</span>
+    </div>
+  </section>
+
+  <!-- ============ 一、现状 ============ -->
+  <section class="grid">
+    <div class="card span12">
+      <h2><span class="s">现状梳理</span> 寿命预测界面现在是怎么跑的</h2>
+      <p>当前“寿命预测算法”页面默认使用<b>最终版 BDRL</b>（0901 升级版），核心是用整栋健康分 <code>health_score_final</code> 反推“等效健康年龄”，再沿退化曲线外推到失效阈值，并用维修台账真实条数延寿：</p>
+      <div class="formula"><span class="o">当前 剩余寿命 RUL</span>（逐栋）
+输入：当前年；建成年；健康分 h₀ = kf_basedata.health_score_final（缺失默认70）
+参数：tc=8年；hc=60；tend=12年；hMin=40；repairExtend=2.5年/条
+
+维修真实条数 realRepair = COUNT(已验收/审核通过 且 end_date非空)
+T_end' = tend + realRepair × repairExtend
+
+等效年龄 t_eq：
+  h₀ ≥ hc → t_eq = (100 − h₀) / k₁ ,          k₁ = (100−hc)/tc
+  否则     → t_eq = tc + √(1 − h₀/hc)·(T_end' − tc)
+失效点 t_end：
+  t_eq ≤ tc → t_end = (100 − hMin)/k₁
+  否则      → t_end = tc + √(1 − hMin/hc)·(T_end' − tc)
+RUL = clamp(t_end − t_eq , 0 , 12)</div>
+      <div class="box orange">
+        <div class="h">它的进步（已解决）</div>
+        <ul>
+          <li>不再用“物理年龄”一刀切 → 老而健康房不再被判 0 年（升级前 1527 栋紧急维修 → 升级后 70 栋）；</li>
+          <li>维修次数用真实台账计数，修得越多理论寿命越长。</li>
+        </ul>
+      </div>
+      <div class="box red">
+        <div class="h">它还没解决的问题（本次升级抓手）</div>
+        <ul>
+          <li><b>整栋只给一个数，看不见“哪个部件先到期”</b> —— 无法回答维修决策问得最多的“下一步该修哪儿”；</li>
+          <li><b>用整栋健康分反推，会掩盖短寿命部件</b>：一栋自控仪仅剩 2 年余、其余良好、健康分 85 的烤房，会被算出 9 年寿命，与“自控仪最易损坏”的实际规律冲突；</li>
+          <li><b>指导寿命已核定但没进寿命模型</b>（加热外置10/内置12、散热15、自控6、屋顶未盖6/盖15、挂烟梁木10/钢15、烟夹6 等尚未逐件参与）；</li>
+          <li><b>数据不完整部件没有兜底口径</b>，与健康分侧的“5年兜底”不对齐。</li>
+        </ul>
+        <p class="footernote">一句话：现有寿命是“整栋健康分给一个答案”，升级后的目标是“<span class="hl">让每个部件告诉我们这栋烤房还差几年，再由最短的短板决定整栋</span>”。</p>
+      </div>
+    </div>
+
+    <!-- ============ 二、抓手指向 ============ -->
+    <div class="card span12">
+      <h2><span class="s">升级依托</span> 两张现成的“王牌”</h2>
+      <div class="two">
+        <div class="box">
+          <div class="h">① 健康分已定稿（逐部件、可归一、有兜底）</div>
+          <ul>
+            <li>三重输入：部件状态、修复年度、人工评价；</li>
+            <li>归一化公式 <code>P_norm = Σ(Wᵢ·Lᵢ·Sᵢ)/Σ有效Wᵢ ×100</code>，数据不全部件按 5 年兜底仍参与；</li>
+            <li>直接可复用到寿命侧：<b>部件健不健康 ↔ 部件还能用几年</b>。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">② 指导寿命已核定（主要部件全清单）</div>
+          <ul>
+            <li>加热外置 10 年 / 内置 12 年；散热器 15 年；自控仪 6 年；</li>
+            <li>易损件：出风百叶窗 5 年、烟夹 6 年、大门 10 年；</li>
+            <li>主体：屋顶未加盖 6 年 / 加盖 15 年；挂烟梁柱木质 10 年 / 钢材 15 年；电源电线、发电机 10 年。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">有了这两张王牌，就能把寿命预测从“单值宏观曲线”升级为“逐部件微观算盘 + 整栋短板约束”。</p>
+    </div>
+
+    <!-- ============ 三、设计思想 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">设计思想</span> 四层模型：部件 → 部位 → 整栋 → 决策</h2>
+      <div class="flow">
+        <div class="step"><div class="t">L1 部件层</div><div class="d">每个部件按指导寿命Tᵢ + 修复年度算剩余年限 rᵢ（数据不全兜底）</div></div>
+        <div class="step"><div class="t">L2 部位层</div><div class="d">加热/散热/自控/主体 四部位各自聚合</div></div>
+        <div class="step"><div class="t">L3 整栋层</div><div class="d">短板约束 ⊗ 整栋健康分反推，合成 RUL</div></div>
+        <div class="step"><div class="t">L4 决策层</div><div class="d">风险部位排序、预警、修缮优先级、退役年份</div></div>
+      </div>
+      <div class="box blue">
+        <div class="h">为什么纵向拆到部件、横向合成短板是对的（贴合实际 + 融合主观）</div>
+        <ul>
+          <li><b>贴合实际</b>：烤房是否可用高度依赖部件；一栋烤房的寿命短板往往就是最先老化的部件（实测样例健康分71分，风险排序 自控仪＞烟夹烟梁＞加热散热，与实际损坏规律吻合）；</li>
+          <li><b>融合主观</b>：人工评价、状态判断本就存于数据，作为“部件可信度”与“整栋修正”的主观留口；服务队现场复核可整级覆盖最终预警；</li>
+          <li><b>可解释</b>：每个数字都能落到“某个部件用了几年、还剩几年”，维修人员能直接看懂、能讲给评委。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ============ 四、主公式 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">核心</span> 升级主公式（BDRL-U6 逐部件短板融合）</h2>
+      <div class="three">
+        <div class="box">
+          <div class="h">L1 部件剩余年限 rᵢ</div>
+          <div class="formula">已用年限 Aᵢ = 今年 − max(部件修复年,
+                 维修台账该部件组最新完工年)
+  缺修复记录 → 按烤房建成年
+  两者皆缺（数据不全）→ 兜底口径(见第六节)
+剩余 rᵢ = max(0, Tᵢ − Aᵢ) × Sᵢ  +  repairBonusᵢ
+  Tᵢ  按类型/材质查指导寿命表
+  Sᵢ  状态修正(正常1/异常.7/损坏.3/缺失0)
+  repairBonusᵢ = 该部件真实维修条数×1.5年</div>
+        </div>
+        <div class="box">
+          <div class="h">L2 部位层 / 短板项</div>
+          <div class="formula">部位剩余 Rⱼ = Σ(wⱼᵢ·rᵢ) / Σwⱼᵢ   (部位内第j组部件加权)
+整栋结构短板 R_b =
+  0.6 × min(参与部件 rᵢ)          // 最弱部件主导
+ + 0.4 × Σⱼ(wⱼ·Rⱼ)               // 部位整体水平
+  wⱼ = 加热.30 散热.26 自控.26 主体.18</div>
+        </div>
+        <div class="box">
+          <div class="h">L3 整栋合成 + 校验</div>
+          <div class="formula">整栋健康分反推 RUL_w（沿用现有U1）
+  h₀ → t_eq → t_end − t_eq
+短板融合 RUL = α·RUL_w + (1−α)·R_b
+  α∈[0,1] 推荐0.5（可调：信任整栋 vs 信任结构）
+主观修正 RUL_final = RUL × K_man
+  K_man 由人工评价/服务队复核：
+  好1.05 / 中1.00 / 差0.90（可整级覆盖）
+clamp 0 ≤ RUL_final ≤ L_max</div>
+        </div>
+      </div>
+      <div class="box orange">
+        <div class="h">三处“主观判断”留口（本方案刻意做得“既客观又可调”）</div>
+        <table>
+          <thead><tr><th>留口</th><th>主观判断点</th><th>默认</th><th>谁来改</th></tr></thead>
+          <tbody>
+            <tr><td><b>α 融合权重</b></td><td>更信“整栋健康分”还是“部件短板”</td><td>0.5</td><td>县局/专家按片区实际调</td></tr>
+            <tr><td><b>K_man 修正系数</b></td><td>人工评价/服务队对整栋寿命的复核印象</td><td>好1.05/中1.0/差0.9</td><td>技术员、服务队现场判定</td></tr>
+            <tr><td><b>指导寿命 Tᵢ 局部覆盖</b></td><td>某村设备老化普遍偏快，可下调 Tᵢ</td><td>按表</td><td>合作社/专家按村校准</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 五、指导寿命表 ============ -->
+    <div class="card span12">
+      <h2><span class="s">参数表</span> 主要部件指导使用年限（已核定口径）</h2>
+      <table>
+        <thead><tr><th>部位</th><th>部件</th><th>指导年限 Tᵢ</th><th>类型/材质分支</th><th>修复可重置</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3">加热</td><td>加热器/燃烧机</td><td class="num"><b>10/12</b></td><td>外置10年 / 内置12年；缺类型按12</td><td>✔</td></tr>
+          <tr><td>送料电机</td><td class="num">8</td><td>随燃烧机，缺数据按5年兜底</td><td>✔</td></tr>
+          <tr><td>风机（加热侧）</td><td class="num">10</td><td>—</td><td>✔</td></tr>
+          <tr><td rowspan="3">散热</td><td>散热管/炉膛/清灰门/烟囱</td><td class="num"><b>12→15</b></td><td>按散热器核定 15 年</td><td>✔</td></tr>
+          <tr><td>出风百叶窗</td><td class="num">5</td><td>易损件</td><td>✔</td></tr>
+          <tr><td>冷风门/排湿窗</td><td class="num">8</td><td>—</td><td>✔</td></tr>
+          <tr><td rowspan="3">自控</td><td>自控仪/主板</td><td class="num"><b>6</b></td><td>短寿命件，最易损坏</td><td>✔</td></tr>
+          <tr><td>温湿度探头/传感器线</td><td class="num">5</td><td>易损件</td><td>✔</td></tr>
+          <tr><td>循环风机/助燃风机</td><td class="num">10</td><td>—</td><td>✔</td></tr>
+          <tr><td rowspan="4">主体/附属</td><td>烤房大门</td><td class="num"><b>10</b></td><td>—</td><td>✔</td></tr>
+          <tr><td>屋顶</td><td class="num"><b>6/15</b></td><td>未加盖6年 / 加盖15年；缺字段按15</td><td>✔</td></tr>
+          <tr><td>挂烟梁柱</td><td class="num"><b>10/15</b></td><td>木质10年 / 钢材15年；缺材质按10</td><td>✔</td></tr>
+          <tr><td>烟夹</td><td class="num"><b>6</b></td><td>易损件</td><td>✔</td></tr>
+          <tr><td>辅助</td><td>电源电线、发电机</td><td class="num">10</td><td>缺独立结构字段 → 5年兜底 + 待补采</td><td>✔</td></tr>
+        </tbody>
+      </table>
+      <p class="note">上下限按“保守档”缺省：缺材质按较短年限、缺类型按主流行情，宁可保守一点，避免高估寿命；若当地设备普遍耐用好，由专家按村上调。</p>
+    </div>
+
+    <!-- ============ 六、数据不完整补充条款 ============ -->
+    <div class="card span12">
+      <h2><span class="s t">补充条款</span> 数据不完整时寿命侧怎么兜底（与健康分同口径）</h2>
+      <table>
+        <thead><tr><th>情形</th><th>寿命侧兜底</th><th>标记</th></tr></thead>
+        <tbody>
+          <tr><td>部件缺状态、修复年、种类任一</td><td class="num">按数据不完整：Tᵢ兜底5年、Sᵢ=1.0、不叠加维修激励（保守）</td><td><span class="pill o">待补采</span></td></tr>
+          <tr><td>维修台账缺“已验收/完工日”</td><td class="num">不计入 realRepair；也不算部件 reset（与健康分一致）</td><td><span class="pill o">待归档</span></td></tr>
+          <tr><td>某部位完全无部件记录</td><td class="num">该部位权重不参与分母归一，不强行补分</td><td><span class="pill b">归一</span></td></tr>
+          <tr><td>整栋部件数据全部不全</td><td class="num">退回“纯整栋健康分反推 RUL_w”，至少给一条曲线结论</td><td><span class="pill t">退化为RUL_w</span></td></tr>
+          <tr><td>健康分 h₀ 缺失</td><td class="num">用默认 70 分反推，并在界面标“健康分缺失-默认”</td><td><span class="pill o">默认</span></td></tr>
+          <tr><td>修复年度缺、只有建成年</td><td class="num">已用年限按建成年算（真实可得的年数），不强行置0</td><td><span class="pill b">按建成</span></td></tr>
+        </tbody>
+      </table>
+      <p class="note">原则：<b>缺数据不剔除、也绝不虚增寿命</b>——能算的按真实年数算，算不了的按 5 年保守兜底并标记待补采，等补录后立即按真实指导寿命重算。这样表格里不会出现一堆“寿命真空”的烤房，也不会出现“缺数据反被高估”的误导。</p>
+    </div>
+
+    <!-- ============ 七、维修台账联动 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">联动</span> 维修台账怎么“反着”喂寿命</h2>
+      <div class="two">
+        <div>
+          <h3>部件级重置（比整栋更精细）</h3>
+          <div class="formula">Aᵢ = 今年 − max(部件修复年, 该部件组最近完工年)
+→ 修过自控，自控的已用年限就从维修完成年重算
+→ 该部件剩余 rᵢ 明显回弹
+   （不再只是在理论寿命上加2.5年）</div>
+          <p class="note">效果：把维修“计入寿命”从宏观加时，落到“具体哪个部件被新了一次”，更接近真实。</p>
+        </div>
+        <div>
+          <h3>整栋真实计件延寿（沿用）+ 维修轨迹</h3>
+          <div class="formula">realRepair = 已验收且完工的维修条数
+维修轨迹 = 按部件组分别计：JR/SR/ZK/ZT/ALL
+→ 哪个组维修多，说明该组是老化的短板，
+  寿命预警自动指向它（呼应风险部位排序）</div>
+          <p class="note">维修记录沿部件组归类，与健康分侧 computeRepairMap 共用一套归类逻辑，口径统一。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 八、主观判断全貌 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">主观融入</span> “客观数据 + 主观判断”如何各就各位</h2>
+      <div class="three">
+        <div class="box">
+          <div class="h">客观量化（自动，可溯源）</div>
+          <ul>
+            <li>建设年度、部件修复年度、指导寿命；</li>
+            <li>维修台账真实条数、完工日期；</li>
+            <li>健康分（逐部件归一化结果）。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">半主观（有据，系数化）</div>
+          <ul>
+            <li>部件状态（正常/异常/损坏）→ 修正 Sᵢ；</li>
+            <li>人工评价（好/中/差）→ 整栋 K_man；</li>
+            <li>业务重要度（自控1.25/加热1.15/散热1.15）→ 风险排序加权。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">主观裁量（专家留口）</div>
+          <ul>
+            <li>α 融合权重按片区调；</li>
+            <li>指导寿命 Tᵢ 按村校准；</li>
+            <li>服务队现场复核可整级覆盖预警等级。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">这套分层刻意保留“人的判断”入口，既不牺牲可复现性，又贴合基层“技术员看一眼更准”的真实习惯，且每次人都能改、系统能存、可被后一次的自动计算尊重。</p>
+    </div>
+
+    <!-- ============ 九、真实示例 ============ -->
+    <div class="card span12">
+      <h2><span class="s t">示例</span> 老房 09-420527KF00018（2009建 · 健康分85.2）——短板怎么拖低整栋</h2>
+      <div class="box">
+        <div class="h">逐部件剩余年限（修复年 2022，当前 2026）</div>
+        <table>
+          <thead><tr><th>部件</th><th>指导寿命 Tᵢ</th><th>修复年→Aᵢ</th><th>剩余 rᵢ(T−A)</th><th>状态S</th><th>维修条数</th><th>rᵢ×S</th></tr></thead>
+          <tbody>
+            <tr><td>加热器</td><td class="num">12</td><td class="num">2022→4</td><td class="num">8</td><td>正常1.0</td><td class="num">0</td><td class="num">8.0</td></tr>
+            <tr><td>散热器</td><td class="num">15</td><td class="num">2022→4</td><td class="num">11</td><td>正常1.0</td><td class="num">0</td><td class="num">11.0</td></tr>
+            <tr><td style="color:var(--red)">自控仪</td><td class="num" style="color:var(--red)">6</td><td class="num">2022→4</td><td class="num" style="color:var(--red)"><b>2</b></td><td>正常1.0</td><td class="num">0</td><td class="num" style="color:var(--red)"><b>2.0</b></td></tr>
+            <tr><td>主体（门/梁/屋顶）</td><td class="num">6~20</td><td class="num">门09/梁24</td><td class="num">~3</td><td>正常1.0</td><td class="num">0</td><td class="num">3.0</td></tr>
+          </tbody>
+        </table>
+        <div class="formula">min(参与部件 rᵢ) = 2.0（自控仪，短寿命件）
+部位整体 = (8+11+2+3)/4 ≈ 6.0
+R_b = 0.6×2.0 + 0.4×6.0 = 3.6 年
+
+整栋健康分反推 RUL_w = 9.0（沿用现有U1，85.2→9.0）
+
+融合 α=0.5：RUL = 0.5×9.0 + 0.5×3.6 = <span class="y">6.3 年</span>
+K_man = 1.0（人工“好”）→ RUL_final = 6.3 年
+
+预警等级：<span class="y">需关注（4–7年）</span>，退役约 2032
+风险部位排序第一：<span class="y">自控仪</span></div>
+        <p class="footernote">对比：只信整栋健康分 → 9.0 年“正常”，但现场逻辑是“自控仪仅剩 2 年余，这栋烤房真正要先盯的是自控”。融合后 RUL=6.3 年“需关注”，并把风险部位指向自控仪，与实测样例“风险部位自控仪第一”吻合。<b>α 敏感性：0.3→5.2 / 0.5→6.3 / 0.7→7.5 / 0.9→8.7</b>，便于按片区定策略。</p>
+      </div>
+    </div>
+
+    <!-- ============ 十、与现有系统关系 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">落地</span> 如何从“整栋 BDRL”平滑升级（不推翻现有）</h2>
+      <div class="two">
+        <div>
+          <div class="h">保留 + 增补</div>
+          <ul>
+            <li><b>保留</b>：U1 健康分反推等效年龄、U2 维修真实计数、现有预警分级与 <code>ovens.predicted_life_years</code> 同步链路；</li>
+            <li><b>增补</b>：部件层计算、短板约束 R_b、α 融合、K_man 主观修正、风险部位排序；</li>
+            <li><b>新增字段</b>：life_component（各部件剩余年限片段）、life_short_part（短板部件名）、life_conf（可信标记：完整/兜底/退化）。</li>
+          </ul>
+        </div>
+        <div>
+          <div class="h">数据流（延续现状即可）</div>
+          <div class="formula">逐部件(指导寿命+修复年+状态)
+   → 部件剩余 rᵢ          → R_b 短板
+健康分 h₀ → RUL_w ──→ RUL=α·RUL_w+(1−α)·R_b
+                        └→ ×K_man → RUL_final
+   → 预警等级 → 退役年份
+   → ovens.predicted_life_years</div>
+          <p class="note">前端仍按剩余寿命显示色块与预警，整数清晰；新增“部件剩余寿命明细”可在详情弹窗展示，方便维修人员下钻。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 十一、对比与结语 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">评估</span> 升级前后对比 + 给评委的一句话</h2>
+      <div class="three">
+        <div class="box red">
+          <div class="h">升级前</div>
+          <ul>
+            <li>整栋健康分给“一个年限”；</li>
+            <li>短寿命部件被整体平均掩盖；</li>
+            <li>回答“还剩几年”，不回答“先修哪”；</li>
+            <li>数据不全无兜底口径。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">升级后</div>
+          <ul>
+            <li>逐部件给剩余年限 + 整栋短板；</li>
+            <li>自控等短寿件直接暴露；</li>
+            <li>回答“还剩几年 + 先修哪个部件”；</li>
+            <li>数据不全 5 年兜底并归一，不虚增。</li>
+          </ul>
+        </div>
+        <div class="box orange">
+          <div class="h">给评委一句话</div>
+          <p>“寿命预测从‘整栋给一个数’升级为‘<b>让每个部件的指导寿命和修复记录告诉我们还差几年</b>’，用最短短板决定整栋、用人工判断做修正——修得好、短板就短，寿命自然就长。”</p>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <p class="footernote">参考口径：《当前寿命预测算法说明》<b>最终版BDRL</b> 现有公式；《0905健康分改进》逐部件+归一化+兜底思路；《几个数据核实及初步安排》《大数据算法赋能…》《让烤房鲜活起来…》的 <b>部件指导年限表、健康模型实测样例、四大部位十八部件清查、寿命/成本/负载五大维度</b> 业务思想。本文件为升级设计，具体落库参数以定稿为准。</p>
+    </div>
+
+  </section>
+  <div class="footer">烤房寿命预测升级融合方案（BDRL-U6 逐部件短板融合）· 0905 · 报告0829/0904</div>
+</div>
+</body>
+</html>

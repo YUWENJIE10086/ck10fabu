@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烤房健康分 + 剩余寿命融合算法详解（0901升级版）</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#dff0da; --green3:#bfe1b5; --greenDeep:#0f241f;
+      --teal:#11888a; --teal2:#dff3f2; --orange:#f47721; --orange2:#fce8d8;
+      --blue:#2f6fbb; --blue2:#e4effb; --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4;
+      --purple:#7b5ea7; --purple2:#efe9f8;
+      --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(17,136,138,.09), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.74}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 60px}
+    .hero{background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));border:1px solid var(--line);border-radius:24px;padding:30px 34px;box-shadow:var(--shadow)}
+    h1{margin:0 0 8px;font-size:31px;line-height:1.3}
+    .sub{color:var(--sub);font-size:15px;max-width:1000px}
+    .timestamp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--blue2);color:var(--blue);font-size:12.5px;font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .chip b{color:var(--green)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 20px 18px;box-shadow:var(--shadow)}
+    .span6{grid-column:span 6}.span7{grid-column:span 7}.span5{grid-column:span 5}.span12{grid-column:span 12}.span4{grid-column:span 4}.span8{grid-column:span 8}
+    h2{font-size:20px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:#2f6fbb;color:#fff}
+    h3{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf5}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13.5px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill.g{background:var(--green2);color:var(--green)}
+    .pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}
+    .pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.t{background:var(--teal2);color:var(--teal)}
+    .pill.p{background:var(--purple2);color:var(--purple)}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+    .kpi>div{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,var(--green2));border:1px solid #d8e8d4}
+    .kpi b{display:block;font-size:22px;color:var(--green)}
+    .kpi span{font-size:12.5px;color:var(--sub)}
+    .kpi.r>div{background:linear-gradient(180deg,#fff,#ffe9d9);border-color:#f4d6bd}
+    .kpi.r b{color:var(--orange)}
+    .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .step{border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff;min-height:96px}
+    .step .t{font-weight:700;font-size:13.5px;margin-bottom:3px}
+    .step .d{font-size:12px;color:var(--sub)}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;background:var(--green2);color:var(--green);margin-right:6px}
+    .note{color:var(--sub);font-size:12px}
+    .footernote{color:var(--sub);font-size:12.5px;margin-top:6px}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .divider{height:1px;background:var(--line);margin:20px 0}
+    code{background:#eef2ee;border-radius:6px;padding:1px 6px;font-size:12.5px;color:#b32525;font-family:ui-monospace,Menlo,monospace}
+    @media (max-width:980px){.span3,.span4,.span5,.span6,.span7,.span8,.span12,.three,.two,.flow,.kpi{grid-column:span 12;grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:20px}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ 总览 ============ -->
+  <section class="hero">
+    <h1>烤房健康分 + 剩余寿命融合算法详解</h1>
+    <div class="sub"><b>从信息化采集的数据出发 → 算出三维健康分 → 再把健康分反推剩余寿命（BDRL 升级版）→ 结果回流烤房档案</b>，供勘察、养护、投建决策。本版为 <b>0901 升级版</b>，核心变更：<span class="hlg">BDRL 由"按物理年龄定曲线"升级为"按真实健康分反推等效年龄 + 维修台账真实计数"</span>，修复了老烤房被误判为 0 年的难题。</div>
+    <div class="timestamp">📅 文档生成：2026-09-01 18:01（北京时间）｜本次寿命全量重算：2026-09-01 17:53 ｜健康填三维重算：2026-09-01 17:12</div>
+    <div class="chips">
+      <span class="chip">输入 · 建设年度 / 部件状态 / 管护制度 / 人工评价 / <b>维修台账</b></span>
+      <span class="chip">健康分 · 部件 80% + 管护 10% + 人工 10%</span>
+      <span class="chip">寿命 · BDRL 升级版 = U2 维修真实计数 + U1 健康分反推等效年龄</span>
+    </div>
+  </section>
+
+  <section class="grid">
+
+    <!-- ============ 0. 升级总览（给评委开篇） ============ -->
+    <div class="card span12">
+      <h2><span class="s o">升级总览</span> 这次算法到底"升级"了什么</h2>
+      <div class="kpi">
+        <div><b>1527 → 70</b><span>紧急维修栋数（升级前 → 升级后，全局2442栋）</span></div>
+        <div><b>0 → 9.0 年</b><span>老房09-…18剩余寿命（升级前 → 升级后）</span></div>
+        <div><b>11.0 年</b><span>新房23-…23（保持不变，量级一致）</span></div>
+        <div><b>U1 + U2</b><span>健康分反推等效年龄 + 维修真实计数</span></div>
+      </div>
+      <div class="box blue">
+        <div class="h">一句话讲给评委</div>
+        <p>原来寿命预测用"烤房盖了多少年"来定退化曲线，导致<span class="hl">健康分其实很高、刚保养过的老烤房被一刀切判为寿命归零</span>。升级后我们<span class="hl">直接信任系统算出的健康分，用它在退化曲线上反推"这台房现在相当于几岁的新房"</span>，同时<span class="hl">维修还有几次真账就延寿几年</span>——于是"修得好 = 健康分高 = 等效年轻 = 寿命更长"这条业务逻辑被完整打通，不再被物理年龄卡死。</p>
+      </div>
+    </div>
+
+    <!-- ============ 一、数据来源 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 1 步</span> 信息化数据从哪来（输入层）</h2>
+      <p>系统为每栋烤房建立"一房一档"，健康分与寿命的全部输入来自以下四类信息化记录：</p>
+      <div class="flow">
+        <div class="step"><div class="t">① 烤房档案</div><div class="d">kf_basedata：建成年度(finish_date)、乡镇/村、使用状态</div></div>
+        <div class="step"><div class="t">② 部件台账</div><div class="d">加热/散热/自控/主体四张表：状态、评价、修复年份</div></div>
+        <div class="step"><div class="t">③ 管护·人工</div><div class="d">manage_mode（集中/分户）、manual_eval（好/中/差）</div></div>
+        <div class="step"><div class="t">④ 维修台账</div><div class="d">repair_records：已验收/审核通过 + 完工日期(end_date)</div></div>
+        <div class="step"><div class="t">⑤ 退化折算</div><div class="d">年份差→部件已用年限 Δt→CDCI三段式退化</div></div>
+        <div class="step"><div class="t">⑥ 输出回流</div><div class="d">健康分0-100 + 剩余寿命(年) + 预警等级 + 退役年份</div></div>
+      </div>
+      <div class="box blue">
+        <div class="h">🔑 每条数据的用途</div>
+        <ul>
+          <li><b>建成年度</b> → 计算房龄与部件已使用年限 Δt；</li>
+          <li><b>部件状态 + 上次修复年份</b> → 状态分 S_status 与退化分 S_degrade 的输入；</li>
+          <li><b>管护制度 / 人工评价</b> → 三维融合中的第 2、3 维，体现"管不管"与"现场复核"；</li>
+          <li><b>维修台账</b> → 双重作用：① 健康分侧<b>重置退化年龄</b>；② 寿命侧<b>真实计数延寿</b>（升级 U2）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ============ 二、健康分算法 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 2 步</span> 健康分三维融合算法（现状值 0-100）</h2>
+      <div class="box">
+        <div class="h">主公式</div>
+        <div class="formula"><span class="o">H<sub>健康分</sub></span> = 0.80 × C<sub>部件</sub> + 0.10 × M<sub>管护</sub> + 0.10 × A<sub>人工</sub>   <span class="c">// 满分 100</span></div>
+        <p class="note">部件 80 分、管护 10 分、人工 10 分 —— 与《三个模型建模初步建议》"主要部件80 + 现行管护制度10 + 人工评价10"结构完全一致；部件内部采用本项目实际运行的 4 组加权框架（AHP 层次分析确定权重）。</p>
+      </div>
+
+      <h3>2.1 部件健康分 C<sub>部件</sub>（权重 80% 的承载主体）</h3>
+      <p>由四组部件加权：加热设备 JR + 散热器 SR + 自控设备 ZK + 烤房主体 ZT，每组内部再由"状态 + 退化 + 评价"三维构成：</p>
+      <div class="formula"><span class="o">C<sub>部件</sub></span> = 0.30·JR + 0.26·SR + 0.26·ZK + 0.18·ZT
+<span class="c">// 权重来自 AHP（加热最重要、散热与自控次之、主体最低）</span>
+<span class="o">某部件</span> C<sub>i</sub> = 0.40·S<sub>状态</sub> + 0.30·S<sub>退化</sub> + 0.30·S<sub>评价</sub></div>
+      <table>
+        <thead><tr><th>部件组</th><th>权重</th><th>对应部件表</th><th>子项（状态列）</th></tr></thead>
+        <tbody>
+          <tr><td>JR 加热设备</td><td><span class="num">0.30</span></td><td>kf_heater</td><td>燃烧机 burner_status</td></tr>
+          <tr><td>SR 散热器</td><td><span class="num">0.26</span></td><td>kf_radiator</td><td>管道/燃烧室/灰门/烟囱</td></tr>
+          <tr><td>ZK 自控设备</td><td><span class="num">0.26</span></td><td>kf_controller</td><td>冷风门/电机/排湿窗/循环风机/助燃风机/控制柜/水壶/探头（8项）</td></tr>
+          <tr><td>ZT 烤房主体</td><td><span class="num">0.18</span></td><td>kf_oven_body</td><td>墙体屋顶/挂烟梁/大门（3项）</td></tr>
+        </tbody>
+      </table>
+
+      <div class="two">
+        <div>
+          <h3>2.2 三个子分怎么定</h3>
+          <table>
+            <tr><th>子分</th><th>取值</th></tr>
+            <tr><td>S<sub>状态</sub></td><td>正常=100 · 异常=50 · 损坏=0</td></tr>
+            <tr><td>S<sub>评价</sub></td><td>较好=80 · 一般=60 · 较差=50 · 差=30</td></tr>
+            <tr><td>S<sub>退化</sub></td><td>见右：CDCI 三段式退化函数</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>2.3 退化分 S<sub>退化</sub> —— CDCI 三段式</h3>
+          <div class="formula"><span class="o">Δt</span> = 今年 − max(部件修复年份, 维修台账最新完工年份)
+<span class="c">// 未修过按默认 5 年起算</span>
+稳定区 Δt ≤ 0.2L          → 100
+线性区 0.2L &lt; Δt ≤ 0.7L  → 100 − k₁(Δt − 0.2L),  k₁ = 100/(0.5L)
+加速区 Δt &gt; 0.7L          → 30·e^(−k₂(Δt − 0.7L)),  k₂ = 2/L</div>
+          <p class="note">L 为部件设计寿命（JR=10、SR=12、ZK=10、ZT=20 年，界面可调）。越接近寿命终点退化越快，贴合烤房设备真实老化规律。</p>
+        </div>
+      </div>
+
+      <h3>2.4 管护分 M 与人工分 A（权重 10% + 10%）</h3>
+      <table>
+        <thead><tr><th>维度</th><th>档位 → 得分</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>管护制度 M</td><td>集中管护=100 · 分户管护=80</td><td>集中管护设备更统一、退化更慢</td></tr>
+          <tr><td>人工评价 A</td><td>好=100 · 中=80 · 差=50</td><td>技术员现场复核，吸收照片/表单覆盖不到的经验</td></tr>
+        </tbody>
+      </table>
+      <p class="note">管护与人工两维在界面可直接下拉录入（<code>管护制度 / 人工评价</code>），未录入默认"集中管护 + 好"兜底（各给满分），保证每栋烤房都能算出分。</p>
+
+      <h3>2.5 维修台账联动（健康分回弹）</h3>
+      <p>读取该烤房维修列表中"已验收/审核通过 + 完工日期非空"记录，按维修类型与描述关键词归到四部件组（加热→JR、散热热风→SR、自控电路探头→ZK、保温屋顶大门→ZT，无法归类记入通用组 ALL），以其完工年份作为该部件退化起始年：</p>
+      <div class="formula"><span class="o">退化起始年</span> = max( 部件表修复年份 , 维修台账最新完工年份 )</div>
+      <p class="note">效果：<b>修过关键部件的烤房，退化年龄重新从维修当天起算，健康分明显回弹</b>——让维修投入直接体现在健康分上，与寿命侧的真实计数延寿互为印证。</p>
+    </div>
+
+    <!-- ============ 三、健康分真实示例 ============ -->
+    <div class="card span12">
+      <h2><span class="s">真实示例</span> 老烤房 09-420527KF00018（2009年建 · 梅家河 肖家坪）</h2>
+      <div class="two">
+        <div class="box">
+          <div class="h">① 读取原始部件数据（表内真实值）</div>
+          <table>
+            <thead><tr><th>部件</th><th>L 寿命</th><th>状态</th><th>评价</th><th>修复年份</th><th>Δt(2026)</th></tr></thead>
+            <tbody>
+              <tr><td>JR 加热器</td><td>10</td><td>正常</td><td>较好</td><td>2022</td><td>4</td></tr>
+              <tr><td>SR 散热器(4项)</td><td>12</td><td>均正常</td><td>较好</td><td>2022</td><td>4</td></tr>
+              <tr><td>ZK 自控(8项)</td><td>10</td><td>均正常</td><td>较好</td><td>2022</td><td>4</td></tr>
+              <tr><td>ZT 主体</td><td>20</td><td>均正常</td><td><b>较差</b></td><td>墙体18/梁24/门09</td><td>8/2/17</td></tr>
+            </tbody>
+          </table>
+          <p class="note">该房维修台账均为"已归档"（未验收、无完工日），不触发健康分重置，故退化年龄以部件修复年份为准。寿命侧因无"已验收"记录，维修计数为 0。</p>
+        </div>
+        <div>
+          <div class="h">② 逐部件算 C<sub>i</sub>（三步代入 CDCI）</div>
+          <ul>
+            <li><b>JR</b>：Δt=4 ∈ 线性区(2,7] → k₁=100/(0.5×10)=20 → S<sub>退化</sub>=100−20×(4−2)=60<br>C_JR = 0.4·100 + 0.3·60 + 0.3·80 = <b>82.0</b></li>
+            <li><b>SR</b>：Δt=4 ∈ 线性区(2.4,8.4] → k₁=16.67 → S_d=73.3<br>C_SR = 40 + 22.0 + 24 = <b>86.0</b></li>
+            <li><b>ZK</b>：同 JR → <b>82.0</b></li>
+            <li><b>ZT</b>：三子项 S_d=(墙体8→60, 梁2→100, 门17→加速22.2)，平均60.7<br>C_ZT = 40 + 0.3·60.7 + 0.3·50 = <b>73.2</b></li>
+          </ul>
+        </div>
+      </div>
+      <div class="box orange">
+        <div class="h">③ 汇总 → 健康分（与系统 health_score_final=85.2 完全一致）</div>
+        <div class="formula">C<sub>部件</sub> = 0.30×82.0 + 0.26×86.0 + 0.26×82.0 + 0.18×73.2 = <span class="g">81.5</span>
+M<sub>管护</sub>（集中管护）= 100   A<sub>人工</sub>（好）= 100
+H = 0.80×81.5 + 0.10×100 + 0.10×100 = 65.2 + 10 + 10 = <span class="o">85.2 分 → 健康等级「良好」</span></div>
+        <p class="footernote">✅ 该分数已写入 <code>health_score_final</code> 并同步 <code>current_health_score</code>、<code>ovens.health_score / health_level</code>。烤房列表实测返回 healthScore=85.2。</p>
+      </div>
+    </div>
+
+    <!-- ============ 四、寿命预测算法（升级版） ============ -->
+    <div class="card span12">
+      <h2><span class="s b">第 3 步</span> 剩余寿命预测算法（BDRL 升级版）</h2>
+      <p>寿命预测<b>不再用物理年龄定曲线</b>，而是<b>以真实健康分 h₀ 反推"等效健康年龄"，再沿退化曲线外推到失效阈值</b>；同时用<b>维修台账真实条数</b>延寿。这一升级让"修得好 → 健康分高 → 等效年轻 → 寿命更长"的完整逻辑打通。</p>
+      <div class="kpi r">
+        <div><b>100→40</b><span>健康区间（跌破40判需维修）</span></div>
+        <div><b>h₀</b><span>当前健康分 = health_score_final</span></div>
+        <div><b>realRepair</b><span>维修台账真实「已验收」条数（替代 ⌊age/8⌋）</span></div>
+        <div><b>t_eq</b><span>反推的"等效健康年龄"（维修后更年轻）</span></div>
+      </div>
+      <div class="two">
+        <div>
+          <h3>4.1 参数（系统默认值，可调）</h3>
+          <table>
+            <tr><th>参数</th><th>值</th><th>含义</th></tr>
+            <tr><td>tc</td><td>8</td><td>退化转折年（前段线性/后段二次分界）</td></tr>
+            <tr><td>hc</td><td>60</td><td>转折点健康值</td></tr>
+            <tr><td>tend</td><td>12</td><td>理论寿命（年）</td></tr>
+            <tr><td>hMin</td><td>40</td><td>失效/维修阈值（跌破即判需修）</td></tr>
+            <tr><td>repairExtend</td><td>2.5</td><td>每条真实维修记录延寿年限</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>4.2 升级核心：等效年龄反推 + 维修真实计数</h3>
+          <div class="formula"><span class="b">U2 维修真实计数</span>
+realRepair = COUNT(repair_records WHERE 已验收/审核通过 AND end_date 非空)
+T<sub>end'</sub> = tend + realRepair × repairExtend   <span class="c">// 修得越多，理论寿命越长</span>
+
+<span class="b">U1 健康分反推等效年龄</span>
+k₁ = (100 − hc) / tc   <span class="c">// 前段线性斜率</span>
+若 h₀ ≥ hc：t_eq = (100 − h₀) / k₁          <span class="c">// 前段线性反解</span>
+否则：      t_eq = tc + √(1 − h₀/hc)·(T<sub>end'</sub> − tc)  <span class="c">// 后段二次反解</span>
+
+<span class="b">失效点</span>（按 t_eq 所在段决定外推方式）：
+若 t_eq ≤ tc：t_end = (100 − hMin) / k₁                          <span class="c">// 前段线性外推</span>
+否则：         t_end = tc + √(1 − hMin/hc)·(T<sub>end'</sub> − tc)  <span class="c">// 后段二次外推</span>
+
+<span class="b">剩余寿命</span> residual = t_end − t_eq，clamp 0 ≤ residual ≤ 12</div>
+        </div>
+      </div>
+      <div class="box red">
+        <div class="h">为什么之前会误判？（升级前 1527 栋"紧急维修"的根因）</div>
+        <ul>
+          <li>旧模型用 <code>age=今年−建成年</code> 直接在曲线上定位，一旦 age ≥ T'end 就"超龄"；</li>
+          <li>维修回弹依赖 <code>theoreticalH&gt;0</code>，而老房 age ≥ T'end 时 theoreticalH=0，门槛被挡住 → <span class="hl">健康分再高也救不回</span>；</li>
+          <li>维修次数用 ⌊age/8⌋ 估算，与维修台账无关。</li>
+        </ul>
+        <p class="footernote">升级后改用健康分反推等效年龄 t_eq 替代 age：老而健康者变为"等效年轻"，不再归零；维修次数取真实台账，维修越多延寿越准。</p>
+      </div>
+    </div>
+
+    <!-- ============ 五、寿命真实示例（升级后） ============ -->
+    <div class="card span6">
+      <h2><span class="s b">真实示例A</span> 老房 09-420527KF00018（2009建·升级后修正）</h2>
+      <div class="box">
+        <div class="h">计算过程（健康分反推，不再归零）</div>
+        <div class="formula">建成年=2009， age=17（物理年龄，仅作备案）
+h₀ = health_score_final = 85.2
+realRepair = 0（该房无'已验收'维修记录）
+T<sub>end'</sub> = 12 + 0×2.5 = 12
+k₁ = (100−60)/8 = 5
+h₀(85.2) ≥ hc(60) → t_eq = (100−85.2)/5 = <span class="g">2.96 年</span>
+t_eq(2.96) ≤ tc(8) → 前段线性外推失效点：
+t_end = (100 − 40) / 5 = 12
+residual = 12 − 2.96 = <span class="o">9.04 → 列表 9.0 年</span></div>
+        <div class="note">✅ 与系统实测 <code>life_residual_final=9.0</code> 一致，预警等级「正常」，退役年份 <b>2035</b>。升级前该房被判 0 年/紧急维修。</div>
+      </div>
+    </div>
+    <div class="card span6">
+      <h2><span class="s b">真实示例B</span> 新房 25-420527KF00023（2025建·杨林桥 白鹤洞）</h2>
+      <div class="box orange">
+        <div class="h">计算过程（与旧模型量级一致，未受影响）</div>
+        <div class="formula">age = 2026−2025 = 1
+h₀ = 95.2， realRepair = 0 → T<sub>end'</sub> = 12
+h₀(95.2) ≥ hc(60) → t_eq = (100−95.2)/5 = 0.96
+t_eq(0.96) ≤ tc(8) → t_end = (100−40)/5 = 12
+residual = 12 − 0.96 = <span class="o">11.04 → 11.0 年</span></div>
+        <div class="note">✅ 与系统实测 <code>life_residual_final=11.0</code> 一致，预警等级「正常」，退役年份 <b>2037</b>。升级前后量级一致，未受影响。</div>
+      </div>
+    </div>
+    <div class="card span12">
+      <div class="box green" style="border-color:var(--green);background:#f4fbf5">
+        <div class="h">✅ 升级前后系统实测对照（同一批 2442 栋）</div>
+        <table>
+          <thead><tr><th>指标</th><th>升级前</th><th>升级后（0901重算）</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>紧急维修栋数</td><td class="num" style="color:var(--red)"><b>1527</b></td><td class="num" style="color:var(--green)"><b>70</b></td><td>大量健康分76-85的老房被误判→已修正</td></tr>
+            <tr><td>平均寿命</td><td class="num">—</td><td class="num"><b>6.3 年</b></td><td>2442栋 avg</td></tr>
+            <tr><td>正常 / 需关注 / 建议维修</td><td class="num">—</td><td class="num">1195 / 744 / 433</td><td>分布更符合实际</td></tr>
+            <tr><td>老房09-…18 寿命</td><td class="num">0 年（紧急维修）</td><td class="num"><b>9.0 年（正常）</b></td><td>退役2035</td></tr>
+            <tr><td>新房23-…23 寿命</td><td class="num">11.0 年</td><td class="num"><b>11.0 年</b></td><td>正常，退役2037</td></tr>
+          </tbody>
+        </table>
+        <p class="footernote">说明：升级版统一"在前段按线性外推失效点"（t_end=12），故新房屋值仍为 11.0，与旧版一致；老房侧等效年龄 t_eq 大幅年轻，寿命得到修正。</p>
+      </div>
+    </div>
+
+    <!-- ============ 六、融合贯通 + 数据库同步 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 4 步</span> 健康分 ↔ 寿命预测 融合贯通 + 数据库同步链路</h2>
+      <div class="two">
+        <div>
+          <p><b>正向链路</b>：部件数据 + 管护/人工 + 维修台账 → 三维健康分 H₀ → 反推等效年龄 → BDRL 升级版 → 剩余寿命、预警等级、退役年份。</p>
+          <div class="formula">H₀ → t_eq → BDRL → residual 年 → 预警等级 → 退役年份
+residual ≤ 0  紧急维修  ·  (0,4]  建议维修  ·  (4,7]  需关注  ·  &gt;7  正常</div>
+          <div class="box" style="margin-top:8px">
+            <div class="h">🔁 维修台账的双向"回弹"</div>
+            <p class="note">① <b>健康分侧</b>：维修完工 → 重置部件退化年龄 → 健康分回升；② <b>寿命侧</b>：维修真实条数 → 拉长理论寿命 T'end，且健康分回升 → 等效年龄年轻 → 剩余寿命增加。<b>两头都在回弹，口径统一、相互印证。</b></p>
+          </div>
+        </div>
+        <div>
+          <p><b>数据库多端同步（本次已实际执行）</b></p>
+          <div class="formula"><span class="b">健康分</span>
+health_score_final → current_health_score
+                  → ovens.health_score / health_level
+<span class="b">寿命</span>
+life_residual_final → current_life_residual
+                  → ovens.predicted_life_years</div>
+          <table>
+            <thead><tr><th>消费方</th><th>读取字段</th></tr></thead>
+            <tbody>
+              <tr><td>AI智能分析(健康分页)</td><td>health_score_final / life_residual_final</td></tr>
+              <tr><td>烤房档案列表</td><td>current_health_score / current_life_residual</td></tr>
+              <tr><td>烤房列表/筛选/统计</td><td>ovens.health_score / health_level / predicted_life_years</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 七、同步结果实证 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">实证</span> 数据库已同步 · 烤房列表读到最新值（2026-09-01 18:00 实测）</h2>
+      <div class="box">
+        <div class="h">🔍 实测验证（接口实时读取）</div>
+        <table>
+          <thead><tr><th>烤房</th><th>healthScore<br>(current_health_score)</th><th>currentHealthScore</th><th>currentLifeResidual</th><th>结论</th></tr></thead>
+          <tbody>
+            <tr><td>09-420527KF00018</td><td class="num"><b>85.2</b></td><td class="num">85.2</td><td class="num"><b>9.0</b></td><td><span class="pill g">列表=最新计算值 ✅</span></td></tr>
+          </tbody>
+        </table>
+        <p class="footernote">数据流闭环：算法计算(<code>health_score_final=85.2</code>, <code>life_residual_final=9.0</code>) → <code>UPDATE kf_basedata.current_*</code> → <code>UPDATE ovens</code> → 烤房档案列表接口 <code>SELECT current_health_score, current_life_residual</code>。<b>烤房列表用的就是计算的最新值，数据库几端口径一致。</b></p>
+      </div>
+    </div>
+
+    <!-- ============ 7.5 预警机制与等级分隔 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">预警机制</span> 如何预警 + 等级分隔是否合理（与系统一致）</h2>
+      <p>系统对每栋烤房同时输出<span class="hlg">健康等级（5档）</span>与<span class="hlg">剩余寿命预警（4档）</span>，两套阈值都挂在<b>同一个 0-100 健康分尺度</b>上，因此"健康分 → 寿命 → 预警 → 退役年份"一条链路拉通。以下色标为前端实际渲染所用（与 <code>BarnHealthScore.vue</code> / <code>BarnLifePredict.vue</code> 代码一致）。</p>
+
+      <div class="two">
+        <div>
+          <h3>5.1 健康等级预警（5档，由健康分 H 分段）</h3>
+          <table>
+            <thead><tr><th>等级</th><th>分数区间</th><th>色标</th><th>处置语义</th></tr></thead>
+            <tbody>
+              <tr><td>优良</td><td class="num">90–100</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#2E8B6A"></span> #2E8B6A</td><td>设备状态良好，可正常运行</td></tr>
+              <tr><td>良好</td><td class="num">75–89</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#5FB292"></span> #5FB292</td><td>设备基本正常，建议定期维护</td></tr>
+              <tr><td>一般</td><td class="num">60–74</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#D4944A"></span> #D4944A</td><td>设备出现老化，需要关注</td></tr>
+              <tr><td>预警</td><td class="num">40–59</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#D4604A"></span> #D4604A</td><td>设备严重老化，需维修</td></tr>
+              <tr><td>危险</td><td class="num">0–39</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#B71C1C"></span> #B71C1C</td><td>接近退役，紧急处理</td></tr>
+            </tbody>
+          </table>
+          <p class="note">写库：<code>ovens.health_level</code>，烤房列表/筛选/分配界面以色块展示。</p>
+        </div>
+        <div>
+          <h3>5.2 剩余寿命预警（4档，由剩余年限 RUL 分段）</h3>
+          <table>
+            <thead><tr><th>等级</th><th>剩余年限</th><th>色标</th><th>处置语义</th></tr></thead>
+            <tbody>
+              <tr><td>正常</td><td class="num">&gt; 7 年</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#2E8B6A"></span> #2E8B6A</td><td>烤房状态良好，可继续使用</td></tr>
+              <tr><td>需关注</td><td class="num">4 – 7 年</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#5FB292"></span> #5FB292</td><td>建议制定维护计划</td></tr>
+              <tr><td>建议维修</td><td class="num">0 – 4 年</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#D4944A"></span> #D4944A</td><td>需要安排维修更换</td></tr>
+              <tr><td>紧急维修</td><td class="num">≤ 0 年</td><td><span style="display:inline-block;width:64px;height:16px;border-radius:4px;background:#D4604A"></span> #D4604A</td><td>跌破失效阈值，立即维修/评估报废</td></tr>
+            </tbody>
+          </table>
+          <p class="note">写库：<code>ovens.predicted_life_years</code>；寿命页据此映射预警等级与退役年份。</p>
+        </div>
+      </div>
+
+      <h3>5.3 预警是怎么"响起来"的（完整触发链路）</h3>
+      <div class="flow">
+        <div class="step"><div class="t">① 算健康分</div><div class="d">三维融合给出 H（0-100）</div></div>
+        <div class="step"><div class="t">② 判健康等级</div><div class="d">H 落档 → 优良…危险，写 ovens.health_level</div></div>
+        <div class="step"><div class="t">③ 推剩余寿命</div><div class="d">健康分反推等效年龄 → RUL</div></div>
+        <div class="step"><div class="t">④ 判寿命预警</div><div class="d">RUL 落档 → 正常…紧急维修，映射退役年份</div></div>
+        <div class="step"><div class="t">⑤ 界面显色</div><div class="d">烤房列表/寿命页/BI大屏按上表色块展示</div></div>
+        <div class="step"><div class="t">⑥ 处置动作</div><div class="d">≤7安排关注，≤4安排维修，≤0紧急处置</div></div>
+      </div>
+
+      <div class="box blue">
+        <div class="h">5.4 分数分隔是否合理（给评委的分隔依据论证）</div>
+        <p><b>健康等级 5 档（90 / 75 / 60 / 40）</b></p>
+        <ul>
+          <li><b>90 为"优良"门槛</b>：部件近乎全新或高维护，退化仍处于 CDCI 稳定区，风险冗余足；</li>
+          <li><b>75 为"良好"门槛</b>：大体对应部件进入线性退化中段（Δ t ∈ 0.2L~0.5L）而仍未到加速区，可正常使用但要定期维护；</li>
+          <li><b>60 为"一般"门槛</b>：与 BDRL 转折点健康值 <code>Hc=60</code> 同源——健康分低于 60，意味着部件已越过线性退化进入加速劣化，老化开始显现，必须关注；</li>
+          <li><b>40 为"预警/危险"界</b>：与寿命失效阈值 <code>H_min=40</code> 完全同源——跌破 40 即视为"已无有效剩余寿命"，必须维修，是两套分级共用的硬底线。</li>
+        </ul>
+        <p class="note">结论：健康 5 档的两处关键节点（60、40）刻意与寿命模型的 <code>Hc</code>、<code>H_min</code> 共用同一数值，<b>保证"健康分级"与"寿命预警"在健康分上无缝衔接、互为印证</b>，避免两套体系打架。</p>
+        <p><b>寿命预警 4 档（&gt;7 / 4–7 / 0–4 / ≤0）</b></p>
+        <ul>
+          <li><b>&gt;7 年·正常</b>：等效年龄偏低、安全冗余充足，对应健康"优良/良好"；</li>
+          <li><b>4–7 年·需关注</b>：进入设计寿命中后期，对应健康"一般"，开始纳入立计划观察；</li>
+          <li><b>0–4 年·建议维修</b>：临近退役窗口，对应健康"预警"，安排当年维修更换——与设备大修周期、年度养护计划对齐；</li>
+          <li><b>≤0 年·紧急维修</b>：已跌破失效阈值，对应健康"危险"，立即处置。升级后仅当健康分真的跌破 40 才会落入此档，不再有"超龄健康房被一刀切"的误判。</li>
+        </ul>
+        <p class="note">分隔依据兼顾<b>统计合理性（阈值与模型参数同源）</b>与<b>业务可操作性（每档对应明确处置动作）</b>；若后续样本积累，可用历年观测对阈值做最小二乘校准（升级项 U3）。本次重算分布：正常1195 / 需关注744 / 建议维修433 / 紧急维修70，与"多数烤房可续用、少数需维修"的实际吻合。</p>
+      </div>
+    </div>
+
+    <!-- ============ 八、给评委的说明与后续 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">第 5 步</span> 给评委的说明 + 后续可选升级</h2>
+      <div class="three">
+        <div class="box blue">
+          <div class="h">本版已落地</div>
+          <ul>
+            <li>三维健康分（80+10+10）与维修台账联动；</li>
+            <li>BDRL 升级：健康分反推等效年龄（U1）+ 维修真实计数（U2）；</li>
+            <li>数据库 4 端同步，列表/大屏读数一致。</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="h">下一步可选（U3-U5）</div>
+          <ul>
+            <li><b>U3</b> 参数用历年数据最小二乘拟合（tc/hc/tend 不再固定）；</li>
+            <li><b>U4</b> 四部件风险排序，寿命预警直接指向"先修哪个部件"；</li>
+            <li><b>U5</b> 健康分+寿命+维修紧迫度合成"修缮优先级 P"。</li>
+          </ul>
+        </div>
+        <div class="box orange">
+          <div class="h">口径说明</div>
+          <ul>
+            <li>寿命上限 clamp ≤12 年（极限寿命）；</li>
+            <li>分级：≤0 紧急维修 / ≤4 建议维修 / ≤7 需关注 / &gt;7 正常；</li>
+            <li>升级不改变前端的参数结构，仅后端逻辑增强，可一键重算。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </section>
+  <div class="footer">烤房健康分 + 剩余寿命融合算法 · 0901升级版 · 适用于算法模型0901讲解演示 · 数据来源：系统真实计算 + 数据库实测</div>
+</div>
+</body>
+</html>

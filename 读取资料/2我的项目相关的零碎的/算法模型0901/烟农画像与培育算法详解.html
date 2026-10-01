@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烟农画像与培育算法详解</title>
+  <style>
+    :root{--bg:#f5faf5;--card:#fff;--ink:#17382f;--sub:#5f6f69;--green:#2e7d32;--green2:#dff0da;--teal:#11888a;--orange:#f47721;--blue:#2f6fbb;--purple:#7d4e9e;--line:#d6e0d6;--shadow:0 8px 24px rgba(23,56,47,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:
+      radial-gradient(circle at 10% 0%, rgba(125,78,158,.08), transparent 22%),
+      radial-gradient(circle at 90% 0%, rgba(46,125,50,.08), transparent 22%),
+      var(--bg);color:var(--ink);line-height:1.72}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 56px}.hero,.card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+    .hero{padding:28px 30px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}.card{padding:18px}
+    h1{margin:0 0 6px;font-size:34px} h2{margin:0 0 10px;font-size:22px}.sub{color:var(--sub);font-size:15px}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.chip{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .span7{grid-column:span 7}.span5{grid-column:span 5}.span6{grid-column:span 6}.span12{grid-column:span 12}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{border-left:4px solid var(--purple);background:#fbf8fe;padding:12px 14px;border-radius:14px;margin-top:10px}
+    .box.green{border-color:var(--green);background:#f8fcf7}.box.orange{border-color:var(--orange);background:#fffaf5}.box.blue{border-color:var(--blue);background:#f7fbff}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top} th{background:#f2ebfa;text-align:left}
+    ul{margin:10px 0 0 18px;padding:0} li{margin:7px 0;font-size:14px}.footer{margin-top:16px;color:var(--sub);font-size:12px;text-align:center}
+    .pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#f0e5f6;color:#7d4e9e;font-size:12px}
+    .radar{background:linear-gradient(180deg,#fff,#fbf8fe);border:1px dashed #e1d7ef;border-radius:18px;padding:14px}
+    .item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f0edf6}.item:last-child{border-bottom:0}
+    .bar{height:10px;background:#e9e1f2;border-radius:999px;flex:1;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),#b695d4)}
+    .muted{color:var(--sub);font-size:13px}
+  </style>
+</head>
+<body><div class="wrap">
+  <section class="hero">
+    <h1>烟农画像与培育算法详解</h1>
+    <div class="sub">这一页是你新增的“烟农培育”逻辑：先把烟农知识薄弱点找出来，再把培训、上门辅导、物资和岗位服务精准投过去。</div>
+    <div class="chips">
+      <span class="chip">输入：烟农问卷、烘烤知识、栽培知识、植保知识、采烤知识、服务评价</span>
+      <span class="chip">输出：画像分、薄弱维度、村/磅组/烟农清单、培育建议</span>
+      <span class="chip">用途：BI 大屏“烟农培育”页 + 上门辅导工单</span>
+    </div>
+  </section>
+  <section class="grid">
+    <div class="card span7">
+      <h2>1. 画像怎么形成</h2>
+      <p>你的问卷材料已经说明，烟农不仅有烤房管理问题，也有知识结构问题。最适合做成画像的方式，是把问卷结果、培训记录、烘烤表现和服务反馈汇总成五维雷达图，再把每个维度拆到村、磅组和烟农个人。</p>
+      <div class="two">
+        <div class="box">
+          <p><b>五维建议：</b>栽培、植保、采烤、烘烤、综合素养。</p>
+          <p><b>低分识别：</b>哪个维度低，就代表哪里的知识薄弱。</p>
+        </div>
+        <div class="box blue">
+          <p><b>粒度建议：</b>先到村，再到磅组，最后落到烟农个人。</p>
+          <p><b>输出建议：</b>直接生成“上门辅导名单 + 课程推荐 + 工单”。</p>
+        </div>
+      </div>
+      <div class="box green">
+        <p>如果你要把算法做得更实用，画像分不能只是问卷平均分，最好叠加三个修正项：最近一次烘烤结果、近一年培训参与率、历史服务评价。这样画像会更接近“谁真的需要辅导”。</p>
+      </div>
+    </div>
+    <div class="card span5">
+      <h2>2. 一张画像的长相</h2>
+      <div class="radar">
+        <div class="item"><span>栽培</span><div class="bar"><span style="width:58%"></span></div><b>58</b></div>
+        <div class="item"><span>植保</span><div class="bar"><span style="width:66%"></span></div><b>66</b></div>
+        <div class="item"><span>采烤</span><div class="bar"><span style="width:61%"></span></div><b>61</b></div>
+        <div class="item"><span>烘烤</span><div class="bar"><span style="width:52%"></span></div><b>52</b></div>
+        <div class="item"><span>综合</span><div class="bar"><span style="width:70%"></span></div><b>70</b></div>
+      </div>
+      <p class="muted">示意：某村在烘烤维度明显偏弱，就要优先安排烘烤现场会、上门辅导和技术员跟踪。</p>
+    </div>
+    <div class="card span12">
+      <h2>3. 画像分怎么计算</h2>
+      <div class="two">
+        <div>
+          <ul>
+            <li>先把问卷题目按维度分组，得到每个维度的原始得分。</li>
+            <li>再把原始得分标准化到 0-100 分。</li>
+            <li>然后加上培训参与率、最近烘烤表现和服务评价的修正项。</li>
+            <li>最后输出村级、磅组级和烟农级画像。</li>
+          </ul>
+        </div>
+        <div class="formula" style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#111b2d;color:#dfe8ff;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13px">
+PortraitScore = 0.45×Questionnaire
+              + 0.25×Training
+              + 0.20×HarvestResult
+              + 0.10×ServiceFeedback
+
+WeakDim = argmin( 栽培, 植保, 采烤, 烘烤, 综合 )
+Priority = WeakDim × PopulationWeight × ProductionWeight</div>
+      </div>
+    </div>
+    <div class="card span6">
+      <h2>4. 培育怎么落到行动</h2>
+      <table>
+        <thead><tr><th>输出对象</th><th>动作</th></tr></thead>
+        <tbody>
+          <tr><td>村</td><td>生成村级薄弱维度热力图，确定现场会主题</td></tr>
+          <tr><td>磅组</td><td>生成磅组辅导清单，安排技术员上门</td></tr>
+          <tr><td>烟农</td><td>生成个人培训建议，推送课程和材料</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card span6">
+      <h2>5. 建议叠加到模型里的字段</h2>
+      <ul>
+        <li>近三年烘烤成绩。</li>
+        <li>培训参与次数与到课率。</li>
+        <li>烘烤过程的异常次数。</li>
+        <li>烟农年龄、劳力结构、职业化程度。</li>
+        <li>服务评价和整改完成情况。</li>
+      </ul>
+    </div>
+    <div class="card span12">
+      <h2>6. 烟农培育页的 BI 展示建议</h2>
+      <p><span class="pill">左侧</span> 村级画像总览，显示薄弱维度排名和红黄绿分布。</p>
+      <p><span class="pill">中间</span> 磅组或烟农画像雷达图，点开后看到具体题目和低分项。</p>
+      <p><span class="pill">右侧</span> 上门辅导建议，包括课程、物资、技术员和跟踪时间。</p>
+      <p><span class="pill">底部</span> 形成“画像 - 培训 - 复测 - 再画像”的闭环。</p>
+    </div>
+    <div class="card span12">
+      <h2>7. 讲给评委听的表述</h2>
+      <p>“我们不是简单做一个问卷统计，而是把烟农问卷转成画像，把知识薄弱点定位到村、磅组和烟农个人，再把培训、上门辅导和物资支持精准推送过去。这样就能从‘统一培训’变成‘按需培育’，真正解决哪里弱、弱在哪、怎么补。”</p>
+    </div>
+  </section>
+  <div class="footer">这一页可以直接作为 BI 大屏新增的“烟农培育”模块说明页，并和问卷画像数据联动。</div>
+</div></body>
+</html>

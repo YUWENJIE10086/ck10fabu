@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>新建选址沙盘演练界面改进方案</title>
+  <style>
+    :root {
+      --ink: #18322a;
+      --muted: #65766f;
+      --line: #d9e5df;
+      --soft: #f4f8f5;
+      --green: #1f7a5a;
+      --gold: #b87922;
+      --red: #b74335;
+      --blue: #2d6f8f;
+      --bg: #edf4f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.94), rgba(237,244,240,.96)),
+        repeating-linear-gradient(90deg, rgba(31,122,90,.05) 0 1px, transparent 1px 44px);
+      line-height: 1.72;
+    }
+    .page { max-width: 1200px; margin: 0 auto; padding: 40px 28px 70px; }
+    .hero {
+      background: #fff;
+      border-left: 8px solid var(--green);
+      box-shadow: 0 18px 42px rgba(35, 76, 60, .1);
+      padding: 22px 26px;
+      border-radius: 8px;
+    }
+    h1 { margin: 0; font-size: 31px; letter-spacing: 0; }
+    .sub { margin-top: 8px; color: var(--muted); }
+    h2 { margin: 34px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 22px; }
+    h3 { margin: 22px 0 8px; color: var(--green); font-size: 17px; }
+    p { margin: 8px 0 12px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .metric { font-size: 26px; font-weight: 800; color: var(--green); }
+    .label { font-size: 13px; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; background: #fff; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #e7f2ed; color: #16382c; }
+    .formula {
+      background: #10251e;
+      color: #eafff6;
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      overflow-x: auto;
+    }
+    .note {
+      background: #fff8ea;
+      border: 1px solid #ecd5a9;
+      border-left: 5px solid var(--gold);
+      border-radius: 8px;
+      padding: 13px 15px;
+    }
+    .wire {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 12px;
+      min-height: 360px;
+      margin-top: 14px;
+    }
+    .pane {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .map {
+      min-height: 360px;
+      background:
+        linear-gradient(135deg, rgba(31,122,90,.13), rgba(45,111,143,.12)),
+        repeating-linear-gradient(45deg, rgba(24,50,42,.08) 0 1px, transparent 1px 18px);
+      position: relative;
+      overflow: hidden;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--green); }
+    .pin { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--red); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+    .pin.a { left: 36%; top: 42%; }
+    .pin.b { left: 58%; top: 30%; background: var(--gold); }
+    .pin.c { left: 66%; top: 64%; background: var(--green); }
+    .tag { display: inline-block; padding: 2px 7px; border-radius: 999px; background: #eaf4ef; color: var(--green); font-size: 12px; }
+    .bad { color: var(--red); font-weight: 700; }
+    .good { color: var(--green); font-weight: 700; }
+    @media (max-width: 900px) {
+      .wire { grid-template-columns: 1fr; }
+      h1 { font-size: 25px; }
+      .page { padding: 26px 16px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>新建选址沙盘演练界面改进方案</h1>
+      <div class="sub">目标：把现有“烤房新建”从候选点管理页，升级成“点选新增烤房后，立即看村级负载、千亩村发展指数和融合优先级变化”的演练页。</div>
+    </section>
+
+    <h2>一、用户真正想完成什么</h2>
+    <div class="grid">
+      <div class="card"><div class="metric">找村</div><div class="label">先判断哪些村确实需要新增烤房。</div></div>
+      <div class="card"><div class="metric">落点</div><div class="label">在地图上点一个候选位置，归属到对应乡镇和行政村。</div></div>
+      <div class="card"><div class="metric">推演</div><div class="label">新增1座或多座后，实时看负载率、县均差距和均衡指数变化。</div></div>
+      <div class="card"><div class="metric">解释</div><div class="label">能说清楚为什么这个村优先，而不是只给一个分数。</div></div>
+    </div>
+    <p>所以“新建选址”页面不应只复制原来的候选点列表，而要把页面主动作改成：选择发展情景 → 看推荐村 → 地图落点 → 计算影响 → 形成方案。</p>
+
+    <h2>二、界面总布局</h2>
+    <div class="wire">
+      <div class="pane">
+        <h3>左侧：决策控制台</h3>
+        <p><span class="tag">情景</span> 当前规模、增长2%、增长5%、增长10%</p>
+        <p><span class="tag">产能</span> 单座设计产能，默认5000kg/季</p>
+        <p><span class="tag">权重</span> 负载缺口、发展指数、规模趋势、政策管护</p>
+        <p><span class="tag">动作</span> 自动推荐、手动落点、撤销新增、导出方案</p>
+      </div>
+      <div class="pane map">
+        <h3>中间：地图沙盘</h3>
+        <p>用颜色表达村级压力：红色严重超负荷、橙色超负荷、黄色饱和、绿色正常、蓝色富余。</p>
+        <p>点击地图新增候选点后，地图、右侧榜单、底部明细同时刷新。</p>
+        <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span>
+      </div>
+      <div class="pane">
+        <h3>右侧：推荐与解释</h3>
+        <p><b>TOP 1 白鹤洞</b><br>负载率高，新增后改善明显，发展指数中等。</p>
+        <p><b>TOP 2 陈家淌</b><br>负载压力偏高，发展指数高，持续发展可信度强。</p>
+        <p><b>TOP 3 赵家山</b><br>负载与发展指数都靠前，可作为第二梯队。</p>
+      </div>
+    </div>
+
+    <h2>三、千亩村发展指数怎么写</h2>
+    <p>建议页面上不要写成抽象“综合得分”，而写成业务人员能看懂的五项：</p>
+    <table>
+      <tr><th>指标</th><th>满分</th><th>页面写法</th><th>含义</th></tr>
+      <tr><td>村级集体经济收益</td><td>4分</td><td>集体经济基础</td><td>村里是否有能力组织、维护、承接新建烤房。</td></tr>
+      <tr><td>村烤房管护服务</td><td>4分</td><td>管护服务能力</td><td>现有烤房管护体系是否稳定，新增后能不能管得住。</td></tr>
+      <tr><td>村争取政策</td><td>4分</td><td>政策争取能力</td><td>村里争取政策资金和项目支持的能力。</td></tr>
+      <tr><td>规模增长趋势</td><td>4分</td><td>种植规模趋势</td><td>2024-2026 面积、产量是否持续增长。</td></tr>
+      <tr><td>发展承载量</td><td>4分</td><td>发展承载空间</td><td>按2%、5%、10%增长后，烤房供给是否还能承受。</td></tr>
+    </table>
+    <div class="formula">千亩村发展指数 = 五项得分合计 / 20 × 100<br>融合优先级 = 0.50 × 负载缺口得分 + 0.25 × 发展指数得分 + 0.15 × 规模趋势得分 + 0.10 × 政策管护保障得分</div>
+    <p>页面建议展示为一个“发展指数条”：总分在前，五项小条在后。用户点某个村时，右侧显示“这个村为什么适合新增”的解释。</p>
+
+    <h2>四、动作如何设计</h2>
+    <table>
+      <tr><th>动作</th><th>用户操作</th><th>系统计算</th><th>页面反馈</th></tr>
+      <tr><td>选择情景</td><td>切换当前/增长2%/增长5%/增长10%</td><td>切换对应预测产量或面积承载</td><td>推荐榜和负载表重新排序</td></tr>
+      <tr><td>查看推荐村</td><td>点击右侧村名</td><td>定位村中心，读取负载和发展指数</td><td>地图高亮该村，显示解释卡</td></tr>
+      <tr><td>手动落点</td><td>在地图点击新增点</td><td>按乡镇+村或最近村归属，新增数+1</td><td>新增后负载率、均衡指数即时变化</td></tr>
+      <tr><td>批量推演</td><td>输入新增座数</td><td>按推荐村或当前村叠加新增</td><td>显示“新增前→新增后”的变化</td></tr>
+      <tr><td>撤销方案</td><td>删除候选点或一键清空</td><td>恢复原始负载</td><td>地图和表格回到基线</td></tr>
+      <tr><td>输出方案</td><td>点击导出</td><td>汇总选点、村级指标、推荐理由</td><td>形成可汇报的新建选址方案</td></tr>
+    </table>
+
+    <h2>五、当前页面哪里应该改</h2>
+    <table>
+      <tr><th>区域</th><th>当前情况</th><th>建议改法</th></tr>
+      <tr><td>顶部标题</td><td>新建选址点沙盘演练</td><td>改成“新建选址沙盘演练”，副标题写“收购量 × 烤房承载 × 千亩村发展指数”。</td></tr>
+      <tr><td>左侧候选点</td><td>偏候选点管理</td><td>拆成“情景控制”和“候选方案”，先让用户选增长情景和产能，再落点。</td></tr>
+      <tr><td>地图</td><td>已有村负载颜色</td><td>增加村级发展指数图层开关：负载图层、发展指数图层、融合优先级图层。</td></tr>
+      <tr><td>右侧推荐</td><td>按优先级指数推荐</td><td>改成融合推荐榜：负载缺口、发展指数、增长趋势、政策管护四列。</td></tr>
+      <tr><td>底部表格</td><td>分村负载明细</td><td>增加“发展指数/20、融合优先级、推荐动作”列。</td></tr>
+      <tr><td>算法说明</td><td>现在有折叠说明</td><td>改成两段：现有负载算法说明 + 千亩村发展指数说明，避免误解为地形环境模型。</td></tr>
+    </table>
+
+    <h2>六、推荐的第一版 MVP</h2>
+    <p>第一版不要大改后端结构，先让“新建选址”页面在视觉和交互上表达融合思路：</p>
+    <table>
+      <tr><th>优先级</th><th>改动</th><th>原因</th></tr>
+      <tr><td>P0</td><td>把页面标题和算法说明改成“新建选址沙盘演练”</td><td>先把页面定位讲清楚。</td></tr>
+      <tr><td>P0</td><td>增加“千亩村发展指数”解释卡</td><td>让用户知道五项20分怎么来。</td></tr>
+      <tr><td>P1</td><td>推荐榜增加发展指数和融合优先级列</td><td>从“只看负载”升级到“负载+发展潜力”。</td></tr>
+      <tr><td>P1</td><td>增加情景切换：当前、2%、5%、10%</td><td>复用 Excel 第二张表已有增长情景。</td></tr>
+      <tr><td>P2</td><td>新增接口返回融合排序</td><td>把 Excel 三张表口径正式入库或转为接口数据。</td></tr>
+    </table>
+    <div class="note">重点边界：这个新建选址沙盘演练仍然不走地形环境选址逻辑。它的核心是“哪里烟叶规模和增长潜力更需要新增烤房”，不是“哪里地形最适合建房”。</div>
+  </main>
+</body>
+</html>

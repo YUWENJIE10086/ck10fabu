@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一、选择作品 · 烤房智享智投项目</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f4f9;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+        .report-container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -12px rgba(0,20,40,0.25);
+            padding: 2.5rem 3rem;
+        }
+        .report-header {
+            border-bottom: 2px solid #1a3a5c;
+            padding-bottom: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .report-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0b2a44;
+            letter-spacing: 1px;
+        }
+        .report-header .sub {
+            font-size: 1rem;
+            color: #2d577c;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+        h2.section {
+            font-size: 1.6rem;
+            color: #0b2a44;
+            margin: 2rem 0 1rem 0;
+            border-left: 6px solid #1a6b9e;
+            padding-left: 1rem;
+        }
+        h3.subsection {
+            font-size: 1.25rem;
+            color: #1a4b74;
+            margin: 1.8rem 0 0.8rem 0;
+            font-weight: 600;
+        }
+        p {
+            font-size: 1.02rem;
+            line-height: 1.8;
+            color: #1e2c3c;
+            text-align: justify;
+            margin-bottom: 0.8rem;
+        }
+        .highlight {
+            background: #e6eff8;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #003366;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            margin: 1.2rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            background: #fbfdff;
+        }
+        th {
+            background: #1a3a5c;
+            color: white;
+            padding: 0.6rem 0.8rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        td {
+            border: 1px solid #d0ddee;
+            padding: 0.5rem 0.8rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+        tr:nth-child(even) {
+            background: #f5f9ff;
+        }
+        .table-caption {
+            font-size: 0.9rem;
+            color: #3d5f7a;
+            margin-top: 0.3rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid #1a6b9e;
+            background: #eaf3fc;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+        .chart-box {
+            background: #fafdff;
+            border: 1px solid #e2eaf3;
+            border-radius: 16px;
+            padding: 1rem 1rem 0.8rem 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+        .chart-box h4 {
+            text-align: center;
+            color: #1a4b74;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        .chart-box canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 220px;
+        }
+        @media (max-width: 700px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            .report-container {
+                padding: 1.5rem;
+            }
+        }
+        .callout {
+            background: #eef4fa;
+            border-left: 5px solid #1a6b9e;
+            padding: 0.8rem 1.5rem;
+            margin: 1.2rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+        .callout strong {
+            color: #003366;
+        }
+        .btn-update {
+            background: #1a4b74;
+            color: white;
+            border: none;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .btn-update:hover {
+            background: #0d3452;
+        }
+        .footnote {
+            color: #4d6f8e;
+            font-size: 0.9rem;
+            border-top: 1px dashed #c6d6e8;
+            padding-top: 1rem;
+            margin-top: 1.5rem;
+        }
+        .swot-table td:first-child {
+            font-weight: 600;
+            background: #eaf1f9;
+        }
+        .swot-table td {
+            text-align: left;
+            padding: 0.5rem 0.8rem;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+<div class="report-container">
+
+    <!-- 报告头部 -->
+    <div class="report-header">
+        <h1>大数据算法赋能烤房智享智投全链条解决方案</h1>
+        <div class="sub">数创成果报告 · 一、选择作品</div>
+    </div>
+
+    <!-- ========== 一、选择作品 ========== -->
+    <h2 class="section">一、选择作品</h2>
+
+    <!-- (一) 提出需求 -->
+    <h3 class="subsection">（一）提出需求</h3>
+
+    <p>
+        烤房是烟叶烘烤的核心基础设施，直接关系烟叶品质与烟农收益。宜昌市作为湖北省重要烟叶产区，下辖秭归、兴山、长阳、五峰等烟区县，全市现有各类烤房共计 <span class="highlight">5222座</span>，其中秭归县占 <span class="highlight">2422座</span>，是全市烤房存量最大的县域。近年来，随着烟叶种植规模调整与烘烤工艺升级，烤房设施的管理压力持续增大，基层在烤房使用、运维和投资决策等方面暴露出突出矛盾，严重制约烘烤效率与资产效益。
+    </p>
+    <p>
+        为精准掌握烤房运行现状，项目组联合秭归县烟草部门对全县2422座烤房开展了全容量排查，并结合其他烟区县的抽样数据，梳理出当前烤房管理面临的 <span class="highlight">三大核心问题</span>。以下数据基于2024—2025年烘烤季的实地调研与统计。
+    </p>
+
+    <!-- 表1-1 烤房存量及利用率 -->
+    <div class="table-wrap">
+        <table id="tableUtilization">
+            <caption style="caption-side:bottom; margin-top:0.3rem; font-weight:600; color:#1a4b74;">表1-1 宜昌市主要烟区烤房存量及利用率（2025年烘烤季）</caption>
+            <thead>
+                <tr><th>县（区）</th><th>烤房总数（座）</th><th>高峰期需求（座）</th><th>实际可用（座）</th><th>利用率（%）</th><th>闲置率（%）</th></tr>
+            </thead>
+            <tbody>
+                <tr><td contenteditable="true">秭归县</td><td contenteditable="true">2422</td><td contenteditable="true">2100</td><td contenteditable="true">1680</td><td contenteditable="true">69.4</td><td contenteditable="true">30.6</td></tr>
+                <tr><td contenteditable="true">兴山县</td><td contenteditable="true">980</td><td contenteditable="true">850</td><td contenteditable="true">620</td><td contenteditable="true">63.3</td><td contenteditable="true">36.7</td></tr>
+                <tr><td contenteditable="true">长阳县</td><td contenteditable="true">760</td><td contenteditable="true">650</td><td contenteditable="true">490</td><td contenteditable="true">64.5</td><td contenteditable="true">35.5</td></tr>
+                <tr><td contenteditable="true">五峰县</td><td contenteditable="true">620</td><td contenteditable="true">550</td><td contenteditable="true">410</td><td contenteditable="true">66.1</td><td contenteditable="true">33.9</td></tr>
+                <tr><td contenteditable="true">其他（夷陵、远安等）</td><td contenteditable="true">440</td><td contenteditable="true">380</td><td contenteditable="true">290</td><td contenteditable="true">65.9</td><td contenteditable="true">34.1</td></tr>
+                <tr style="font-weight:600; background:#e3edf8;"><td>合计 / 平均</td><td>5222</td><td>4530</td><td>3490</td><td>65.8</td><td>34.2</td></tr>
+            </tbody>
+        </table>
+        <div class="table-caption">数据来源：宜昌市烟草公司烟叶生产科及秭归县全容量排查（2025年）<br>💡 点击表格内数字可编辑，修改后点击下方按钮更新图表</div>
+        <button class="btn-update" onclick="updateAllCharts()">🔄 更新图表（根据表格数据）</button>
+    </div>
+
+    <p>
+        数据显示，全市烤房平均利用率不足 <span class="highlight">66%</span>，高峰期供需缺口高达 <span class="highlight">1040座</span>，而同期闲置率却超过 <span class="highlight">34%</span>，资源错配矛盾突出。进一步分析产权结构发现，烤房产权分属烟农、村集体和合作社，缺乏统一调度平台，跨村调剂困难，加剧了“没房用”的困境。
+    </p>
+
+    <!-- 图表1：供需缺口柱状图 + 产权饼图 -->
+    <div class="chart-grid">
+        <div class="chart-box">
+            <h4>烘烤高峰期烤房供需缺口（座）</h4>
+            <canvas id="gapChart" width="400" height="200"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>烤房产权分布（秭归县）</h4>
+            <canvas id="ownershipChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <p>
+        在运维方面，排查发现 <span class="highlight">约42%</span> 的烤房存在不同程度的设备老化或故障隐患，但维修响应体系不健全。2024年烘烤季，秭归县共接到故障报修 <span class="highlight">1860次</span>，平均维修响应时间 <span class="highlight">4.7天</span>，其中 <span class="highlight">31%</span> 的故障因未能及时处置导致设备进一步损坏，单次维修成本平均增加 <span class="highlight">560元</span>。下表展示了故障类型分布。
+    </p>
+
+    <!-- 表1-2 故障类型 -->
+    <div class="table-wrap">
+        <table id="tableFault">
+            <caption style="caption-side:bottom; margin-top:0.3rem; font-weight:600; color:#1a4b74;">表1-2 秭归县烤房故障类型统计（2024烘烤季）</caption>
+            <thead><tr><th>故障类型</th><th>占比（%）</th></tr></thead>
+            <tbody>
+                <tr><td contenteditable="true">加热设备故障</td><td contenteditable="true">38</td></tr>
+                <tr><td contenteditable="true">温控系统失灵</td><td contenteditable="true">27</td></tr>
+                <tr><td contenteditable="true">风机损坏</td><td contenteditable="true">18</td></tr>
+                <tr><td contenteditable="true">密封老化</td><td contenteditable="true">10</td></tr>
+                <tr><td contenteditable="true">其他</td><td contenteditable="true">7</td></tr>
+            </tbody>
+        </table>
+        <div class="table-caption">数据来源：秭归县烤房维修记录统计</div>
+    </div>
+
+    <!-- 图表2：故障饼图 + 维修响应折线 -->
+    <div class="chart-grid">
+        <div class="chart-box">
+            <h4>烤房故障类型占比</h4>
+            <canvas id="faultChart" width="400" height="200"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>维修响应时间趋势（2024烘烤季）</h4>
+            <canvas id="responseChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <p>
+        养护管理方面，全县仅有 <span class="highlight">28%</span> 的烤房有规范的日常养护记录，超过 <span class="highlight">60%</span> 的养护工作流于形式，公益性岗位用工缺乏有效监督，导致设备早衰现象普遍。据测算，因养护不到位造成的设备寿命缩短，每年给全县烟农带来间接损失约 <span class="highlight">320万元</span>。
+    </p>
+
+    <!-- 表1-3 养护执行与健康度 -->
+    <div class="table-wrap">
+        <table id="tableMaintenance">
+            <caption style="caption-side:bottom; margin-top:0.3rem; font-weight:600; color:#1a4b74;">表1-3 秭归县烤房养护执行与设备健康度抽样统计</caption>
+            <thead><tr><th>养护执行率</th><th>设备健康评分（满分100）</th><th>年均故障次数</th><th>年均维修成本（元）</th></tr></thead>
+            <tbody>
+                <tr><td contenteditable="true">高（≥80%）</td><td contenteditable="true">82.5</td><td contenteditable="true">1.2</td><td contenteditable="true">320</td></tr>
+                <tr><td contenteditable="true">中（50%~79%）</td><td contenteditable="true">65.3</td><td contenteditable="true">2.8</td><td contenteditable="true">680</td></tr>
+                <tr><td contenteditable="true">低（<50%）</td><td contenteditable="true">47.1</td><td contenteditable="true">5.6</td><td contenteditable="true">1240</td></tr>
+            </tbody>
+        </table>
+        <div class="table-caption">数据基于秭归县120座样本烤房跟踪（2024-2025）</div>
+    </div>
+
+    <p>
+        在投资决策层面，近三年秭归县累计投入烤房新建及修缮资金 <span class="highlight">860万元</span>，但因缺乏量化评估体系，部分区域存在“该修的没修、不该建的重复建设”现象。例如，2024年新建的 <span class="highlight">45座</span> 烤房中，有 <span class="highlight">12座</span> 位于现有产能已饱和的村组，造成资源浪费；而同时有 <span class="highlight">28个</span> 自然村存在明确缺口却未获新建指标。
+    </p>
+
+    <div class="callout">
+        <strong>综上可见：</strong> 烤房管理长期依赖人工经验，<strong>“无量化评分、无数据建模、无智能决策”</strong> 的粗放模式，导致资源错配、响应滞后、投入盲目。现有信息化手段仅停留在台账登记层面，无法实现资源调度、故障预警、决策支持等关键功能。基层烟农面临 <strong>“没房用、没人修、没钱管”</strong> 的三重困扰，亟需通过数字化、智能化手段打通烤房全链条，释放数据要素价值。
+    </div>
+
+    <!-- ========== (二) 确定课题 ========== -->
+    <h3 class="subsection">（二）确定课题</h3>
+
+    <p>
+        针对上述三大痛点，项目组对现行人工管理方式与拟建的智能管理模式进行了深入对比分析。传统模式依赖纸质台账和人工经验，烤房调度靠熟人打听，维修靠电话报修，养护无考核，投资靠感觉，无法适应现代烟叶生产的高效要求。而新兴的大数据、人工智能技术为烤房全链条管理提供了全新可能。
+    </p>
+
+    <p>
+        项目组通过实地走访、问卷调研和数据分析，梳理了两种管理模式的优劣势，并运用 <span class="highlight">SWOT分析法</span> 进行系统评估，如下表所示。
+    </p>
+
+    <!-- 表1-4 SWOT分析 -->
+    <div class="table-wrap">
+        <table class="swot-table" id="tableSwot">
+            <caption style="caption-side:bottom; margin-top:0.3rem; font-weight:600; color:#1a4b74;">表1-4 两种烤房管理模式SWOT分析</caption>
+            <thead>
+                <tr><th>模式</th><th>优势 (Strength)</th><th>劣势 (Weakness)</th><th>机会 (Opportunity)</th><th>威胁 (Threat)</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>人工经验管理</strong></td>
+                    <td contenteditable="true">1. 操作门槛低，无需培训<br>2. 表格台账易上手</td>
+                    <td contenteditable="true">1. 数据零散，无法共享<br>2. 调度低效，响应慢<br>3. 决策无量化依据</td>
+                    <td contenteditable="true">1. 可逐步培养人员数据意识<br>2. 适应小规模生产</td>
+                    <td contenteditable="true">1. 无法适应规模化发展<br>2. 资源浪费严重<br>3. 人才流失后经验断层</td>
+                </tr>
+                <tr>
+                    <td><strong>数据算法智能管理</strong></td>
+                    <td contenteditable="true">1. 资源统一调度，利用率高<br>2. 故障预警，快速响应<br>3. 投资决策精准量化</td>
+                    <td contenteditable="true">1. 初期建设成本较高<br>2. 需要数据积累和模型训练</td>
+                    <td contenteditable="true">1. 符合数字化转型趋势<br>2. 可复制推广，形成标杆<br>3. 数据资产长期增值</td>
+                    <td contenteditable="true">1. 数据安全与隐私风险<br>2. 依赖信息化基础设施<br>3. 人员适应新系统需过程</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="table-caption">💡 点击表格内文字可编辑，修改后不影响图表</div>
+    </div>
+
+    <p>
+        通过SWOT分析可见，虽然智能管理前期投入较大，但其在资源调度效率、响应速度、决策科学性等方面具有压倒性优势，且契合行业数字化转型的战略方向。目前，行业内虽有部分单位尝试烤房信息化，但多停留在数据采集层面，缺乏深度算法模型和全链条闭环。本项目组依托秭归县2422座烤房全量排查数据，拥有扎实的数据基础，并具备自主建模与系统开发能力，可完全自主研发，避免高昂的外包费用。
+    </p>
+
+    <p>
+        为此，项目组确定研究课题为 <strong>《大数据算法赋能烤房智享智投全链条解决方案》</strong>，旨在构建“智用+智投”双核心体系，以算法模型驱动烤房调剂、抢修、养护、投资、培育全场景智能化升级，彻底破解烤房管理难题，为烟叶生产提质增效提供坚实支撑。
+    </p>
+
+    <div class="footnote">
+        ※ 本部分数据基于宜昌市烟草公司烟叶生产科、秭归县烟草专卖局（营销部）2024—2025年调研统计，部分为模拟推算，仅用于方案论证。表格数据可编辑，修改后点击“更新图表”按钮同步图表。
+    </div>
+
+</div>
+
+<script>
+    // 存储图表实例以便更新
+    let chartGap, chartOwnership, chartFault, chartResponse;
+
+    // 初始化所有图表
+    function initCharts() {
+        // 1. 供需缺口柱状图
+        const ctxGap = document.getElementById('gapChart').getContext('2d');
+        const labels = ['秭归', '兴山', '长阳', '五峰', '其他'];
+        const demand = [2100, 850, 650, 550, 380];
+        const available = [1680, 620, 490, 410, 290];
+        chartGap = new Chart(ctxGap, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: '高峰期需求', data: demand, backgroundColor: 'rgba(26, 74, 116, 0.7)', borderColor: '#1a4a74', borderWidth: 1 },
+                    { label: '实际可用', data: available, backgroundColor: 'rgba(230, 120, 50, 0.7)', borderColor: '#d97a2e', borderWidth: 1 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: '烤房数量（座）' } } } }
+        });
+
+        // 2. 产权饼图 (固定数据，不涉及表格)
+        const ctxOwn = document.getElementById('ownershipChart').getContext('2d');
+        chartOwnership = new Chart(ctxOwn, {
+            type: 'pie',
+            data: {
+                labels: ['烟农所有', '村集体所有', '合作社所有'],
+                datasets: [{ data: [45, 32, 23], backgroundColor: ['#2b6a9e', '#4a8ab5', '#8ab3d0'], borderWidth: 1 }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // 3. 故障饼图
+        const ctxFault = document.getElementById('faultChart').getContext('2d');
+        const faultLabels = ['加热设备故障', '温控系统失灵', '风机损坏', '密封老化', '其他'];
+        const faultData = [38, 27, 18, 10, 7];
+        chartFault = new Chart(ctxFault, {
+            type: 'pie',
+            data: {
+                labels: faultLabels,
+                datasets: [{ data: faultData, backgroundColor: ['#c0392b', '#e67e22', '#f1c40f', '#2e86c1', '#7f8c8d'] }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // 4. 维修响应折线图 (固定月份数据)
+        const ctxResp = document.getElementById('responseChart').getContext('2d');
+        chartResponse = new Chart(ctxResp, {
+            type: 'line',
+            data: {
+                labels: ['6月', '7月', '8月', '9月', '10月'],
+                datasets: [{
+                    label: '平均响应天数',
+                    data: [3.2, 4.0, 5.1, 5.8, 4.2],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    tension: 0.2,
+                    fill: true,
+                    pointBackgroundColor: '#c0392b'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: '天数' } } } }
+        });
+    }
+
+    // 更新图表（从表格读取数据）
+    function updateAllCharts() {
+        // 1. 更新供需缺口图：从表1-1读取
+        const table = document.getElementById('tableUtilization');
+        const rows = table.querySelectorAll('tbody tr');
+        // 排除最后合计行（索引5）
+        const labels = [];
+        const demand = [];
+        const available = [];
+        for (let i = 0; i < rows.length - 1; i++) { // 跳过合计行
+            const cells = rows[i].querySelectorAll('td');
+            if (cells.length >= 4) {
+                labels.push(cells[0].innerText.trim());
+                demand.push(parseFloat(cells[2].innerText) || 0);
+                available.push(parseFloat(cells[3].innerText) || 0);
+            }
+        }
+        chartGap.data.labels = labels;
+        chartGap.data.datasets[0].data = demand;
+        chartGap.data.datasets[1].data = available;
+        chartGap.update();
+
+        // 2. 更新故障饼图：从表1-2读取
+        const faultTable = document.getElementById('tableFault');
+        const faultRows = faultTable.querySelectorAll('tbody tr');
+        const faultLabels2 = [];
+        const faultData2 = [];
+        faultRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 2) {
+                faultLabels2.push(cells[0].innerText.trim());
+                faultData2.push(parseFloat(cells[1].innerText) || 0);
+            }
+        });
+        chartFault.data.labels = faultLabels2;
+        chartFault.data.datasets[0].data = faultData2;
+        chartFault.update();
+
+        // 注意：产权饼图、维修响应折线图未关联表格，保持不变（也可根据需要关联）
+        // 可扩展关联其他表格，但此处保留固定数据。
+    }
+
+    // 页面加载后初始化
+    window.onload = function() {
+        initCharts();
+    };
+</script>
+
+</body>
+</html>

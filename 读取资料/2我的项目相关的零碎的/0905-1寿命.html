@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>烤房寿命预测升级方案 · 逐部件短板融合</title>
+    <style>
+        :root {
+            --green: #0a624d;
+            --deep: #163c34;
+            --muted: #63756f;
+            --orange: #d9822b;
+            --red: #bf4c3d;
+            --line: rgba(18, 88, 66, .16);
+            --card: rgba(255,255,255,.9);
+            --shadow: 0 12px 34px rgba(31, 82, 62, .10);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 10% 6%, rgba(217,130,43,.18), transparent 28%),
+                radial-gradient(circle at 90% 10%, rgba(10,98,77,.16), transparent 32%),
+                linear-gradient(180deg, #fbfcf7 0%, #eef7ee 54%, #fff8ed 100%);
+            font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--deep);
+            line-height: 1.75;
+            padding: 20px;
+        }
+        .wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        header {
+            padding: 40px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #0a4438, #0e7658 62%, #d9822b);
+            color: white;
+            box-shadow: 0 20px 58px rgba(21, 76, 56, .18);
+            margin-bottom: 30px;
+        }
+        .eyebrow { letter-spacing: .18em; color: #ddf4e4; font-weight: 700; }
+        h1 { margin: 10px 0 12px; font-size: 38px; line-height: 1.2; }
+        header p { max-width: 900px; margin: 0; color: #f2fff3; font-size: 17px; }
+        section {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        h2 {
+            margin: 0 0 16px;
+            color: var(--green);
+            font-size: 26px;
+            border-bottom: 2px solid #e8f0e8;
+            padding-bottom: 8px;
+        }
+        h3 {
+            margin: 20px 0 10px;
+            font-size: 20px;
+            color: #1f5a4a;
+        }
+        h4 {
+            margin: 16px 0 6px;
+            font-size: 17px;
+            color: #2b6b58;
+        }
+        p { margin: 8px 0; }
+        .lead {
+            border-left: 6px solid var(--green);
+            background: #e8f4ec;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-size: 17px;
+            margin: 12px 0;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .box {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 16px 20px;
+            background: #fbfdf9;
+        }
+        .formula {
+            font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+            white-space: pre-wrap;
+            background: #12372f;
+            color: #effff2;
+            border-radius: 16px;
+            padding: 16px 18px;
+            overflow-x: auto;
+            line-height: 1.7;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        .formula .hl { color: #ffe08a; }
+        .formula .hlg { color: #7de3a8; }
+        .formula .hlb { color: #9cc0ff; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #d8e8dc;
+            padding: 9px 12px;
+            vertical-align: top;
+        }
+        th { background: #eaf4ed; color: #104b3d; text-align: left; }
+        tr:nth-child(even) td { background: #fbfdf9; }
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: #e7f4ed;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .tag.orange { background: #fff0dc; color: #b96616; }
+        .tag.red { background: #fdecea; color: var(--red); }
+        .note {
+            border-radius: 16px;
+            padding: 14px 18px;
+            border: 1px solid rgba(217,130,43,.28);
+            background: #fff7e8;
+            margin: 14px 0;
+        }
+        .footnote {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 20px;
+            border-top: 1px solid var(--line);
+            padding-top: 16px;
+        }
+        @media (max-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            header { padding: 24px; }
+            h1 { font-size: 28px; }
+            section { padding: 20px; }
+            body { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- ========== 头部 ========== -->
+    <header>
+        <div class="eyebrow">🔧 升级寿命预测 · 基于最新健康分</div>
+        <h1>烤房剩余寿命：从“整栋一个数”到“逐部件短板融合”</h1>
+        <p>
+            本方案将寿命预测从仅依赖整栋健康分反推，升级为<strong>逐部件计算剩余年限 + 短板约束 + 健康分校准</strong>。
+            我们详细解释每一步的“为什么”——包括退化曲线选择、维修重置、数据兜底，以及最终如何合成整栋剩余寿命。
+        </p>
+    </header>
+
+    <!-- ========== 一、现状回顾 ========== -->
+    <section>
+        <h2>一、现有寿命预测（BDRL）的工作原理</h2>
+        <p>
+            当前系统默认使用“最终版 BDRL”（双段退化）。它的核心是：用整栋烤房的健康分 <code>health_score_final</code> 反推一个“等效健康年龄”，再外推到失效阈值，得到剩余寿命。
+        </p>
+        <div class="grid-2">
+            <div>
+                <h3>📌 核心思路</h3>
+                <ul>
+                    <li><strong>输入：</strong>建设年份、当前健康分（0~100）。</li>
+                    <li><strong>假设：</strong>烤房健康退化先线性（稳定期），后加速（劣化期）。</li>
+                    <li><strong>转折点：</strong>8年时健康分降至60，理论寿命终点12年，失效阈值40分。</li>
+                    <li><strong>维修延寿：</strong>每修一次，理论终点延长2.5年。</li>
+                </ul>
+            </div>
+            <div>
+                <h3>📉 曲线形状</h3>
+                <div class="formula" style="font-size:13px;">
+前段（0～8年）：健康分 = 100 – 5×房龄
+后段（8年后）：健康分 = 60 × [1 – ((房龄–8)/(理论终点–8))²]
+                </div>
+                <p style="font-size:14px; color:var(--muted);">
+                    然后用实际健康分与理论值比较，若实际更高，则按比例延长剩余寿命。
+                </p>
+            </div>
+        </div>
+        <div class="note">
+            <strong>✅ 优点：</strong>不再按物理年龄一刀切，老房若维护好也能延寿。<br>
+            <strong>❌ 不足：</strong>只看整栋平均分，掩盖了“自控仪6年就坏、烟夹5年老化”这类部件级差异，无法回答“具体该修哪个部件”。
+        </div>
+    </section>
+
+    <!-- ========== 二、升级思路 ========== -->
+    <section>
+        <h2>二、升级方案：逐部件预测 + 短板约束</h2>
+        <p class="lead">
+            每一栋烤房由多个部件组成，每个部件有自己的<strong>指导寿命、修复记录、当前状态</strong>。
+            真正的寿命瓶颈，往往是最先到期的那个部件。我们把每个部件的剩余年限算出来，再合成整栋寿命。
+        </p>
+        <div class="grid-2">
+            <div>
+                <h3>🔹 部件层（L1）</h3>
+                <p>对每个主要部件（加热器、散热管、自控仪、主体等）：</p>
+                <ul>
+                    <li>读取其<strong>指导使用年限</strong>（如自控仪6年，散热管15年）。</li>
+                    <li>计算<strong>已用年限</strong> = 当前年份 – max(部件修复年份, 该部件最近维修完工年份)。</li>
+                    <li>结合<strong>状态系数</strong>（正常/异常/损坏/缺失）进行修正。</li>
+                    <li>加上<strong>维修激励</strong>（每修一次额外延长一定年限）。</li>
+                    <li>得出该部件<strong>剩余年限</strong>。</li>
+                </ul>
+            </div>
+            <div>
+                <h3>🔹 整栋合成（L2）</h3>
+                <p>用两种视角融合：</p>
+                <ul>
+                    <li><strong>短板约束</strong>：最脆弱的部件决定整栋下限（权重60%）。</li>
+                    <li><strong>部位整体水平</strong>：四大部位（加热/散热/自控/主体）加权平均（权重40%）。</li>
+                    <li>再用<strong>最新健康分</strong>做校准，健康分高说明综合状态更可靠，健康分低则压缩剩余寿命。</li>
+                    <li>输出<strong>整栋剩余寿命、最紧迫部件、预计退役年份</strong>，便于直接安排维修。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 三、部件退化曲线 ========== -->
+    <section>
+        <h2>三、部件退化曲线：为什么选用“双段式”</h2>
+        <p>
+            设备老化通常不是匀速的：<strong>早期稳定，后期加速</strong>。比如自控仪前3年故障率低，5年后急剧上升。
+            为此我们采用<strong>双段退化曲线</strong>，与健康分中的CDCI曲线同源，但直接用于“剩余年限”计算。
+        </p>
+        <div class="grid-2">
+            <div>
+                <h4>📈 曲线公式（用于部件剩余年限）</h4>
+                <div class="formula" style="font-size:13px;">
+已用年限 A = 今年 – 修复/建成年份
+指导寿命 T（查表）
+若 A ≤ 0.2T → 稳定期，剩余 = T–A（无衰减）
+若 0.2T < A ≤ 0.7T → 线性衰减，剩余 = (T–A) × (0.7 – A/T)/0.5
+若 A > 0.7T → 加速衰减，剩余 = (T–A) × 0.3 × exp(–2×(A–0.7T)/T)
+                </div>
+                <p style="font-size:14px; color:var(--muted);">
+                    <strong>为什么这样分段？</strong> 前20%寿命基本无损耗，中间50%缓慢下降，最后30%急剧劣化，贴合机械电子设备实际。
+                </p>
+            </div>
+            <div>
+                <h4>🛠️ 状态修正 &amp; 维修重置</h4>
+                <ul>
+                    <li><strong>状态系数 S</strong>：正常1.0，异常0.7，损坏0.3，缺失0（直接失效）。</li>
+                    <li><strong>维修重置</strong>：若部件在维修台账中有最近完工记录，则已用年限从该完工年算起，相当于“回春”。</li>
+                    <li><strong>维修激励</strong>：每修一次额外增加1.5年（鼓励维护）。</li>
+                </ul>
+                <div class="formula" style="font-size:13px;">
+部件剩余年限 rᵢ = max(0, 退化剩余 × Sᵢ) + 维修次数×1.5
+                </div>
+                <p style="font-size:14px; color:var(--muted);">
+                    这样，修过的部件剩余年限会明显回升，与“修了就年轻”的直观感受一致。
+                </p>
+            </div>
+        </div>
+        <div class="note">
+            <strong>📌 数据不完整兜底：</strong>若某部件缺状态、缺修复年或缺部件记录，则按<strong>5年</strong>作为指导寿命。缺修复年度时暂按已用0年，状态缺失时状态系数取1.0，并标记“待补采/5年兜底”。这样避免因为缺采集把老烤房直接算成寿命耗尽。
+        </div>
+    </section>
+
+    <!-- ========== 四、整栋合成公式 ========== -->
+    <section>
+        <h2>四、整栋剩余寿命的合成公式</h2>
+        <div class="formula">
+<strong>步骤1：</strong> 计算每个部件的剩余年限 rᵢ（如上）。
+<strong>步骤2：</strong> 计算结构短板 R_b
+    min_r = min(所有参与部件的 rᵢ)                    // 最弱部件
+    部件加权平均 R_avg = Σ(Wᵢ × rᵢ) / ΣWᵢ
+    当前结构化部件总权重：80分
+    R_b = 0.6 × min_r + 0.4 × R_avg                  // 短板主导
+
+<strong>步骤3：</strong> 用最新健康分 h 校准
+    F_h = clamp(0.75 + h/400, 0.60, 1.10)
+    健康分100 → F_h=1.00；健康分60 → F_h=0.90；健康分40 → F_h=0.85
+
+<strong>步骤4：</strong> 输出整栋剩余寿命
+    RUL_final = clamp(R_b × F_h, 0, 15)
+    预计退役年份 = 当前年份 + ceil(RUL_final)
+        </div>
+        <p>
+            <strong>为什么不用旧BDRL融合？</strong> 当前健康分已经融合了部件状态、指导寿命、管护和人工评价；寿命预测再用旧BDRL会重复计算。新口径直接以部件剩余寿命为主，健康分只做校准，更容易解释。
+        </p>
+    </section>
+
+    <!-- ========== 五、示例 ========== -->
+    <section>
+        <h2>五、真实示例：一栋2010年烤房（健康分78）</h2>
+        <p>
+            假设某烤房建于2010年，当前2026年，最新健康分78。主要部件及修复情况如下表。
+            我们用升级算法计算整栋剩余寿命，并明确最紧迫部件。
+        </p>
+        <table>
+            <thead><tr><th>部件</th><th>指导寿命</th><th>最近修复年</th><th>已用年限</th><th>状态</th><th>维修次数</th><th>退化剩余</th><th>部件 rᵢ</th></tr></thead>
+            <tbody>
+                <tr><td>加热器(内置)</td><td>12</td><td>2020</td><td>6</td><td>正常</td><td>1</td><td>6.0</td><td>6.0</td></tr>
+                <tr><td>散热管</td><td>12</td><td>2018</td><td>8</td><td>正常</td><td>0</td><td>4.0</td><td>4.0</td></tr>
+                <tr><td>自控仪</td><td>6</td><td>2024</td><td>2</td><td>正常</td><td>2</td><td>4.0</td><td>4.0</td></tr>
+                <tr><td>屋顶(加盖)</td><td>15</td><td>2010</td><td>16</td><td>异常</td><td>0</td><td>0</td><td>0</td></tr>
+                <tr><td>大门</td><td>5年兜底</td><td>—</td><td>0</td><td>待补采</td><td>0</td><td>5.0</td><td>5.0</td></tr>
+            </tbody>
+        </table>
+        <p style="font-size:14px; color:var(--muted);">
+            * 大门缺修复记录，不按2010年建设年直接扣完，而是按5年兜底、已用0年、待补采处理。
+        </p>
+        <div class="formula">
+<strong>计算结构短板 R_b：</strong>
+min_r = 0（屋顶/墙体）  →  0.6×0 = 0
+部件加权平均：R_avg≈4.1年
+R_b = 0.6×0 + 0.4×4.1 = 1.64 年
+
+<strong>健康分校准：</strong>
+F_h = 0.75 + 78/400 = 0.945
+RUL_final = 1.64×0.945 ≈ 1.6 年
+预计退役年份 = 2026 + ceil(1.6) = 2028年
+
+<strong>预警等级：</strong>建议维修（0~4年），重点原因：屋顶/墙体寿命为0，散热管和自控仪也进入4年内。
+        </div>
+        <p>
+            <strong>解释：</strong>整栋寿命不是平均出来的乐观值，而是被最短板部件压住。页面应展示“整栋剩余寿命、短板寿命、部件均值、预计退役年、最紧迫部件TOP3”。
+        </p>
+    </section>
+
+    <!-- ========== 六、与健康分的联动 ========== -->
+    <section>
+        <h2>六、与最新健康分算法的联动</h2>
+        <p>
+            健康分升级后已变为<strong>逐部件加权归一化</strong>（80%部件 + 10%管护 + 10%人工），且每个部件有独立的指导寿命、修复年份和状态。
+            寿命预测直接复用同一套部件台账，因此二者完全同步：
+        </p>
+        <ul>
+            <li><strong>健康分</strong>反映“当前综合健康程度”。</li>
+            <li><strong>剩余寿命</strong>反映“按当前状态还能用多久”。</li>
+            <li>部件级别的健康和寿命一一对应，修了哪里，健康和寿命同时改善。</li>
+        </ul>
+        <div class="note">
+            <strong>数据一致性：</strong>部件指导寿命表、状态判定、维修归类逻辑与健康分完全共用，避免口径冲突。
+        </div>
+    </section>
+
+    <!-- ========== 七、总结 ========== -->
+    <section>
+        <h2>七、升级前后对比 &amp; 给评委的一句话</h2>
+        <div class="grid-2">
+            <div class="box" style="background:#fdecea; border-color:var(--red);">
+                <h4 style="color:var(--red);">升级前（BDRL）</h4>
+                <ul>
+                    <li>仅依赖整栋健康分反推</li>
+                    <li>掩盖短寿部件</li>
+                    <li>不能回答“先修哪”</li>
+                    <li>数据不全时无明确兜底</li>
+                </ul>
+            </div>
+            <div class="box" style="background:#e8f4ec; border-color:var(--green);">
+                <h4 style="color:var(--green);">升级后（逐部件短板融合）</h4>
+                <ul>
+                    <li>每个部件独立计算剩余年限</li>
+                    <li>短板决定整栋下限</li>
+                    <li>明确风险部位排序</li>
+                    <li>数据不全按5年保守兜底</li>
+                </ul>
+            </div>
+        </div>
+        <p style="font-size:18px; font-weight:600; color:var(--green); margin-top:12px;">
+            “寿命预测不再是整栋给一个平均答案，而是让每个部件用它的指导寿命和修复记录告诉我们还能用多久——最短的板决定了整栋的剩余寿命，修好短板，寿命自然延长。”
+        </p>
+        <div class="footnote">
+            <strong>参考依据：</strong> 0905健康分算法（逐部件+归一化+兜底）、当前BDRL算法、部件指导年限表（加热/散热/自控/主体等）。本方案已统一口径，可直接落库。
+        </div>
+    </section>
+
+</div>
+</body>
+</html>

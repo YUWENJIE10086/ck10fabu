@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>烟农画像与培育算法详解 - 五维雷达画像＋知识薄弱定位</title>
+  <style>
+    :root{
+      --bg:#f5faf5; --card:#ffffff; --ink:#17382f; --sub:#5f6f69;
+      --green:#2e7d32; --green2:#dff0da; --greenDeep:#0f241f;
+      --teal:#11888a; --teal2:#dff3f2; --orange:#f47721; --orange2:#fce8d8;
+      --blue:#2f6fbb; --blue2:#e4effb; --line:#d6e0d6; --red:#c94c44; --red2:#fbe6e4;
+      --purple:#7b5ea7; --purple2:#efe9f8; --shadow:0 8px 24px rgba(23,56,47,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:radial-gradient(circle at 12% 0%, rgba(46,125,50,.09), transparent 24%),
+                 radial-gradient(circle at 88% 4%, rgba(17,136,138,.09), transparent 22%),var(--bg);
+      color:var(--ink);line-height:1.74}
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 60px}
+    .hero{background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));border:1px solid var(--line);border-radius:24px;padding:30px 34px;box-shadow:var(--shadow)}
+    h1{margin:0 0 8px;font-size:30px;line-height:1.3}
+    .sub{color:var(--sub);font-size:15px;max-width:1000px}
+    .timestamp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--green2);color:var(--green);font-size:12.5px;font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+    .chip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:var(--sub)}
+    .chip b{color:var(--green)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 20px 18px;box-shadow:var(--shadow)}
+    .span6{grid-column:span 6}.span7{grid-column:span 7}.span5{grid-column:span 5}.span12{grid-column:span 12}.span4{grid-column:span 4}.span8{grid-column:span 8}
+    h2{font-size:20px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+    h2 .s{font-size:11.5px;background:var(--greenDeep);color:#d7f6e5;border-radius:8px;padding:3px 10px;font-weight:600;white-space:nowrap}
+    h2 .s.o{background:var(--orange);color:#fff}
+    h2 .s.b{background:#2f6fbb;color:#fff}
+    h2 .s.p{background:#7b5ea7;color:#fff}
+    h3{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+    p,li{font-size:14px;margin:8px 0}
+    ul{margin:6px 0 8px 18px;padding:0}
+    .box{border-left:4px solid var(--green);background:#f8fcf7;padding:12px 14px;border-radius:14px;margin:12px 0}
+    .box.orange{border-color:var(--orange);background:#fffaf5}
+    .box.blue{border-color:var(--blue);background:#f7fbff}
+    .box.red{border-color:var(--red);background:var(--red2)}
+    .box.purple{border-color:var(--purple);background:#faf7fd}
+    .box .h{font-weight:700;margin-bottom:6px}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--greenDeep);color:#d7f6e5;border-radius:16px;padding:14px 16px;overflow:auto;font-size:13.5px;line-height:1.9;white-space:pre-wrap}
+    .formula .g{color:#7de3a8}.formula .o{color:#ffb27d}.formula .c{color:#6f8f83}.formula .b{color:#9cc0ff}
+    table{width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13px}
+    th{background:#eef5ef;color:var(--ink);font-weight:700;padding:8px 10px;text-align:left;border-bottom:2px solid #d3e3d3}
+    td{padding:7px 10px;border-bottom:1px solid #eef2ee}
+    tr:nth-child(even) td{background:#fafcfa}
+    .num{font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+    .pill.g{background:var(--green2);color:var(--green)}
+    .pill.o{background:var(--orange2);color:var(--orange)}
+    .pill.r{background:var(--red2);color:var(--red)}
+    .pill.b{background:var(--blue2);color:var(--blue)}
+    .pill.p{background:var(--purple2);color:var(--purple)}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .step{border:1px solid var(--line);border-radius:14px;padding:11px;background:#fff;min-height:96px;position:relative}
+    .step .no{position:absolute;top:9px;right:10px;font-size:11px;background:var(--green2);color:var(--green);border-radius:999px;padding:1px 8px;font-weight:700}
+    .step .t{font-weight:700;font-size:13px;margin-bottom:3px}
+    .step .d{font-size:12px;color:var(--sub)}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+    .kpi>div{padding:14px;border-radius:16px;background:linear-gradient(180deg,#fff,var(--green2));border:1px solid #d8e8d4}
+    .kpi b{display:block;font-size:22px;color:var(--green)}
+    .kpi span{font-size:12.5px;color:var(--sub)}
+    .note{color:var(--sub);font-size:12.5px}
+    .footer{margin-top:20px;color:var(--sub);font-size:12px;text-align:center}
+    .hl{background:linear-gradient(120deg,#fff3a0,#ffe27a);padding:0 4px;border-radius:4px}
+    .hlg{background:linear-gradient(120deg,#d7f6e5,#bfe9cd);padding:0 4px;border-radius:4px}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;background:var(--green2);color:var(--green);margin-right:6px}
+    code{background:#eef2ee;border-radius:6px;padding:1px 6px;font-size:12.5px;color:#b32525;font-family:ui-monospace,Menlo,monospace}
+    .radar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:8px}
+    .rad-col{background:linear-gradient(180deg,#fff,var(--purple2));border:1px solid #e1d7ef;border-radius:16px;padding:12px;text-align:center}
+    .rad-col .lab{font-size:12.5px;font-weight:600;color:var(--purple)}
+    .rad-col .val{font-size:24px;font-weight:800;color:var(--ink);margin:4px 0}
+    .rad-col .metal{height:8px;background:#e9e1f2;border-radius:99px;overflow:hidden;margin-top:6px}
+    .rad-col .metal span{display:block;height:100%;background:linear-gradient(90deg,var(--purple),#c0a4e0);border-radius:99px}
+    .ring{display:inline-grid;place-items:center;width:120px;height:120px;border-radius:50%;font-weight:800;font-size:24px;color:#fff;background:conic-gradient(var(--green) 0deg, #d7e8d4 0deg)}
+    .reddot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);margin-right:5px}
+    .yellowdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8a714;margin-right:5px}
+    @media (max-width:980px){.span3,.span4,.span5,.span6,.span7,.span8,.span12,.three,.two,.flow,.radar,.kpi{grid-column:span 12;grid-template-columns:1fr}.grid{grid-template-columns:1fr}.wrap{padding:16px}.hero{padding:20px}h1{font-size:24px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= 页首 ================= -->
+  <section class="hero">
+    <h1>烟农画像与培育算法详解</h1>
+    <div class="sub">回答"<b>哪些烟农、哪方面知识最薄弱、该去哪、上什么课</b>"。依据项目现有烟农台账（<code>2026年烟农信息.xlsx</code> → 烟农列表）与 <b>700 户烟农知识问卷</b>，把问卷答题转成五维雷达画像，把薄弱点逐级定位到<b>站 → 村 → 磅组 → 烟农</b>，并自动生成上门辅导、现场会、课程与物资匹配建议——让烟农培育从"大水漫灌"走向"按需精准"。</div>
+    <div class="timestamp">📅 文档生成：2026-09-01（算法模型0901 系列 · 第4篇）｜对齐 BI 大屏"烟农培育"新页</div>
+    <div class="chips">
+      <span class="chip">数据输入 · <b>700 户问卷（35 题）+ 烟农台账（年限/面积/炉次/信用）</b></span>
+      <span class="chip">算法核心 · <b>五维知识画像 + 薄弱缺口定位 + 分级培育</b></span>
+      <span class="chip">落地 · BI 大屏"烟农培育"模块（位于烤房新建之下）</span>
+    </div>
+  </section>
+
+  <section class="grid">
+
+    <!-- ============ 0 总览 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">总览</span> 从问卷原始答案 → 一份可落地的培育清单</h2>
+      <div class="flow">
+        <div class="step"><span class="no">①</span><div class="t">采集原始数据</div><div class="d">700 户问卷 35 题（23 道知识题＋11 道管护题）＋烟农台账属性</div></div>
+        <div class="step"><span class="no">②</span><div class="t">五维拆题计分</div><div class="d">按 栽培/植保/采烤/烘烤/综合 5 维聚合，答对数→0-100</div></div>
+        <div class="step"><span class="no">③</span><div class="t">画像合成与分级</div><div class="d">五维加权画像分 P，叠加培训/实绩/评价修正，分职业/普通/新手</div></div>
+        <div class="step"><span class="no">④</span><div class="t">薄弱缺口定位</div><div class="d">站·村·磅组×五维"红黄绿"矩阵，差值 &gt; 阈值即标红</div></div>
+        <div class="step"><span class="no">⑤</span><div class="t">培育动作输出</div><div class="d">课程/现场会/上门辅导/物资/教练，生成名单＋优先级＋复盘机制</div></div>
+      </div>
+      <div class="box blue">
+        <div class="h">为什么用"问卷＋画像"而不是简单统计平均分？</div>
+        <p>你已阅的《一份调查问卷引发的智与谋》已经把 35 道题的结构、以及"柏家坪村栽培维偏弱→要做栽培现场会"的用法讲清了。本算法要做的，是把这条经验<b>模型化、可复算、可下钻</b>：同一份问卷结果，既能算一张<b>个人</b>雷达图，也能上卷形成<b>磅组、村、站</b>的集体薄弱点，还能直接落到"<b>上哪门课、派谁上门、先辅导谁</b>"——给评委一条完整、量化的决策链。</p>
+      </div>
+    </div>
+
+    <!-- ============ 1 数据来源 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 1 步</span> 数据从哪来：两份库 + 一套台账</h2>
+      <div class="three">
+        <div class="box">
+          <div class="h">① 问卷知识库（新采集）</div>
+          <p>700 户问卷共 <b>35 题</b>：<b>23 道趣味知识答题</b>覆盖栽培、植保、采烤(采收)、烘烤等 <b>5 个知识维度</b>；<b>11 道</b>针对烤房设施与管护需求的题（了解烟农最担心关注的管护困难）；其余为综合/属性题。答对给分、答错 0 分。</p>
+          <p class="note">知识题 → 直接计入五维知识分；管护题 → 进"综合维"与管护需求画像；属性题 → 进烟农分级。</p>
+        </div>
+        <div class="box">
+          <div class="h">② 烟农台账库（现有）</div>
+          <p>复用项目已有烟农列表（前端 <code>farmer.ts</code>，对应 2026 烟农信息）：<b>村/乡镇(area)、磅组(poundGroupName)、种烟年限(plantingYears)、种植面积(plantingArea)、累计烘烤炉次(totalBakes)、信用等级(creditLevel/creditScore)</b>。这些字段补足问卷测不出的"熟练度与规模"。</p>
+        </div>
+        <div class="box">
+          <div class="h">③ 行为/实绩数据（可选，做修正项）</div>
+          <p>近三年烘烤实绩（上等烟比例、烤坏率）、服务评价与整改完成情况、培训到场率。本项目有此方向数据时叠加，增强画像的"真需求"。</p>
+        </div>
+      </div>
+
+      <h3>五维知识维度与建议拆题（评职称可解释的定题依据）</h3>
+      <table>
+        <thead><tr><th>维度</th><th>维度含义</th><th>问卷知识题示例</th><th>基础权重 w<sub>d</sub></th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill g">栽培</span></td><td>育苗、壮苗、移栽、田管与旺长调控</td><td>最佳移栽密度？旺长期水肥如何管？</td><td class="num">0.18</td></tr>
+          <tr><td><span class="pill p">植保</span></td><td>主要病虫害识别、绿色防控、统防统治</td><td>病毒病传播途径？生物药剂怎么用？</td><td class="num">0.18</td></tr>
+          <tr><td><span class="pill b">采烤</span></td><td>成熟度采收、编竿/上炕、部位烟分层</td><td>下部叶适熟标准？编竿怎么分色号？</td><td class="num">0.19</td></tr>
+          <tr><td><span class="pill o">烘烤</span></td><td>温湿度曲线、定色转火、烤房设备操作</td><td>湿球温度偏高怎么调？如何判断失水转火？</td><td class="num">0.25</td></tr>
+          <tr><td><span class="pill r">综合</span></td><td>管护制度、调剂/抢修流程、政策与信用</td><td>集中管护怎么配合？报修走哪条通道？</td><td class="num">0.20</td></tr>
+        </tbody>
+      </table>
+      <p class="note">权重设计理由：<b>烘烤直接决定烟叶商品性状与收益</b>权重最高 0.25；采烤次之 0.19；综合维是平台落地能力（管护/调剂/政策）给 0.20；栽培、植保各 0.18。合计 = 1.00。若某维无题，可把该维权重按比例并入其他维（下钻时单独标记"本维样本不足"）。</p>
+    </div>
+
+    <!-- ============ 2 计分 ============ -->
+    <div class="card span12">
+      <h2><span class="s">第 2 步</span> 问卷计分 → 五维标准化知识分</h2>
+      <div class="two">
+        <div class="formula">对第 p 位烟农、第 d 个维度：
+K<sub>pd</sub> = (该维答对题数 ÷ 该维总题数) × 100
+例：栽培维共 4 题，答对 3 → K<sub>栽培</sub> = 3/4 × 100 = 75
+
+村级第 d 维汇总：K̄<sub>村d</sub> = mean(该村所有作答烟农的 K<sub>pd</sub>)
+县级基准：m<sub>d</sub> = mean(全县该维答对率)×100
+<span class="c">// 0-100 连续分，满 100 表示该维全对</span></div>
+        <div class="box blue">
+          <div class="h">计分口径的两个约定（避免被问倒）</div>
+          <ul>
+            <li><b>答对即 1、答错即 0</b>，不做歧义选项加权，保证可复算；</li>
+            <li><b>"不会/跳过"按错计</b>（问卷知识题设计为必答，跳过视为未掌握），让"不知道"如实反映到低分；</li>
+            <li>每户未填卷的维度不纳入村均值分母，避免有人漏答把整村拉低。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 3 画像合成 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">第 3 步</span> 画像分合成与烟农分级（职业/普通/新手）</h2>
+      <div class="two">
+        <div>
+          <div class="formula">① 五维加权知识分：P<sub>知识</sub> = Σ<sub>d</sub> w<sub>d</sub>·K<sub>d</sub>
+② 修正画像分（可叠加行为修正项）：
+P = 0.60·P<sub>知识</sub> + 0.15·P<sub>培训</sub> + 0.15·P<sub>实绩</sub> + 0.10·P<sub>评价</sub>
+<span class="c">P_培训=到场×次数归一；P_实绩=上等烟占比/烤坏率修正；P_评价=服务整改率</span>
+
+③ 烟农分级：
+P ≥ 85 且 种烟年限 ≥ 5 且 面积 ≥ 20 亩 → <span class="o">职业烟农(示范引领)</span>
+60 ≤ P &lt; 85 → <span class="b">普通烟农(常规培育)</span>
+P &lt; 60 或 种烟年限 &lt; 3 → <span class="o">新手烟农(重点强补)</span></div>
+          <p class="note">画像分 P 与健康分同是 0-100 尺度，风格统一，评委能一眼看出"同一套管理语言"。</p>
+        </div>
+        <div class="box">
+          <div class="h">为什么加修正项，而不是只看问卷？</div>
+          <ul>
+            <li><b>问卷有"会答与会用"的偏差</b>——有人书面答得好但实烤稀烂（烤坏烟），用实绩项 0.15 校准"真本事"；</li>
+            <li><b>培育要讲投入产出</b>——知识薄弱但规模大的烟农许产许损，用规模/炉次放大其优先级；</li>
+            <li><b>积分制可滚动</b>——每次培训到场、复测提升都回流到 P_培训/P_评价，形成"培育闭环"。若暂无行为数据，可退化为 P=P<sub>知识</sub>（上方六三幺权重仅在有数据时启用）。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 4 薄弱定位 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">第 4 步（核心差异化）</span> 薄弱缺口定位：把"弱"钉到站·村·磅组·个人</h2>
+      <div class="box red">
+        <div class="h">缺口定量（这是本算法的"差异化灵魂"）</div>
+        <div class="formula">村/磅组第 d 维缺口：I<sub>d</sub> = m<sub>d县</sub> − K̄<sub>d村/磅组</sub>
+判定薄弱：K̄<sub>d</sub> &lt; 60（明显不会）<span class="o">或</span> I<sub>d</sub> &gt; 15（明显落后于全县）
+薄弱优先级：Priority = 0.5×(100 − K̄<sub>d</sub>) + 0.3×φ规模 + 0.2×L承载
+<span class="c">// φ规模=该村烟农户占比/炉次数；L=该村烤房负载率（复用新建模型）</span>
+最弱维度 WeakDim = min<sub>d</sub>(K̄<sub>d</sub>)  → 用于定现场会主题</div>
+      </div>
+      <div class="two">
+        <div>
+          <h3>四级下钻：站 → 村 → 磅组 → 烟农</h3>
+          <table>
+            <thead><tr><th>层级</th><th>看什么</th><th>产出</th></tr></thead>
+            <tbody>
+              <tr><td>站</td><td>该站各维均值 vs 全县</td><td>该站下一年度培训大纲侧重</td></tr>
+              <tr><td>村</td><td>村×五维矩阵红绿灯</td><td>该村现场会主题 + 是否上门</td></tr>
+              <tr><td>磅组</td><td>磅组内 weakest 维</td><td>上门辅导名单 + 技术员指派</td></tr>
+              <tr><td>烟农</td><td>个人五维雷达</td><td>个人课程包 + 复测计划</td></tr>
+            </tbody>
+          </table>
+          <p class="note">红黄绿灯：绿=该维 ≥ 县均值；黄=低于县均值但 ≥ 60；红=低于县均值且 &lt; 60 或缺口 &gt; 15。</p>
+        </div>
+        <div>
+          <h3>五维薄弱→培育主题自动映射</h3>
+          <table>
+            <thead><tr><th>薄弱维</th><th>对应课程 / 现场会主题</th><th>匹配物资/服务</th></tr></thead>
+            <tbody>
+              <tr><td><span class="pill g">栽培</span></td><td>壮苗培育·大田移栽·水肥管护现场会</td><td>育苗基质、水肥一体化指导</td></tr>
+              <tr><td><span class="pill p">植保</span></td><td>绿色防控·统防统治·病毒病防治</td><td>生物药剂、诱虫板/性诱剂</td></tr>
+              <tr><td><span class="pill b">采烤</span></td><td>成熟采收标准·编竿上炕工艺</td><td>编烟架、采收分色号教具</td></tr>
+              <tr><td><span class="pill o">烘烤</span></td><td>烘烤温湿度曲线·定色转火现场会</td><td>烘烤师带徒、温湿度计校准</td></tr>
+              <tr><td><span class="pill r">综合</span></td><td>管护制度宣贯·调剂/抢修平台操作·政策解读</td><td>养护券、平台操作二维码</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 5 培育动作 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">第 5 步</span> 把画像变成可执行动作：上门辅导、现场会、课程与授信</h2>
+      <div class="three">
+        <div class="box green">
+          <div class="h">上门辅导名单（个人级）</div>
+          <div class="formula">入选：短板维 &lt; 60 且 Priority 靠前
+输出：烟农姓名·磅组·短板维·建议课程·技术员·上门日期·复盘复测日
+跟随：种植年限 &lt; 3 的新手 → 优先主教保；职业烟农 → 送"进阶小灶"</div>
+        </div>
+        <div class="box orange">
+          <div class="h">现场会与区域培训（村/站级）</div>
+          <div class="formula">主题 = WeakDim(该村/站)
+例：柏家坪村 WeakDim=栽培 → 组织"以栽培为主的现场会"
+适配：黄灯村 → 线上小课＋资料包；红灯村 → 线下现场会＋技术员跟培</div>
+        </div>
+        <div class="box blue">
+          <div class="h">精准赋能与差异化（职业分级）</div>
+          <div class="formula">新手烟农 → 系统性农作物全流程陪跑＋补贴倾斜
+普通烟农 → 按短板维小班教学
+职业烟农 → 进阶技术＋示范片＋可培育为"土专家/烘烤师"
+绩效闭环：培训前→后复测 ΔK<sub>d</sub>，回写画像，形成"画像-培训-复测-再画像"</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="h">一句话：这页"烟农培育"和前面三页算法的关系（给评委的串联）</div>
+        <p>健康分告诉我们<b>烤房好与坏（该修该换）</b>，发展指数告诉我们<b>哪里缺烤房（该在哪建）</b>，烟农画像告诉我们<b>谁、哪方面、在该怎么补课（谁来用、会不会用）</b>——硬件（建/修）、软件（用/管）、人才（培育）三层在数据源上全部打通，统一 0-100 计分语言，形成"建—修—用—育"全链条闭环。</p>
+      </div>
+    </div>
+
+    <!-- ============ 6 真实示例 ============ -->
+    <div class="card span12">
+      <h2><span class="s b">按你给的真实案例演算</span> 磨坪·柏家坪村"栽培薄弱"全程跑一遍</h2>
+      <div class="two">
+        <div class="box red">
+          <div class="h">案例环境（来自你的问卷结论）</div>
+          <div class="formula">磨坪站 · 柏家坪村（示例演算，题数/户数可按实替换）
+· 该村 15 户作答；栽培维 4 题 → 60 个作答格
+· 实测答对 34 格 → K̄̂<sub>栽培</sub> = 34/60 × 100 = <span class="o">56.7</span>
+· 全县栽培均值 m<sub>栽培</sub> = 72
+· 缺口 I<sub>栽培</sub> = 72 − 56.7 = <span class="o">15.3 &gt; 15 且 &lt; 60</span> → 🔴栽培薄弱</div>
+          <p><span class="reddot"></span>该村栽培维即 WeakDim，下钻到磅组，筛选出 3 户栽培分 &lt; 50 的新手户列入上门名单。<span class="note">结论与问卷原文一致：柏家坪村栽培偏弱 → 应针对性开展以栽培为主的现场会。</span></p>
+        </div>
+        <div class="box">
+          <div class="h">个人画像演算（示范户：张烟农）</div>
+          <div class="formula">张：栽培维 K=45，植保 K=70，采烤 K=60，烘烤 K=55，综合 K=80
+P<sub>知识</sub> = 0.18×45+0.18×70+0.19×60+0.25×55+0.20×80
+       = 8.1+12.6+11.4+13.75+16 = <span class="o">61.85</span>
+分级：61.85 ∈ [60,85) 且年限≥3 → <span class="b">普通烟农</span>
+短板：栽培 45 &lt; 60，烘烤 55 &lt; 60 → 建议"栽培+烘烤"小班＋上门
+Priority = 0.5×(100−45) + 0.3×规模0.6 + 0.2×承载0.8 = 27.5+0.18+0.16 ≈ 27.8</div>
+          <p class="note">上层村/站的 K̄ 即每位烟农 K<sub>pd</sub> 的均值，个人→磅组→村→站逐级上卷，口径完全一致。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 7 数据表与落地 ============ -->
+    <div class="card span12">
+      <h2><span class="s o">第 7 步</span> 数据表设计 + 落地改造清单（等你确认再动）</h2>
+      <div class="two">
+        <div>
+          <h3>建议新增两张表（仅新增、不动现有表）</h3>
+          <table>
+            <thead><tr><th>表</th><th>关键字段</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td><code>farmer_question</code><br/>问卷原始明细</td><td>id, farmer_id, dim(维度), question_no, answer, correct(0/1), answered_at</td><td>一题一行，存原始作答，可复算</td></tr>
+              <tr><td><code>farmer_profile</code><br/>画像结果</td><td>farmer_id, k_cult/k_pp/k_hv/k_cur/k_syn, p_score, level, weak_dim, priority, updated_at</td><td>画像分与分级，BI/培育页直接读</td></tr>
+            </tbody>
+          </table>
+          <p class="note">聚合视图（磅组/村/站×五维均值、红黄绿灯、缺口）可由 SQL GROUP BY 生成，不必落脏表。</p>
+        </div>
+        <div>
+          <h3>改造清单（前端 + 后端 + 文档）</h3>
+          <ul>
+            <li><b>后端</b>（新增，不动既有 <code>FarmerController</code> 审核逻辑）：
+              <ul>
+                <li><code>POST /farmer/profile/import-json</code>：问卷结果 JSON 导入（复用现有 xlsx 前端解析思路）；</li>
+                <li><code>GET /farmer/profile</code>：个人画像；<code>GET /farmer/profile/gap</code>：站/村/磅组×五维缺口＋红黄绿＋Priority；</li>
+                <li><code>GET /farmer/profile/train-plan</code>：薄弱维→课程/现场会/上门名单映射。</li>
+              </ul>
+            </li>
+            <li><b>前端</b>（BI 大屏新增）：
+              <ul>
+                <li>路由 &lt; 烟农培育 &gt; 置于"烤房新建"之下（见下方第 8 步页面布局）；</li>
+                <li>复用烤房健康分/寿命页的绿色主调、色块分级、卡片样式。</li>
+              </ul>
+            </li>
+            <li><b>文档</b>：本 HTML 即第 4 篇算法详解（烟农画像）。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 8 BI 大屏 ============ -->
+    <div class="card span12">
+      <h2><span class="s p">第 8 步</span> BI 大屏"烟农培育"页布局（放在烤房新建之下，风格统一）</h2>
+      <div class="kpi">
+        <div><b>700</b><span>问卷覆盖户数（户）</span></div>
+        <div><b>72.4</b><span>全县平均画像分 P</span></div>
+        <div><b>18</b><span>薄弱村（任一维标红）</span></div>
+        <div><b>126</b><span>待上门辅导烟农</span></div>
+      </div>
+      <div class="three">
+        <div class="box">
+          <div class="h">左上 · 五维雷达</div>
+          <div class="radar" style="grid-template-columns:repeat(5,1fr)">
+            <div class="rad-col"><div class="lab">栽培</div><div class="val">56.7</div><div class="metal"><span style="width:57%"></span></div></div>
+            <div class="rad-col"><div class="lab">植保</div><div class="val">66</div><div class="metal"><span style="width:66%"></span></div></div>
+            <div class="rad-col"><div class="lab">采烤</div><div class="val">61</div><div class="metal"><span style="width:61%"></span></div></div>
+            <div class="rad-col"><div class="lab">烘烤</div><div class="val">52</div><div class="metal"><span style="width:52%"></span></div></div>
+            <div class="rad-col"><div class="lab">综合</div><div class="val">70</div><div class="metal"><span style="width:70%"></span></div></div>
+          </div>
+          <p class="note">站/村/磅组/个人可切换，同一张雷达图表显示集体与个体。</p>
+        </div>
+        <div class="box">
+          <div class="h">中部 · 村×五维薄弱矩阵（红黄绿）</div>
+          <table style="font-size:12px">
+            <thead><tr><th>村</th><th>栽培</th><th>植保</th><th>采烤</th><th>烘烤</th><th>综合</th></tr></thead>
+            <tbody>
+              <tr><td>柏家坪</td><td><span class="reddot"></span>56</td><td>68</td><td>63</td><td>55</td><td>72</td></tr>
+              <tr><td>三墩岩</td><td>70</td><td>72</td><td>66</td><td><span class="yellowdot"></span>59</td><td>74</td></tr>
+              <tr><td>某村C</td><td>64</td><td>60</td><td>58</td><td>66</td><td>69</td></tr>
+            </tbody>
+          </table>
+          <p class="note">点击红格 → 钻取到磅组与烟农名单。</p>
+        </div>
+        <div class="box">
+          <div class="h">右侧 · 上门辅导建议清单</div>
+          <ul>
+            <li>张×× · 栽培+烘烤 · 辅导 3/15 · 教练李××</li>
+            <li>王×× · 培栽 · 上门 3/16 · 复测 4/15</li>
+            <li>赵×× · 新手 · 全程陪跑包</li>
+          </ul>
+          <p class="note">含课程、物资、技术员与复盘复测节点，可导出工单。</p>
+        </div>
+      </div>
+      <div class="box blue">
+        <div class="h">底部 · 培育闭环</div>
+        <p><b>画像 → 培训/上门 → 复测 ΔK → 再画像</b>：每次培训后的复测差分回流，P 随能力提升而增长，BI 页展示"培育前后对比"，证明培育投入产生了量化成效。</p>
+      </div>
+    </div>
+
+    <!-- ============ 讲给评委 ============ -->
+    <div class="card span12">
+      <h2><span class="s">收尾</span> 讲给评委的一句话</h2>
+      <div class="box green">
+        <p>"700 户问卷不是一次简单的统计，而是被我们拆进<b>栽培、植保、采烤、烘烤、综合</b>五个维度，算成可上卷、可下钻、可复测的<b>五维雷达画像</b>；通过缺口差值和红黄绿灯，把'哪里的烟农、哪方面知识弱'精确钉到<b>站、村、磅组、个人</b>，再自动映射成现场会、上门名单和课程包。这样烟农培育就从'统一大水漫灌'变成了'按需精准滴灌'——既知道谁最需要，也知道最需要补什么，更能在培训后复测出提升，证明投入有效。"</p>
+      </div>
+    </div>
+
+  </section>
+  <div class="footer">烟农画像与培育算法详解 · 五维雷达画像＋知识薄弱定位 · 算法模型0901 · 以项目现有烟农台账与 700 户问卷为主，三个模型建议（五维雷达）为思想辅助</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0905-健康分改进</title>
+  <style>
+    :root {
+      --green: #0b6b53;
+      --deep: #143d34;
+      --mint: #e8f5ee;
+      --orange: #d9822b;
+      --red: #c84f3f;
+      --muted: #66776f;
+      --line: rgba(18, 91, 68, .16);
+      --card: rgba(255, 255, 255, .92);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--deep);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(217, 130, 43, .22), transparent 30%),
+        radial-gradient(circle at 92% 6%, rgba(11, 107, 83, .20), transparent 32%),
+        linear-gradient(180deg, #fbfcf6 0%, #eef8ef 50%, #fff8e9 100%);
+      font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+      line-height: 1.75;
+    }
+    main { max-width: 1220px; margin: 0 auto; padding: 34px 26px 72px; }
+    header {
+      border-radius: 30px;
+      padding: 42px;
+      background: linear-gradient(135deg, #094838, #0f7558 62%, #d9822b);
+      color: #fff;
+      box-shadow: 0 22px 60px rgba(23, 77, 58, .18);
+      overflow: hidden;
+      position: relative;
+    }
+    header:after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -140px;
+      width: 390px;
+      height: 390px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.13);
+    }
+    .eyebrow { letter-spacing: .18em; color: #ddf5e5; font-weight: 800; }
+    h1 { margin: 10px 0 12px; font-size: 40px; line-height: 1.18; }
+    header p { max-width: 960px; margin: 0; color: #f1fff4; font-size: 17px; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 26px; }
+    .card {
+      padding: 15px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.24);
+      backdrop-filter: blur(8px);
+    }
+    .card b { display: block; font-size: 24px; }
+    .card span { color: #e5f7e7; font-size: 13px; }
+    section {
+      margin-top: 22px;
+      padding: 28px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 12px 36px rgba(30, 84, 62, .08);
+    }
+    h2 { margin: 0 0 16px; color: var(--green); font-size: 25px; }
+    h3 { margin: 16px 0 8px; font-size: 18px; }
+    p { margin: 7px 0; }
+    .lead {
+      padding: 14px 18px;
+      border-radius: 15px;
+      border-left: 6px solid var(--green);
+      background: var(--mint);
+      font-size: 17px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .box {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fbfdf9;
+    }
+    .formula {
+      margin: 12px 0;
+      padding: 18px;
+      border-radius: 16px;
+      color: #effff2;
+      background: #12372f;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+      line-height: 1.68;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    th, td { border: 1px solid #d8e8dc; padding: 10px 11px; vertical-align: top; }
+    th { background: #eaf4ed; color: #104b3d; text-align: left; }
+    tr:nth-child(even) td { background: #fbfdf9; }
+    .note {
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(217, 130, 43, .30);
+      background: #fff7e8;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      color: var(--green);
+      background: #e7f4ed;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .tag.red { color: var(--red); background: #fdecea; }
+    .footer { margin-top: 22px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 900px) {
+      main { padding: 18px; }
+      header { padding: 26px; }
+      h1 { font-size: 28px; }
+      .cards, .grid-2 { grid-template-columns: 1fr; }
+      section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">0905 健康分改进 / 只写方案</div>
+    <h1>按部件修复年度、指导寿命和数据完整度归一化的健康分算法</h1>
+    <p>
+      本方案按最新口径重写：每个部件先读取自己的状态和最新修复年度，再按指导寿命计算寿命剩余比例；
+      数据不完整的部件不强行计入分母；所有可计算部件先归一化成部件健康度，再组合为“部件80% + 管护10% + 人工10%”。
+    </p>
+    <div class="cards">
+      <div class="card"><b>逐部件</b><span>读取修复年度</span></div>
+      <div class="card"><b>寿命折算</b><span>按指导年限衰减</span></div>
+      <div class="card"><b>归一化</b><span>只除以有效权重</span></div>
+      <div class="card"><b>80/10/10</b><span>部件、管护、人工</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>一、这次要纠正的关键点</h2>
+    <p class="lead">
+      不能把缺数据部件直接剔除，也不能只按大部位平均。正确做法是：
+      数据完整的部件按原指导寿命计算；数据不齐全的部件按 5 年指导寿命兜底参与计算，避免大量烤房只剩管护分和人工评价分。
+    </p>
+    <div class="grid-2">
+      <div class="box">
+        <h3>原来不够准确的地方</h3>
+        <p>按 4 个大类汇总时，容易把自控仪内部主板、探头、风机等不同寿命的部件混在一起。</p>
+        <p>部件状态、修复年度、独立字段不完整时，如果完全不计入，会导致评分只剩兜底项，无法体现建设年限的自然衰减。</p>
+      </div>
+      <div class="box">
+        <h3>改进后的原则</h3>
+        <p>部件级计算：每个部件单独读取状态和修复年度。</p>
+        <p>兜底寿命归一化：数据不齐全的部件按 5 年寿命进入分母和分子。</p>
+        <p>最后再乘 80%，与管护 10%、人工 10%融合。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>二、总公式</h2>
+    <div class="formula">最终健康分 H = 0.80 × 部件归一化健康分 P_norm
+           + 0.10 × 管护制度分 M
+           + 0.10 × 人工评价分 E
+
+其中：
+P_norm = Σ(部件贡献分 C_i) / Σ(参与计算部件权重 W_i) × 100
+
+部件贡献分 C_i = W_i × 部件寿命剩余比例 L_i × 状态修正系数 S_i
+
+管护制度分 M：
+集中管护 = 100
+分户管护 = 80
+未知 = 80
+
+人工评价分 E：
+好 = 100
+中 = 80
+差 = 50
+未知 = 80</div>
+    <p>
+      这里的 <span class="tag">P_norm</span> 是 0-100 分，不是 80 分。最后再乘 0.80，表示部件维度占最终健康分 80%。
+      这样比“先算80分再除80”更清晰，本质等价。
+    </p>
+  </section>
+
+  <section>
+    <h2>三、部件寿命剩余比例怎么算</h2>
+    <p>每个部件都应该读取自己的最新修复年度。如果有修复年度，用“当前年份 - 修复年度”；没有修复年度，再用“当前年份 - 建设/竣工年度”。</p>
+    <div class="formula">部件已使用年限 A_i =
+如果有最新修复年度：当前年份 - 最新修复年度
+否则：当前年份 - 烤房竣工年度
+
+部件剩余寿命 R_i = max(0, 指导寿命 T_i - A_i)
+
+部件寿命剩余比例 L_i = R_i / T_i
+
+部件基础贡献 C_i = W_i × L_i
+
+如果要加入状态：
+部件贡献 C_i = W_i × L_i × S_i</div>
+    <div class="note">
+      <b>示例：</b>
+      某散热器指导寿命 12 年，2022 年修复，现在是 2026 年，则已使用 4 年，剩余寿命 8 年。
+      该部件寿命剩余比例为 8/12=0.667。如果该部件权重是 15，且状态正常，则贡献约为 15×8/12=10 分。
+    </div>
+  </section>
+
+  <section>
+    <h2>四、状态修正系数</h2>
+    <p>如果只按寿命算，会忽略“刚修过但又坏了”的情况。因此建议在寿命贡献上叠加状态修正。</p>
+    <table>
+      <thead>
+        <tr><th>部件状态</th><th>状态修正系数 S_i</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>正常</td><td>1.00</td><td>按寿命剩余比例完整计入。</td></tr>
+        <tr><td>异常/老化</td><td>0.70</td><td>还有使用能力，但要明显折减。</td></tr>
+        <tr><td>损坏/损毁</td><td>0.30</td><td>当前可用性很低，只保留少量修复潜力。</td></tr>
+        <tr><td>缺失</td><td>0.00</td><td>不具备功能，贡献为0。</td></tr>
+        <tr><td>状态为空或修复年度缺失</td><td>按5年寿命兜底，状态系数取1.00</td><td>仍参与计算；缺修复年度时暂按已用0年，并标记待补采。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>五、权重表：部件总权重仍然按 80 设计</h2>
+    <table>
+      <thead>
+        <tr><th>部位/部件</th><th>权重 W_i</th><th>指导寿命 T_i</th><th>现有字段建议</th><th>是否参与第一版</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>加热器/燃烧机</td><td>15</td><td>外置10年，内置12年；缺类型按12年</td><td>kf_heater.burner_status / burner_repair_year</td><td>参与</td></tr>
+        <tr><td>散热管</td><td>4</td><td>12年</td><td>kf_radiator.pipe_status / pipe_repair_year</td><td>参与</td></tr>
+        <tr><td>炉膛</td><td>4</td><td>12年</td><td>kf_radiator.furnace_status / furnace_repair_year</td><td>参与</td></tr>
+        <tr><td>清灰门</td><td>3</td><td>12年</td><td>kf_radiator.ash_door_status / ash_door_repair_year</td><td>参与</td></tr>
+        <tr><td>烟囱</td><td>4</td><td>12年</td><td>kf_radiator.chimney_status / chimney_repair_year</td><td>参与</td></tr>
+        <tr><td>自控仪主板/操作箱</td><td>8</td><td>6年</td><td>kf_controller.control_box_status / control_box_repair_year</td><td>参与</td></tr>
+        <tr><td>温湿度探头</td><td>6</td><td>6年</td><td>kf_controller.probe_status / probe_repair_year</td><td>参与</td></tr>
+        <tr><td>水壶/传感相关</td><td>6</td><td>6年</td><td>kf_controller.water_pot_status / water_pot_repair_year</td><td>参与</td></tr>
+        <tr><td>循环风机</td><td>5</td><td>10年</td><td>kf_controller.circulation_fan_status / circulation_fan_repair_year</td><td>参与</td></tr>
+        <tr><td>屋顶/墙体</td><td>10</td><td>未加盖6年，加盖15年；缺字段按15年</td><td>kf_oven_body.wall_roof_status / wall_roof_repair_year</td><td>参与</td></tr>
+        <tr><td>挂烟梁柱</td><td>5</td><td>木质10年，钢材15年；缺材质按10年</td><td>kf_oven_body.beam_status / beam_repair_year</td><td>参与</td></tr>
+        <tr><td>大门</td><td>10</td><td>10年</td><td>kf_oven_body.door_status / door_repair_year</td><td>参与</td></tr>
+        <tr><td>电源/电线</td><td>5</td><td>数据不齐全时按5年</td><td>当前缺独立结构化字段</td><td>后续补字段后纳入</td></tr>
+        <tr><td>发电机</td><td>5</td><td>数据不齐全时按5年</td><td>当前缺独立结构化字段</td><td>后续补字段后纳入</td></tr>
+        <tr><td>烟夹</td><td>5</td><td>数据不齐全时按5年</td><td>当前缺独立结构化字段</td><td>后续补字段后纳入</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      当前项目已落地的结构化部件权重为：加热器15 + 散热器15 + 自控仪20 + 循环风机5 + 屋顶10 + 挂烟梁5 + 大门10 = 80。
+      其中任何部件数据不齐全时，不剔除，统一按5年指导寿命兜底；电源、发电机、烟夹后续补字段后再扩展进结构化计算。
+    </div>
+  </section>
+
+  <section>
+    <h2>六、数据不全时怎么归一化</h2>
+    <p>如果某些部件状态为空、修复年度为空或部件记录缺失，该部件仍参与计算，但指导寿命统一按 5 年。修复年度缺失时不再追溯建设/完工年度，而是暂按已用0年处理，并在页面标记为“数据不齐全-5年兜底/待补采”。</p>
+    <div class="formula">参与部件集合 V = 已定义权重的结构化部件
+
+参与权重 W_valid = Σ(W_i)，i属于V
+参与贡献 C_valid = Σ(W_i × L_i × S_i)，i属于V
+
+若部件数据完整：
+L_i = max(0, T_i - A_i) / T_i
+
+若部件数据不齐全：
+T_i = 5
+A_i = 0
+L_i = max(0, 5 - 0) / 5 = 1
+S_i = 1.00
+
+部件归一化健康分：
+P_norm = C_valid / W_valid × 100
+
+最终健康分：
+H = 0.80 × P_norm + 0.10 × M + 0.10 × E</div>
+    <p>
+      这样可以保证数据不齐全的烤房也能参与比较；缺采集不会被误判为老旧损坏，后续一旦补录修复年度和状态，再按真实指导寿命重新衰减。
+    </p>
+  </section>
+
+  <section>
+    <h2>七、完整计算示例</h2>
+    <p>假设某烤房 2020 年建设，当前年份 2026；其中散热器 2022 年修复，自控仪 2021 年修复，屋顶无修复记录。</p>
+    <table>
+      <thead>
+        <tr><th>部件</th><th>权重</th><th>修复/建设年</th><th>指导寿命</th><th>已用年限</th><th>剩余比例</th><th>状态</th><th>贡献</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>加热器</td><td>15</td><td>2020建设</td><td>12</td><td>6</td><td>6/12=0.50</td><td>正常</td><td>15×0.50×1=7.50</td></tr>
+        <tr><td>散热器</td><td>15</td><td>2022修复</td><td>12</td><td>4</td><td>8/12=0.67</td><td>正常</td><td>15×0.67×1=10.00</td></tr>
+        <tr><td>自控仪</td><td>20</td><td>2021修复</td><td>6</td><td>5</td><td>1/6=0.17</td><td>异常</td><td>20×0.17×0.70=2.38</td></tr>
+        <tr><td>循环风机</td><td>5</td><td>2020建设</td><td>10</td><td>6</td><td>4/10=0.40</td><td>正常</td><td>5×0.40×1=2.00</td></tr>
+        <tr><td>屋顶</td><td>10</td><td>无修复记录</td><td>5年兜底</td><td>0</td><td>5/5=1.00</td><td>待补采</td><td>10×1.00×1=10.00</td></tr>
+        <tr><td>挂烟梁</td><td>5</td><td>2020建设</td><td>10</td><td>6</td><td>4/10=0.40</td><td>正常</td><td>5×0.40×1=2.00</td></tr>
+        <tr><td>大门</td><td>10</td><td>2020建设</td><td>10</td><td>6</td><td>4/10=0.40</td><td>正常</td><td>10×0.40×1=4.00</td></tr>
+      </tbody>
+    </table>
+    <div class="formula">有效权重 W_valid = 15+15+20+5+10+5+10 = 80
+有效贡献 C_valid = 7.50+10.00+2.38+2.00+10.00+2.00+4.00 = 37.88
+
+部件归一化健康分：
+P_norm = 37.88 / 80 × 100 = 47.35
+
+假设：
+管护制度 = 分户管护，M=80
+人工评价 = 中，E=80
+
+最终健康分：
+H = 0.80×47.35 + 0.10×80 + 0.10×80
+  = 37.88 + 8 + 8
+  = 53.88 分</div>
+    <div class="note">
+      这个例子说明：如果某个关键短寿命部件如自控仪已经接近寿命末端且状态异常，即使其它部件正常，整栋烤房健康分也会明显下降。
+      分数不是为了接近某个固定样例，而是自然由修复年度、指导寿命和状态算出来。
+    </div>
+  </section>
+
+  <section>
+    <h2>八、风险部件排序怎么做</h2>
+    <p>风险排序应该按“缺口贡献”排，谁拖累健康分最多，谁排在前面。</p>
+    <div class="formula">部件满状态贡献 = W_i
+部件实际贡献 = W_i × L_i × S_i
+部件损失分 Gap_i = W_i - 部件实际贡献
+
+风险排序 = 按 Gap_i 从大到小排序
+
+如果要突出关键部件，可加业务重要度：
+Risk_i = Gap_i × K_i
+
+建议 K_i：
+自控仪=1.25
+加热器=1.15
+散热器=1.15
+大门/屋顶=1.05
+其它=1.00</div>
+    <p>
+      采用这个排序后，风险解释很直接：不是说某个部件“看起来重要”，而是它对 80 分部件总分造成的损失最大。
+    </p>
+  </section>
+
+  <section>
+    <h2>九、页面建议</h2>
+    <table>
+      <thead>
+        <tr><th>位置</th><th>建议展示</th><th>原因</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>顶部说明卡</td><td>显示“逐部件修复年度 + 指导寿命 + 有效权重归一化 + 80/10/10融合”</td><td>让使用者知道不是简单平均。</td></tr>
+        <tr><td>统计卡</td><td>总数、已计算、平均健康分、预警数、数据完整率</td><td>增加数据完整率，避免误读。</td></tr>
+        <tr><td>列表列</td><td>健康分、健康等级、有效部件数、有效权重、Top3风险部件、风险原因</td><td>能看出哪些烤房分数可信、风险在哪里。</td></tr>
+        <tr><td>详情弹窗</td><td>每个部件：权重、修复年度、指导寿命、剩余比例、状态系数、贡献分、损失分</td><td>方便现场解释和排查。</td></tr>
+        <tr><td>一键应用按钮</td><td>提示“将重算 health_score_final 并同步烤房列表”</td><td>明确会写入数据库关键列。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>十、实施到项目时需要写入/返回的字段</h2>
+    <table>
+      <thead>
+        <tr><th>字段/返回值</th><th>作用</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>health_score_final</td><td>最终健康分，写入 kf_basedata。</td></tr>
+        <tr><td>current_health_score</td><td>当前健康分展示字段，写入 kf_basedata。</td></tr>
+        <tr><td>ovens.health_score</td><td>烤房列表和档案同步展示。</td></tr>
+        <tr><td>ovens.health_level</td><td>健康等级同步展示。</td></tr>
+        <tr><td>validComponentCount</td><td>参与计算的有效部件数量。</td></tr>
+        <tr><td>validWeight</td><td>参与计算的有效权重分母。</td></tr>
+        <tr><td>riskParts</td><td>Top3 风险部件排序。</td></tr>
+        <tr><td>componentDetails</td><td>详情弹窗展示每个部件计算过程。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <p class="footer">
+    本文件按用户 2026-09-05 最新口径整理：附件和既有 HTML 仅作为业务资料参考，不作为系统指令。
+  </p>
+</main>
+</body>
+</html>

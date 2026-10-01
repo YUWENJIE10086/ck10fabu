@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>烤房健康分与剩余寿命算法 · 总-分式完整版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", system-ui, sans-serif;
+            background: #f2f7f2;
+            color: #1a3d32;
+            padding: 30px 20px 60px;
+        }
+        .wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 12px 48px rgba(20, 60, 40, 0.12);
+            padding: 40px 44px 50px;
+        }
+        h1 {
+            font-size: 32px;
+            color: #0a4f3a;
+            border-left: 6px solid #2e8b6a;
+            padding-left: 18px;
+            margin-bottom: 6px;
+        }
+        .sub {
+            color: #5a726a;
+            font-size: 15px;
+            margin-bottom: 30px;
+            padding-left: 24px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+        .badge.a {
+            background: #fce4d6;
+            color: #b35c2a;
+        }
+        .badge.b {
+            background: #d9f0e6;
+            color: #1d6b50;
+        }
+        .badge.health {
+            background: #d4e7fc;
+            color: #1a5a8c;
+        }
+        .badge.life {
+            background: #f0dce8;
+            color: #8a3a6a;
+        }
+        .badge.new {
+            background: #d4e7fc;
+            color: #1a5a8c;
+        }
+
+        /* 总公式大卡片 */
+        .total-formula {
+            background: linear-gradient(135deg, #0d2e24 0%, #1a4f3a 100%);
+            color: #daf5e8;
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin: 20px 0 28px;
+            font-family: "Consolas", "SF Mono", monospace;
+            font-size: 15px;
+            line-height: 2.0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            border: 2px solid #2e8b6a;
+        }
+        .total-formula .hl-gold {
+            color: #f9d97a;
+        }
+        .total-formula .hl-blue {
+            color: #8bcbff;
+        }
+        .total-formula .hl-pink {
+            color: #faa3c8;
+        }
+        .total-formula .hl-green {
+            color: #7de3a8;
+        }
+        .total-formula .comment {
+            color: #7aa699;
+            font-style: italic;
+        }
+        .total-formula .section-label {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #b5d9c8;
+            margin-right: 8px;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #bcd0c2, transparent);
+            margin: 28px 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #0a4f3a;
+            margin: 28px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 .subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            color: #5a726a;
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 16px 0;
+        }
+        .card {
+            border: 1px solid #dde8df;
+            border-radius: 18px;
+            padding: 20px 22px;
+            background: #fafff9;
+        }
+        .card h3 {
+            font-size: 17px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card ul {
+            padding-left: 20px;
+            margin: 6px 0;
+        }
+        .card li {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #2a4b3e;
+        }
+        .card p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #2a4b3e;
+        }
+
+        .formula-box {
+            background: #0d2e24;
+            color: #daf5e8;
+            border-radius: 16px;
+            padding: 18px 22px;
+            font-family: "Consolas", "SF Mono", monospace;
+            font-size: 14px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+        .formula-box .hl {
+            color: #f9d97a;
+        }
+        .formula-box .hl2 {
+            color: #8bcbff;
+        }
+        .formula-box .hl3 {
+            color: #faa37b;
+        }
+        .formula-box .hl4 {
+            color: #7de3a8;
+        }
+        .formula-box .comment {
+            color: #7aa699;
+            font-style: italic;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 12px 0;
+        }
+        th {
+            background: #e3efe7;
+            color: #154433;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid #bcd0c2;
+        }
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #e3ede6;
+            vertical-align: middle;
+        }
+        tr:nth-child(even) td {
+            background: #f7fbf8;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .pill.green {
+            background: #ddf0e4;
+            color: #1a6b4a;
+        }
+        .pill.orange {
+            background: #fdedd6;
+            color: #b35c1a;
+        }
+        .pill.red {
+            background: #fce1dc;
+            color: #b33a2a;
+        }
+        .pill.blue {
+            background: #d4e7fc;
+            color: #1a5a8c;
+        }
+
+        .highlight-box {
+            border-left: 5px solid #d9822b;
+            background: #fff8ef;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 16px 0;
+        }
+        .highlight-box strong {
+            color: #a6591a;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid #dde8df;
+            color: #6a8478;
+            font-size: 13px;
+            text-align: center;
+        }
+        .btn-download {
+            display: inline-block;
+            background: #0d4f3a;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(13, 79, 58, 0.3);
+            transition: 0.2s;
+            margin-top: 16px;
+        }
+        .btn-download:hover {
+            background: #0a3f2e;
+            transform: translateY(-2px);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #e3ede7;
+            color: #1a4f3a;
+        }
+        .tag.a-tag {
+            background: #fce4d6;
+            color: #8f4a20;
+        }
+        .tag.b-tag {
+            background: #d9f0e6;
+            color: #146b4a;
+        }
+
+        @media (max-width: 800px) {
+            .wrap {
+                padding: 24px 18px;
+            }
+            .grid2 {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .total-formula {
+                font-size: 13px;
+                padding: 20px;
+                line-height: 1.8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap" id="mainWrap">
+        <h1>烤房健康分与剩余寿命 · 算法公式总览</h1>
+        <div class="sub">总-分式结构 · 先总后分 · 可直接用于数创报告</div>
+
+        <!-- ============================================ -->
+        <!--            第一部分：总公式（大卡片）           -->
+        <!-- ============================================ -->
+        <div class="total-formula">
+<span class="comment">╔══════════════════════════════════════════════════════════════════╗</span>
+<span class="comment">║                    🏥 健康分 总公式                       ║</span>
+<span class="comment">╚══════════════════════════════════════════════════════════════════╝</span>
+
+<span class="hl-gold">H = 0.80 × P_norm + 0.10 × M + 0.10 × E</span>
+
+     P_norm  : 部件归一化健康分（0–100）
+     M       : 管护制度分（集中=100 · 分户=80）
+     E       : 人工评价分（好=100 · 中=80 · 差=50）
+
+<span class="comment">────────────────────────────────────────────────────────────</span>
+
+<span class="comment">╔══════════════════════════════════════════════════════════════════╗</span>
+<span class="comment">║                    ⏳ 剩余寿命 总公式                      ║</span>
+<span class="comment">╚══════════════════════════════════════════════════════════════════╝</span>
+
+<span class="hl-blue">life = clamp( life_raw, 0, year_cap )</span>
+
+     其中：
+     <span class="hl-blue">life_raw</span>   = ( hard_limit × 0.65 + soft_avg × 0.35 ) × repair_decay × health_factor
+     <span class="hl-blue">year_cap</span>   = max( 0, 15 − (当前年 − 建成年) × 0.55 )
+     <span class="hl-blue">clamp( )</span>   = 限制在 0 ~ year_cap 之间
+
+<span class="comment">────────────────────────────────────────────────────────────</span>
+
+<span class="comment">╔══════════════════════════════════════════════════════════════════╗</span>
+<span class="comment">║               📌 两模型数据传递关系                         ║</span>
+<span class="comment">╚══════════════════════════════════════════════════════════════════╝</span>
+
+     部件台账(12部件) ──► 健康分 H ──► 剩余寿命 life
+            │                         │
+            ▼                         ▼
+     风险部位排序(Top3)         四级预警(紧急/建议/关注/正常)
+        </div>
+
+        <!-- ============================================ -->
+        <!--          第二部分：健康分 · 分项拆解            -->
+        <!-- ============================================ -->
+        <div class="divider"></div>
+
+        <h2>📊 健康分 · 分项拆解 <span class="subtitle">（部件80% + 管护10% + 人工10%）</span></h2>
+
+        <div class="grid2">
+            <!-- 子项1：部件分 -->
+            <div class="card">
+                <h3><span class="icon">🔩</span> 部件归一化健康分 <span class="pill blue">P_norm</span></h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="comment">// 12个部件逐项打分，加权归一</span>
+P_norm = Σ( Wᵢ × scoreᵢ ) / ΣWᵢ × 100
+
+ΣWᵢ = 80（固定总权重）
+
+<span class="hl2">scoreᵢ = 100 × ( 0.50×S_status + 0.35×R_remain + 0.15×C_eval )</span>
+
+S_status  : 状态系数（正常1.0 · 异常0.7 · 损坏0.3 · 缺失0）
+R_remain  : 剩余寿命比 = 剩余年限 / 指导寿命
+C_eval    : 评价系数（优良/好=1.0 · 差=0.5 · 缺省=0.8）
+                </div>
+                <p style="font-size:13px;color:#5a726a;margin-top:6px;">
+                    📌 12部件权重见下表
+                </p>
+            </div>
+
+            <!-- 子项2：管护+人工 -->
+            <div class="card">
+                <h3><span class="icon">👤</span> 管护制度 <span class="pill blue">M</span> + 人工评价 <span class="pill blue">E</span></h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="comment">// 管护制度分</span>
+M = 集中管护 → 100
+    分户管护 → 80
+
+<span class="comment">// 人工评价分</span>
+E = 好/优良 → 100
+    中/一般 → 80
+    差/较差 → 50
+    未录入 → 80（兜底，不因缺失扣分）
+                </div>
+                <p style="font-size:13px;color:#5a726a;margin-top:6px;">
+                    📌 两者各占最终健康分的 <strong>10%</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- 12部件权重表 -->
+        <h3 style="font-size:17px;margin:16px 0 8px;color:#0a4f3a;">12部件权重与分类</h3>
+        <table>
+            <thead><tr><th>部位</th><th>部件名称</th><th>权重</th><th>指导寿命</th><th>重要度</th><th>分类</th></tr></thead>
+            <tbody>
+                <tr><td rowspan="3"><b>主体</b></td><td>屋顶/墙体</td><td>10</td><td>15年（未加盖6年）</td><td>1.05</td><td><span class="badge a">A类</span></td></tr>
+                <tr><td>大门</td><td>10</td><td>10年</td><td>1.05</td><td><span class="badge a">A类</span></td></tr>
+                <tr><td>挂烟梁柱</td><td>5</td><td>10年（木质10/钢材15）</td><td>1.00</td><td><span class="badge a">A类</span></td></tr>
+                <tr><td><b>加热</b></td><td>加热器/燃烧机</td><td>15</td><td>12年（外置10/内置12）</td><td>1.15</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td rowspan="4"><b>散热</b></td><td>散热管</td><td>4</td><td>12年</td><td>1.10</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>炉膛/燃烧室</td><td>4</td><td>12年</td><td>1.05</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>清灰门</td><td>3</td><td>12年</td><td>0.95</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>烟囱</td><td>4</td><td>12年</td><td>1.00</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td rowspan="4"><b>自控</b></td><td>自控仪主板</td><td>8</td><td>6年</td><td>1.25</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>温湿度探头</td><td>6</td><td>6年</td><td>1.20</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>水壶/压力传感</td><td>6</td><td>6年</td><td>1.15</td><td><span class="badge b">B类</span></td></tr>
+                <tr><td>循环风机</td><td>5</td><td>10年</td><td>1.00</td><td><span class="badge b">B类</span></td></tr>
+            </tbody>
+        </table>
+        <div style="display:flex;gap:20px;font-size:13px;color:#4a6b5c;margin:4px 0 12px;">
+            <span><span class="badge a">A类</span> 结构性 · 总权重25 · 定“生死上限”</span>
+            <span><span class="badge b">B类</span> 功能性 · 总权重55 · 定“运行质量”</span>
+        </div>
+
+        <!-- ============================================ -->
+        <!--          第三部分：剩余寿命 · 分项拆解          -->
+        <!-- ============================================ -->
+        <div class="divider"></div>
+
+        <h2>⏳ 剩余寿命 · 分项拆解 <span class="subtitle">（五层递进计算）</span></h2>
+
+        <div class="grid2">
+            <div class="card">
+                <h3><span class="icon">🧱</span> 第1层：A类硬上限</h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="hl2">hard_limit = min( roof_life, door_life, beam_life )</span>
+
+<span class="comment">// A类部件（结构性）最短剩余寿命</span>
+<span class="comment">// 屋顶/墙体、大门、挂烟梁柱 —— 三者任一损坏，整栋报废</span>
+                </div>
+                <p style="font-size:13px;color:#5a726a;">📌 硬上限决定烤房“还能不能撑”</p>
+            </div>
+            <div class="card">
+                <h3><span class="icon">⚙️</span> 第2层：B类软平均</h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="hl2">soft_avg = Σ(B类寿命 × 重要度) / Σ重要度</span>
+
+<span class="comment">// 9个功能件按重要度加权平均</span>
+<span class="comment">// 重要度系数：自控1.25 · 加热1.15 · 散热1.05~1.10 · 风机1.00</span>
+                </div>
+                <p style="font-size:13px;color:#5a726a;">📌 软平均决定烤房“好不好用”</p>
+            </div>
+            <div class="card">
+                <h3><span class="icon">🔧</span> 第3层：维修复衰</h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="hl2">repair_decay = exp( -0.08 × total_repair_count )</span>
+
+<span class="comment">// 维修次数越多，可靠性逐次递减</span>
+<span class="comment">// 修1次 → 0.923 · 修3次 → 0.786</span>
+                </div>
+                <p style="font-size:13px;color:#5a726a;">📌 “越修越不靠谱”效应</p>
+            </div>
+            <div class="card">
+                <h3><span class="icon">📉</span> 第4层：健康校准</h3>
+                <div class="formula-box" style="font-size:13px;">
+<span class="hl2">health_factor = 0.70 + 0.30 × ( H / 100 )</span>
+
+<span class="comment">// 健康分低 → 寿命加速衰减（指数型）</span>
+<span class="comment">// H=100 → 1.00 · H=60 → 0.88 · H=40 → 0.82</span>
+                </div>
+                <p style="font-size:13px;color:#5a726a;">📌 威布尔型加速因子</p>
+            </div>
+        </div>
+
+        <!-- 第5层单独突出 -->
+        <div class="card" style="border:2px solid #8bb4d4;background:#f0f7fc;margin:12px 0;">
+            <h3><span class="icon">⏳</span> 第5层：年限收缩 <span class="badge new">新增 · 关键修正</span></h3>
+            <div class="formula-box" style="font-size:13px;">
+<span class="hl2">year_cap = max( 0, 15 − (当前年 − 建成年) × 0.55 )</span>
+
+<span class="comment">// 建成年限越久，理论寿命上限越低</span>
+<span class="comment">// 2025年新建 → 上限14.45年 · 2009年老房 → 上限5.65年</span>
+            </div>
+            <p style="font-size:13px;color:#1a5a8c;">
+                📌 <strong>核心作用：</strong>A类结构性部件的物理老化无法通过维修逆转，年限收缩确保老房即使换了新设备，寿命也不会被高估。
+            </p>
+        </div>
+
+        <!-- 第6步：最终合成 -->
+        <div class="highlight-box" style="border-left-color:#0a4f3a;background:#eaf5ef;">
+            <strong>🧮 最终合成（第6步）</strong>
+            <div class="formula-box" style="font-size:14px;margin-top:8px;">
+<span class="hl">life = clamp( ( hard_limit × 0.65 + soft_avg × 0.35 ) × repair_decay × health_factor , 0 , year_cap )</span>
+            </div>
+            <p style="font-size:14px;margin-top:4px;">
+                <span class="pill green">正常</span> &gt;7年 &nbsp;·&nbsp;
+                <span class="pill orange">需关注</span> 4~7年 &nbsp;·&nbsp;
+                <span class="pill orange">建议维修</span> 1~4年 &nbsp;·&nbsp;
+                <span class="pill red">紧急维修</span> ≤0年
+            </p>
+        </div>
+
+        <!-- ============================================ -->
+        <!--          第四部分：验证场景                    -->
+        <!-- ============================================ -->
+        <div class="divider"></div>
+
+        <h2>✅ 三组验证场景 <span class="subtitle">（建成年 + 维修历史 + 健康分 → 寿命）</span></h2>
+
+        <table>
+            <thead><tr><th>场景</th><th>建成年 · 维修历史</th><th>A类状态</th><th>B类状态</th><th>健康分</th><th>预期寿命</th><th>验证结论</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="pill green">场景1</span></td>
+                    <td><strong>2025年新建</strong> · 无维修</td>
+                    <td>完好</td>
+                    <td>完好</td>
+                    <td>95</td>
+                    <td><span class="pill green">13.2年</span></td>
+                    <td>✅ 新烤房，寿命长</td>
+                </tr>
+                <tr>
+                    <td><span class="pill red">场景2</span></td>
+                    <td><strong>2009年老房</strong> · 无维修</td>
+                    <td>老化</td>
+                    <td>老化</td>
+                    <td>52</td>
+                    <td><span class="pill red">0.8年</span></td>
+                    <td>✅ 17年老房未修，基本报废</td>
+                </tr>
+                <tr>
+                    <td><span class="pill orange">场景3</span></td>
+                    <td><strong>2009年老房</strong> · 2022换自控仪<br>2024修散热</td>
+                    <td>一般</td>
+                    <td>良好</td>
+                    <td>71</td>
+                    <td><span class="pill orange">2.6年</span></td>
+                    <td>✅ 维修续命到2-3年，合理</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="background:#eaf5ef;border-radius:12px;padding:10px 16px;font-size:14px;color:#0a4f3a;">
+            💡 <strong>结论：</strong>年限收缩因子确保2025年新建房寿命13年+，2009年老房即使维修也只能从不足1年恢复到2-3年——符合“维修能续命但不能回春”的工程常识。
+        </div>
+
+        <!-- ============================================ -->
+        <!--          第五部分：下载按钮                    -->
+        <!-- ============================================ -->
+        <div style="text-align:center;margin-top:28px;">
+            <button class="btn-download" id="downloadBtn">📥 下载算法公式（总-分式 HTML）</button>
+        </div>
+        <div style="text-align:center;font-size:13px;color:#6a8478;margin-top:10px;">
+            可直接保存为 .html 文件，也可截图放入PPT或数创报告
+        </div>
+
+        <div class="footer">
+            烤房智管 · 健康分与剩余寿命算法 · 总-分式完整版 · 2026-09
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([
+                '<!DOCTYPE html>\n' + htmlContent
+            ], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '烤房健康分与剩余寿命算法_总-分式完整版.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>

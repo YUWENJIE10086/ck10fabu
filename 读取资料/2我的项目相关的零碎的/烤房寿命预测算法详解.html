@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烤房寿命预测算法详解</title>
+<style>
+  :root {
+    --green-900: #0A1F18;
+    --green-800: #0D2B22;
+    --green-700: #0D5D46;
+    --green-600: #1A6B4F;
+    --green-500: #2E8B6A;
+    --green-400: #5FB292;
+    --green-300: #7DC4A8;
+    --green-200: #A0D4C0;
+    --green-100: #D4E8DC;
+    --orange: #D4944A;
+    --red: #D4604A;
+    --text-main: #E8F5F0;
+    --text-sub: #8CBCAC;
+    --text-dim: #5A8A72;
+    --card-bg: rgba(13, 45, 34, 0.6);
+    --border: rgba(46, 139, 106, 0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--green-900);
+    color: var(--text-main);
+    line-height: 1.7;
+    padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* 头部 */
+  .hero {
+    background: linear-gradient(135deg, #0D2B22 0%, #0A1F18 60%, #0D5D46 130%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,139,106,0.15), transparent 70%);
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--green-300);
+    background: rgba(46,139,106,0.12);
+    border: 1px solid rgba(46,139,106,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .hero h1 { font-size: 32px; font-weight: 800; letter-spacing: 2px; margin-bottom: 12px; }
+  .hero p { color: var(--text-sub); font-size: 15px; max-width: 720px; }
+  .hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+  .hero-meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sub); }
+  .hero-meta-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* 章节 */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--green-500), var(--green-700));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  /* 卡片 */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(4px);
+  }
+  .card h3 {
+    font-size: 16px;
+    color: var(--green-300);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h3 .badge {
+    font-size: 11px;
+    background: rgba(46,139,106,0.2);
+    border: 1px solid rgba(46,139,106,0.4);
+    color: var(--green-200);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  /* 公式 */
+  .formula {
+    background: rgba(10, 31, 24, 0.8);
+    border: 1px solid rgba(46,139,106,0.35);
+    border-left: 4px solid var(--green-500);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 14px 0;
+    font-family: 'SF Mono', 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--green-100);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.9;
+  }
+  .formula .hl { color: var(--orange); font-weight: 700; }
+  .formula .cm { color: var(--text-dim); }
+
+  /* 表格 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: rgba(46,139,106,0.15);
+    color: var(--green-200);
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  tr:hover td { background: rgba(46,139,106,0.06); }
+
+  /* 标签 */
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-right: 6px;
+    font-weight: 600;
+  }
+  .tag-green { background: rgba(46,139,106,0.2); color: var(--green-300); border: 1px solid rgba(46,139,106,0.4); }
+  .tag-orange { background: rgba(212,148,74,0.15); color: var(--orange); border: 1px solid rgba(212,148,74,0.4); }
+  .tag-red { background: rgba(212,96,74,0.15); color: var(--red); border: 1px solid rgba(212,96,74,0.4); }
+
+  /* 步骤 */
+  .steps { counter-reset: step; }
+  .step {
+    position: relative;
+    padding: 16px 16px 16px 56px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 16px; top: 16px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-500), var(--green-700));
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step h4 { color: var(--green-200); font-size: 15px; margin-bottom: 6px; }
+  .step p, .step li { color: var(--text-sub); font-size: 14px; }
+  .step ul { padding-left: 18px; margin-top: 6px; }
+
+  /* 示例计算 */
+  .example {
+    background: rgba(212,148,74,0.06);
+    border: 1px solid rgba(212,148,74,0.25);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 14px;
+    color: var(--text-sub);
+  }
+  .example .calc {
+    font-family: 'SF Mono', Consolas, monospace;
+    color: var(--green-100);
+    margin-top: 8px;
+    line-height: 1.9;
+  }
+
+  /* 预警分级 */
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+  .level-item {
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .level-item .lv { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .level-item .range { font-size: 13px; color: var(--text-sub); }
+
+  .note {
+    background: rgba(46,139,106,0.08);
+    border-left: 3px solid var(--green-500);
+    padding: 12px 18px;
+    border-radius: 0 10px 10px 0;
+    font-size: 13px;
+    color: var(--text-sub);
+    margin: 12px 0;
+  }
+  .note b { color: var(--green-300); }
+
+  /* 页脚 */
+  .footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 头部 -->
+  <div class="hero">
+    <span class="hero-tag">算法文档 · ALGORITHM DOCUMENTATION</span>
+    <h1>烤房寿命预测算法详解</h1>
+    <p>基于烤房当前健康分与房龄，预测剩余使用寿命与维修预警时间。项目内置 4 种寿命算法（EDRL / WRRL / BDRL / GPLE），其中 <b style="color:#7DC4A8;">BDRL 双段退化剩余寿命模型</b> 为推荐算法，本页重点详解其原理、公式与实现。</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><span class="dot" style="background:#2E8B6A;"></span>算法：BDRL（推荐）</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#7DC4A8;"></span>输入：健康分 + 房龄</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#D4944A;"></span>输出：剩余寿命 + 维修预警</div>
+      <div class="hero-meta-item"><span class="dot" style="background:#D4604A;"></span>约束：政策最大年限</div>
+    </div>
+  </div>
+
+  <!-- 1. 算法总览 -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span>寿命预测算法总览</div>
+    <div class="card">
+      <h3>项目内置 4 种寿命预测算法</h3>
+      <table>
+        <tr><th>算法</th><th>全称</th><th>核心思路</th><th>适用场景</th></tr>
+        <tr>
+          <td><span class="tag tag-green">BDRL</span>推荐</td>
+          <td>Bi-Segment Degradation Residual Life<br>双段退化剩余寿命模型</td>
+          <td>寿命分两段：前段线性退化，后段加速劣化，并引入维修回弹效应</td>
+          <td>有明确退化拐点、考虑大修延寿的烤房</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">EDRL</span></td>
+          <td>Exponential Decay Residual Life<br>指数衰减剩余寿命模型</td>
+          <td>健康度按指数函数衰减，用当前健康分反推衰减率</td>
+          <td>退化平稳、无拐点的烤房</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">WRRL</span></td>
+          <td>Weibull Reliability &amp; Residual Life<br>威布尔可靠性与剩余寿命模型</td>
+          <td>用威布尔分布描述失效概率，求解可靠度阈值对应寿命</td>
+          <td>可靠性工程标准场景</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">GPLE</span></td>
+          <td>Grey Prediction Lifespan Extrapolation<br>灰色预测 GM(1,1) 寿命推演</td>
+          <td>用历史健康分序列做灰色预测外推</td>
+          <td>历史数据少、贫信息场景</td>
+        </tr>
+      </table>
+      <div class="note"><b>当前项目状态：</b>数据库 <code>kf_basedata.current_life_algo</code> 字段中，BDRL 为推荐算法；实际数据中 GPLE 与 BDRL 均有使用。所有算法的最终结果都受 <b>政策最大年限</b> 约束。</div>
+    </div>
+  </div>
+
+  <!-- 2. BDRL 核心原理 -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span>BDRL 核心原理</div>
+    <div class="card">
+      <h3>双段退化思想</h3>
+      <p>烤房健康度随使用年限的退化并非匀速，而是呈现 <b style="color:#7DC4A8;">"先缓后急"</b> 的形态：</p>
+      <ul style="padding-left:20px; color:var(--text-sub); margin-top:10px;">
+        <li><b style="color:#7DC4A8;">前段（0 ~ T<sub>c</sub>）：线性退化期</b> —— 烤房投入使用初期，部件状态较好，健康度近似线性缓慢下降；</li>
+        <li><b style="color:#D4944A;">后段（T<sub>c</sub> ~ T<sub>end</sub>）：加速劣化期</b> —— 越过转折点后，老化加速，健康度按二次曲线快速下滑；</li>
+        <li><b style="color:#D4604A;">维修回弹效应</b> —— 每次大修使健康度回弹 ΔH，并延长自然寿命终点 ΔT。</li>
+      </ul>
+      <div class="formula"><span class="cm">// 两段退化曲线示意</span>
+H(t) = 100 - k₁·t                    <span class="cm">// 前段：线性退化 (0 ≤ t ≤ T<sub>c</sub>)</span>
+H(t) = H<sub>c</sub>·[1 - ((t-T<sub>c</sub>)/(T<sub>end</sub>-T<sub>c</sub>))²]   <span class="cm">// 后段：加速劣化 (T<sub>c</sub> &lt; t ≤ T<sub>end</sub>)</span></div>
+    </div>
+    <div class="card">
+      <h3>关键参数说明</h3>
+      <table>
+        <tr><th>参数</th><th>含义</th><th>默认值</th><th>说明</th></tr>
+        <tr><td>T<sub>c</sub></td><td>退化转折点（年）</td><td>8 ~ 12</td><td>线性退化转为加速劣化的时间点</td></tr>
+        <tr><td>H<sub>c</sub></td><td>转折点健康度</td><td>60 ~ 65</td><td>到达转折点时对应的健康分</td></tr>
+        <tr><td>T<sub>end</sub></td><td>自然寿命终点（年）</td><td>12 ~ 25</td><td>不考虑维修时的理论寿命上限</td></tr>
+        <tr><td>ΔH</td><td>维修回弹量</td><td>20</td><td>每次大修后健康度回升的分数</td></tr>
+        <tr><td>ΔT</td><td>维修延寿量（年）</td><td>3</td><td>每次大修后寿命终点延长的年数</td></tr>
+        <tr><td>H<sub>min</sub></td><td>退役阈值</td><td>40</td><td>健康度低于此值判定退役</td></tr>
+        <tr><td>H<sub>maint</sub></td><td>维修阈值</td><td>55</td><td>健康度低于此值触发维修预警</td></tr>
+        <tr><td>PolicyMax</td><td>政策最大年限</td><td>20</td><td>政策允许的最大使用年限</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. 详细公式 -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span>详细计算公式</div>
+    <div class="card">
+      <h3>3.1 前段线性退化（0 ≤ t ≤ T<sub>c</sub>）</h3>
+      <div class="formula">k₁ = (100 - H<sub>c</sub>) / T<sub>c</sub>
+H(t) = 100 - k₁·t</div>
+      <p style="color:var(--text-sub); font-size:14px;">k₁ 为前段退化速率，由起点健康度 100 与转折点 (T<sub>c</sub>, H<sub>c</sub>) 唯一确定。</p>
+    </div>
+    <div class="card">
+      <h3>3.2 后段加速劣化（T<sub>c</sub> &lt; t ≤ T<sub>end</sub>）</h3>
+      <div class="formula">H(t) = H<sub>c</sub>·[1 - ((t - T<sub>c</sub>) / (T<sub>end</sub> - T<sub>c</sub>))²]</div>
+      <p style="color:var(--text-sub); font-size:14px;">后段采用二次抛物线形式，健康度从 H<sub>c</sub> 加速下滑至 0（t = T<sub>end</sub> 时 H = 0）。</p>
+    </div>
+    <div class="card">
+      <h3>3.3 维修回弹效应</h3>
+      <div class="formula">repairCount = ⌊ age / 8 ⌋            <span class="cm">// 简化：每 8 年计 1 次大修</span>
+T<sub>end</sub><sup>adj</sup> = T<sub>end</sub> + repairCount × ΔT   <span class="cm">// 大修延长寿命终点</span></div>
+      <p style="color:var(--text-sub); font-size:14px;">实际项目中按烤房房龄每满 8 年折算一次大修，每次大修使寿命终点延长 ΔT 年（默认 3 年）。</p>
+    </div>
+    <div class="card">
+      <h3>3.4 剩余寿命求解</h3>
+      <div class="formula"><span class="cm">// 前段：求解 H(t) = H<sub>min</sub></span>
+t<sub>end</sub> = (100 - H<sub>min</sub>) / k₁
+
+<span class="cm">// 后段：由 H(t) = H<sub>c</sub>·[1 - ((t-T<sub>c</sub>)/(T<sub>end</sub><sup>adj</sup>-T<sub>c</sub>))²] = H<sub>min</sub> 反解</span>
+ratio  = √(1 - H<sub>min</sub> / H<sub>c</sub>)
+t<sub>end</sub> = T<sub>c</sub> + ratio × (T<sub>end</sub><sup>adj</sup> - T<sub>c</sub>)
+
+<span class="cm">// 剩余寿命</span>
+T<sub>res</sub> = t<sub>end</sub> - age</div>
+    </div>
+    <div class="card">
+      <h3>3.5 政策约束</h3>
+      <div class="formula">T<sub>res</sub><sup>final</sup> = min( max(T<sub>res</sub>, 0),  max(PolicyMax - age, 0) )</div>
+      <p style="color:var(--text-sub); font-size:14px;">最终剩余寿命取"算法结果"与"政策剩余年限"的较小值，且不小于 0，防止超龄烤房出现负值。</p>
+    </div>
+  </div>
+
+  <!-- 4. 计算示例 -->
+  <div class="section">
+    <div class="section-title"><span class="num">4</span>计算示例</div>
+    <div class="card">
+      <h3>示例：某烤房房龄 17 年</h3>
+      <p style="color:var(--text-sub); font-size:14px;">参数：T<sub>c</sub>=12，H<sub>c</sub>=65，T<sub>end</sub>=27，H<sub>min</sub>=40，H<sub>maint</sub>=55，PolicyMax=20</p>
+      <div class="example">
+        <b style="color:#D4944A;">① 维修次数与寿命终点</b>
+        <div class="calc">repairCount = ⌊17/8⌋ = 2
+T<sub>end</sub><sup>adj</sup> = 27 + 2×3 = 33</div>
+      </div>
+      <div class="example">
+        <b style="color:#D4944A;">② 当前健康度（age=17 &gt; T<sub>c</sub>=12，走后段公式）</b>
+        <div class="calc">H(17) = 65 × [1 - ((17-12)/(33-12))²]
+      = 65 × [1 - (5/21)²]
+      = 65 × 0.9433 ≈ 61.3</div>
+      </div>
+      <div class="example">
+        <b style="color:#D4944A;">③ 剩余寿命（求解 H(t) = 40）</b>
+        <div class="calc">ratio = √(1 - 40/65) = √0.3846 ≈ 0.6202
+t<sub>end</sub> = 12 + 0.6202 × (33-12) = 12 + 13.02 = 25.02
+T<sub>res</sub> = 25.02 - 17 = 8.02 年</div>
+      </div>
+      <div class="example">
+        <b style="color:#D4944A;">④ 维修预警（求解 H(t) = 55）</b>
+        <div class="calc">ratio = √(1 - 55/65) = √0.1538 ≈ 0.3922
+t<sub>warn</sub> = 12 + 0.3922 × 21 = 20.24
+T<sub>warn</sub> = 20.24 - 17 = 3.24 年</div>
+      </div>
+      <div class="example">
+        <b style="color:#D4944A;">⑤ 政策约束</b>
+        <div class="calc">政策剩余 = 20 - 17 = 3 年
+T<sub>res</sub><sup>final</sup> = min(8.02, 3) = <b style="color:#7DC4A8;">3 年</b></div>
+      </div>
+      <div class="note"><b>结论：</b>该烤房剩余寿命 3 年（受政策约束），约 3.24 年后健康度降至维修阈值，需提前安排维修。</div>
+    </div>
+  </div>
+
+  <!-- 5. 预警分级 -->
+  <div class="section">
+    <div class="section-title"><span class="num">5</span>剩余寿命预警分级</div>
+    <div class="level-grid">
+      <div class="level-item" style="background:rgba(212,96,74,0.12); border-color:rgba(212,96,74,0.4);">
+        <div class="lv" style="color:#D4604A;">紧急维修</div>
+        <div class="range">剩余寿命 ≤ 1 年</div>
+      </div>
+      <div class="level-item" style="background:rgba(212,148,74,0.1); border-color:rgba(212,148,74,0.4);">
+        <div class="lv" style="color:#D4944A;">需维修</div>
+        <div class="range">1 &lt; 剩余寿命 ≤ 3 年</div>
+      </div>
+      <div class="level-item" style="background:rgba(212,148,74,0.07); border-color:rgba(212,148,74,0.3);">
+        <div class="lv" style="color:#D4B44A;">需关注</div>
+        <div class="range">3 &lt; 剩余寿命 ≤ 5 年</div>
+      </div>
+      <div class="level-item" style="background:rgba(46,139,106,0.12); border-color:rgba(46,139,106,0.4);">
+        <div class="lv" style="color:#7DC4A8;">正常</div>
+        <div class="range">剩余寿命 &gt; 5 年</div>
+      </div>
+    </div>
+    <div class="note"><b>说明：</b>该分级与数据库 <code>lifeDistribution</code> 统计口径一致，用于平台"寿命分布"图表展示。</div>
+  </div>
+
+  <!-- 6. 代码实现 -->
+  <div class="section">
+    <div class="section-title"><span class="num">6</span>代码实现（Java）</div>
+    <div class="card">
+      <h3>HealthAlgoController.calculateLifeResidual() — BDRL 分支</h3>
+      <div class="formula"><span class="cm">// 房龄与当前健康分</span>
+age = currentYear - buildYear
+h0  = health_bmhi   <span class="cm">// 当前健康分（BMHI）</span>
+
+<span class="cm">// BDRL 分支</span>
+repairCount = (int)(age / 8)              <span class="cm">// 每8年1次大修</span>
+tendAdj = tend + repairCount * deltaT     <span class="cm">// 维修延寿</span>
+
+if (age &lt;= tc) {                          <span class="cm">// 前段线性</span>
+    k1    = (100 - hc) / tc
+    tEnd  = (100 - hMin) / k1
+    residual = tEnd - age
+} else {                                  <span class="cm">// 后段二次</span>
+    ratio  = sqrt(1 - hMin / hc)
+    tEnd   = tc + ratio * (tendAdj - tc)
+    residual = tEnd - age
+}
+
+<span class="cm">// 政策约束</span>
+policyResidual = policyMax - age
+return min(max(residual, 0), max(policyResidual, 0))</div>
+    </div>
+  </div>
+
+  <!-- 7. 其他算法对比 -->
+  <div class="section">
+    <div class="section-title"><span class="num">7</span>其他 3 种算法速览</div>
+    <div class="card">
+      <h3>EDRL 指数衰减剩余寿命模型</h3>
+      <div class="formula">H(t) = H₀ × e<sup>-λ(t-t₀)</sup>
+λ = -ln(H₀/100) / t₀
+T<sub>res</sub> = (ln(H₀) - ln(H<sub>min</sub>)) / λ
+T<sub>warn</sub> = (ln(H₀) - ln(H<sub>maint</sub>)) / λ</div>
+      <p style="color:var(--text-sub); font-size:14px;">假设健康度按指数函数单调衰减，用当前健康分反推衰减率 λ，再外推至退役阈值。</p>
+    </div>
+    <div class="card">
+      <h3>WRRL 威布尔可靠性与剩余寿命模型</h3>
+      <div class="formula">R(t) = e<sup>-(t/η)<sup>β</sup></sup>
+t<sub>end</sub> = η × (-ln R<sub>min</sub>)<sup>1/β</sup>
+T<sub>res</sub> = t<sub>end</sub> - age</div>
+      <p style="color:var(--text-sub); font-size:14px;">形状参数 β 描述失效模式（β&gt;1 为耗损失效），尺度参数 η 描述特征寿命，求解可靠度降至退役阈值 R<sub>min</sub> 的时间。</p>
+    </div>
+    <div class="card">
+      <h3>GPLE 灰色预测 GM(1,1) 寿命推演</h3>
+      <div class="formula">X<sup>(1)</sup>(k) = Σ X<sup>(0)</sup>(i)            <span class="cm">// 一次累加</span>
+[a, b]<sup>T</sup> = (B<sup>T</sup>B)<sup>-1</sup> B<sup>T</sup>Y     <span class="cm">// 最小二乘参数</span>
+x̂<sup>(0)</sup>(k+1) = (1-e<sup>-a</sup>)·(x<sup>(0)</sup>(1) - b/a)·e<sup>-ak</sup>
+<span class="cm">// 求 x̂(k) ≤ H<sub>min</sub> 的最小 k</span></div>
+      <p style="color:var(--text-sub); font-size:14px;">利用 ≥3 期历史健康分序列做灰色预测外推，适合少数据贫信息场景。无历史数据时退化为按年退化率推算：H(t) = H₀×(1-r)<sup>(t-age)</sup>。</p>
+    </div>
+    <div class="card">
+      <h3>四算法对比</h3>
+      <table>
+        <tr><th>算法</th><th>退化形态</th><th>数据需求</th><th>特点</th></tr>
+        <tr><td><span class="tag tag-green">BDRL</span></td><td>线性 + 二次加速</td><td>健康分 + 房龄</td><td>贴近实际，支持维修延寿</td></tr>
+        <tr><td><span class="tag tag-orange">EDRL</span></td><td>指数衰减</td><td>健康分 + 房龄</td><td>简单，适合平稳退化</td></tr>
+        <tr><td><span class="tag tag-orange">WRRL</span></td><td>威布尔分布</td><td>健康分 + 房龄</td><td>可靠性工程标准</td></tr>
+        <tr><td><span class="tag tag-orange">GPLE</span></td><td>灰色预测外推</td><td>≥3期历史序列</td><td>贫信息场景适用</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 8. 数据流 -->
+  <div class="section">
+    <div class="section-title"><span class="num">8</span>数据流与存储</div>
+    <div class="card">
+      <h3>寿命预测数据流</h3>
+      <div class="steps">
+        <div class="step">
+          <h4>输入数据</h4>
+          <ul>
+            <li><code>kf_basedata.finish_date / start_date</code> → 计算房龄 age</li>
+            <li><code>kf_basedata.health_bmhi</code> → 当前健康分 H₀</li>
+          </ul>
+        </div>
+        <div class="step">
+          <h4>算法计算</h4>
+          <ul>
+            <li>按所选算法（BDRL/EDRL/WRRL/GPLE）计算剩余寿命 T<sub>res</sub></li>
+            <li>应用政策约束：T<sub>res</sub> = min(T<sub>res</sub>, PolicyMax - age)</li>
+          </ul>
+        </div>
+        <div class="step">
+          <h4>结果存储</h4>
+          <ul>
+            <li><code>kf_basedata.life_bdrl / life_edrl / life_wrrl / life_gple</code> → 各算法结果</li>
+            <li><code>kf_basedata.current_life_residual</code> → 当前生效的剩余寿命</li>
+            <li><code>kf_basedata.current_life_algo</code> → 当前使用的算法标识</li>
+          </ul>
+        </div>
+        <div class="step">
+          <h4>前端展示</h4>
+          <ul>
+            <li>烤房详情页展示剩余寿命与维修预警时间</li>
+            <li>统计页展示寿命分布（正常/需关注/需维修/紧急维修）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    烤房寿命预测算法详解 · BDRL 双段退化剩余寿命模型 · 生成于 2026-08-18
+  </div>
+</div>
+</body>
+</html>
