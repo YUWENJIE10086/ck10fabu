@@ -1,0 +1,37 @@
+name: Build 10012237 premium 3S-master competition PPT
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_10012237_READY'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx pillow
+      - name: Decode generator
+        run: |
+          python - <<'PY'
+          import base64,gzip
+          from pathlib import Path
+          p=Path('scripts/build_ppt_10012237.py.gz.b64')
+          Path('scripts/build_ppt_10012237.py').write_bytes(gzip.decompress(base64.b64decode(p.read_text().strip())))
+          PY
+      - name: Build premium editable deck from original 3S master
+        run: python scripts/build_ppt_10012237.py
+      - name: Commit final PPT
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/10012237PPT母版高端科技版"
+          git commit -m "Add 10012237 premium 3S-master competition PPT" || exit 0
+          git pull --rebase origin main
+          git push origin main
