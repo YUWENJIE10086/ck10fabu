@@ -1,0 +1,24 @@
+name: Analyze creator25 images 10011941
+on:
+  push:
+    paths:
+      - 'scripts/ANALYZE_CREATOR25_10011941_READY'
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pillow
+      - run: python scripts/analyze_creator25_10011941.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: creator25-review-10011941
+          path: _tmp_creator25_review
+          compression-level: 6
