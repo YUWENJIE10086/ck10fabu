@@ -1,0 +1,11 @@
+name: List PPT assets 10011941
+on:
+  push:
+    paths:
+      - 'scripts/LIST_PPT_ASSETS_10011941_READY'
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: find '决赛发布材料/10011603PPT/assets' -maxdepth 1 -type f -printf '%f\n' | sort
