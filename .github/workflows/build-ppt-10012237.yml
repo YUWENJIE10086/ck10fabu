@@ -27,11 +27,13 @@ jobs:
           PY
       - name: Build premium editable deck from original 3S master
         run: python scripts/build_ppt_10012237.py
+      - name: Keep delivery folder clean
+        run: rm -rf "决赛发布材料/10012237PPT母版高端科技版/_tmp"
       - name: Commit final PPT
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "决赛发布材料/10012237PPT母版高端科技版"
-          git commit -m "Add 10012237 premium 3S-master competition PPT" || exit 0
+          git add -A "决赛发布材料/10012237PPT母版高端科技版"
+          git commit -m "Refine 10012237 premium 3S-master competition PPT" || exit 0
           git pull --rebase origin main
           git push origin main
