@@ -1,0 +1,20 @@
+name: Package PPT sources 10011603
+on:
+  push:
+    paths:
+      - 'scripts/PACKAGE_PPT_SOURCES_10011603_READY'
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy source files
+        run: |
+          mkdir -p /tmp/ppt_sources
+          cp 'ppt参考/3S共享烤房-0829.pptx' /tmp/ppt_sources/
+          cp 'ppt参考/三智融合-0909.pptx' /tmp/ppt_sources/
+          cp 'ppt参考/智烤管家演讲讲稿9.30.docx' /tmp/ppt_sources/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ppt-sources-10011603
+          path: /tmp/ppt_sources
