@@ -28,12 +28,11 @@ jobs:
 
       - name: Commit refined PPT and design note
         run: |
+          set -euxo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021320_母版原生克制高级美学重构版.pptx" \
-                  "决赛发布材料/1002PPT决赛完善版/去荧光审美重构说明_10021320.md"
-          git commit -m "Add 10021320 restrained high-end competition PPT" || true
-          git reset --hard HEAD
-          git fetch origin main
-          git rebase origin/main
+          ls -lh "决赛发布材料/1002PPT决赛完善版/智烤管家_10021320_母版原生克制高级美学重构版.pptx"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021320_母版原生克制高级美学重构版.pptx" "决赛发布材料/1002PPT决赛完善版/去荧光审美重构说明_10021320.md"
+          git status --short
+          git commit -m "Add 10021320 restrained high-end competition PPT"
           git push origin HEAD:main
