@@ -1,9 +1,9 @@
 from pathlib import Path
 from pptx import Presentation
-from pptx.enum.shapes import MSO_SHAPE_TYPE
 
 SRC = Path('决赛发布材料/1002PPT决赛完善版/智烤管家_10021215_一等奖高阶光效价值深化版.pptx')
-OUT = Path('scripts/_tmp_ppt_shape_audit_10021215.md')
+OUT_DIR = Path('scripts/_tmp_ppt_audit_10021215')
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 prs = Presentation(SRC)
 
 
@@ -41,26 +41,26 @@ def line_desc(sh):
     except Exception:
         return '-'
 
-lines=[]
-lines.append(f'# Shape audit: {SRC.name}')
-lines.append(f'- slides: {len(prs.slides)}')
-lines.append(f'- size: {emu_in(prs.slide_width)} x {emu_in(prs.slide_height)} in')
-
 for si, slide in enumerate(prs.slides, start=1):
+    lines=[]
     texts=[]
     for sh in slide.shapes:
         if getattr(sh, 'has_text_frame', False) and sh.text.strip():
-            texts.append(sh.text.strip().replace('\n','｜')[:120])
-    lines.append(f'\n## S{si}  ' + (' / '.join(texts[:3]) if texts else ''))
+            texts.append(sh.text.strip().replace('\n','｜')[:160])
+    lines.append(f'# S{si:02d} shape audit')
+    lines.append(f'- deck: {SRC.name}')
+    lines.append(f'- size: {emu_in(prs.slide_width)} x {emu_in(prs.slide_height)} in')
+    lines.append('- headline text: ' + (' / '.join(texts[:5]) if texts else '(none)'))
+    lines.append('')
     lines.append('|#|type|name|x|y|w|h|fill|line|text|')
     lines.append('|---:|---|---|---:|---:|---:|---:|---|---|---|')
     for i, sh in enumerate(slide.shapes, start=1):
         st = str(sh.shape_type)
         text=''
         if getattr(sh, 'has_text_frame', False):
-            text=sh.text.strip().replace('\n','｜').replace('|','¦')[:160]
+            text=sh.text.strip().replace('\n','｜').replace('|','¦')[:240]
         nm=(sh.name or '').replace('|','¦')
         lines.append(f'|{i}|{st}|{nm}|{emu_in(sh.left)}|{emu_in(sh.top)}|{emu_in(sh.width)}|{emu_in(sh.height)}|{fill_desc(sh)}|{line_desc(sh)}|{text}|')
-
-OUT.write_text('\n'.join(lines), encoding='utf-8')
-print(OUT)
+    out = OUT_DIR / f'S{si:02d}.md'
+    out.write_text('\n'.join(lines), encoding='utf-8')
+    print(out)
