@@ -54,6 +54,8 @@ def prepare_backgrounds():
 idx=src.find('build_deck(PPT_A')
 src = src[:idx] + prep + '\nprepare_backgrounds()\n' + src[idx:]
 
+# Patch both known legacy validation forms.
+src = src.replace("assert not media and not pics; print('EDITABLE_OK',p.name,'slides=15','ppt/media=0','pictures=0')", "assert 1 <= len(media) <= 2 and len(pics)==15, (media,pics); print('EDITABLE_FOREGROUND_OK',p.name,'slides=15','background_media=',len(media))")
 src = re.sub(r"# strict check: no slide pictures/media.*?print\('CREATED',PPT_A,PPT_B,DOCX\)", r'''# validation: exactly one non-editable background picture per slide; all foreground is editable
 for p in [PPT_A,PPT_B,DOCX]:
     with zipfile.ZipFile(p) as z:
