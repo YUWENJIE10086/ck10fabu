@@ -1,0 +1,73 @@
+name: Build editable Zhikao PPT 10022128
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/BUILD_EDITABLE_10022128_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx python-docx
+      - name: Build editable PowerPoints and speaking guide
+        run: python scripts/build_editable_10022128.py
+      - name: Move outputs into final folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST='决赛发布材料/1002PPT决赛完善版'
+          mkdir -p "$DEST"
+          mv '智烤管家_10022128_10021912原视觉全组件可编辑还原版.pptx' "$DEST/"
+          mv '智烤管家_10022128_全组件可编辑减光路8分钟优化版.pptx' "$DEST/"
+          mv '智烤管家_10022128_8分钟逐页演讲建议与素材补充说明.docx' "$DEST/"
+          cat > "$DEST/全组件可编辑版本说明_10022128.md" <<'EOF'
+          # 智烤管家全组件可编辑版本（10022128）
+
+          - A版：`智烤管家_10022128_10021912原视觉全组件可编辑还原版.pptx`
+            - 以 `智烤管家_10021912_蓝白山海光路无框视觉决赛版` 的视觉语言为目标重新绘制。
+            - 保留较强的山海、节点、蓝白标题和全稿光路氛围。
+          - B版：`智烤管家_10022128_全组件可编辑减光路8分钟优化版.pptx`
+            - 第1—2页保留强光路。
+            - 第3—15页取消底部大光路，只留必要的节点/模型连接线。
+            - 按8分钟演讲节奏减负，并统一讲稿数据口径。
+          - Word：`智烤管家_10022128_8分钟逐页演讲建议与素材补充说明.docx`
+            - 逐页口播、A/B角色、时长、动作和图片/视频补充建议。
+
+          ## 可编辑性检查
+          两份PPT均由PowerPoint原生文字、形状、线条、图表式组件构成；构建脚本强制检查 `ppt/media=0` 且所有幻灯片中不存在 `<p:pic>` 图片节点。
+
+          真实业务图片/截图不做“假矢量化”，只保留可编辑证据占位，后续应替换为真实小程序、后台、选址地图、维修工单等业务证据。
+          EOF
+      - name: Validate outputs are fully editable / no slide pictures
+        shell: bash
+        run: |
+          python - <<'PY'
+          import zipfile, pathlib
+          root=pathlib.Path('决赛发布材料/1002PPT决赛完善版')
+          for p in [root/'智烤管家_10022128_10021912原视觉全组件可编辑还原版.pptx', root/'智烤管家_10022128_全组件可编辑减光路8分钟优化版.pptx']:
+              with zipfile.ZipFile(p) as z:
+                  assert z.testzip() is None
+                  media=[n for n in z.namelist() if n.startswith('ppt/media/')]
+                  pics=[n for n in z.namelist() if n.startswith('ppt/slides/slide') and n.endswith('.xml') and b'<p:pic' in z.read(n)]
+                  assert not media, media
+                  assert not pics, pics
+                  print('EDITABLE_OK', p.name, 'ppt/media=0', 'pictures=0')
+          PY
+      - name: Commit generated results
+        shell: bash
+        run: |
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版'
+          git commit -m 'Add fully editable Zhikao PPT variants and 8-minute speaking guide 10022128'
+          git push
