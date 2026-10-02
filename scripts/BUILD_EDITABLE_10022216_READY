@@ -1,3 +1,3 @@
-ready retry 2 2026-10-02 22:31 CST
+ready retry 3 2026-10-02 22:34 CST
 source: 决赛发布材料/1002PPT决赛完善版/智烤管家_10021912_蓝白山海光路无框视觉决赛版.pptx
-fix: Pillow import
+fix: allow one background picture per slide
