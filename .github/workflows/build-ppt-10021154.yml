@@ -25,11 +25,10 @@ jobs:
         run: python /tmp/build_premium_10021154.py
       - name: Add gradient titles and dynamic scan-light effects
         run: python /tmp/enhance_10021154.py
-      - name: Commit final PPT and style note
+      - name: Commit and push final PPT
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021154_高级科技动态深化决赛版.pptx" "决赛发布材料/1002PPT决赛完善版/样式学习与本版应用_10021154.md"
           git commit -m "Add 10021154 premium dynamic competition PPT" || exit 0
-          git pull --rebase origin main
-          git push
+          git push origin HEAD:main
