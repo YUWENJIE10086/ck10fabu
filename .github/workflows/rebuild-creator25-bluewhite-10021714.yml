@@ -1,0 +1,68 @@
+name: Rebuild Creator25 blue-white competition PPT 10021714
+
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_CREATOR25_BLUEWHITE_10021714_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository with LFS source archive
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Ensure Creator25 LFS archive is materialized
+        run: |
+          git lfs pull --include='创客25图片.zip'
+          ls -lh '创客25图片.zip'
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('创客25图片.zip')
+          print('zip bytes=', p.stat().st_size)
+          if p.stat().st_size < 100000000:
+              raise SystemExit('LFS archive was not materialized')
+          PY
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PPT and image dependencies
+        run: pip install python-pptx pillow lxml
+
+      - name: Unzip 401 images, organize one by one, rebuild PPT
+        run: python scripts/rebuild_creator25_bluewhite_10021714.py
+
+      - name: Validate PPT package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from pptx import Presentation
+          p=Path('决赛发布材料/1002PPT决赛完善版/智烤管家_10021714_创客25逐图学习蓝白母版重做版.pptx')
+          prs=Presentation(p)
+          assert len(prs.slides)==15, len(prs.slides)
+          print('slides=',len(prs.slides),'bytes=',p.stat().st_size)
+          idx=Path('决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714/创客25图片_401张逐图学习索引_10021714.csv')
+          lines=sum(1 for _ in idx.open(encoding='utf-8-sig'))
+          assert lines==402, lines
+          previews=list(Path('决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714/逐图预览').rglob('*.jpg'))
+          assert len(previews)==401, len(previews)
+          print('preview_count=',len(previews))
+          PY
+
+      - name: Commit rebuilt PPT and organized Creator25 preview folder
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/智烤管家_10021714_创客25逐图学习蓝白母版重做版.pptx'
+          git add '决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714'
+          git commit -m 'Rebuild PPT from 401 Creator25 references with restored blue-white titles'
+          git push origin HEAD:main
