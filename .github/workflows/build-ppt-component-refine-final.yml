@@ -1,0 +1,34 @@
+name: Build component-level refined competition PPT
+
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_COMPONENT_REFINE_FINAL_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install slide editing dependencies
+        run: pip install python-pptx pillow lxml
+      - name: Build final component-level refined deck
+        run: python scripts/build_ppt_component_refine_final.py
+      - name: Commit output
+        run: |
+          set -euxo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_"*_创客组件化克制高级决赛版.pptx
+          git add "决赛发布材料/1002PPT决赛完善版/创客25组件化审美重构说明_"*.md
+          git status --short
+          git commit -m "Add component-level restrained competition PPT"
+          git push origin HEAD:main
