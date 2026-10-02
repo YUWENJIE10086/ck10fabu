@@ -1,0 +1,35 @@
+name: Render PPT preview 10021714
+
+on:
+  push:
+    paths:
+      - 'scripts/RENDER_PPT_10021714_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: Install LibreOffice and CJK fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-impress fonts-noto-cjk poppler-utils
+      - name: Render PDF preview
+        run: |
+          mkdir -p '决赛发布材料/1002PPT决赛完善版/预览_10021714'
+          libreoffice --headless --convert-to pdf --outdir '决赛发布材料/1002PPT决赛完善版/预览_10021714' '决赛发布材料/1002PPT决赛完善版/智烤管家_10021714_创客25逐图学习蓝白母版重做版.pptx'
+          mv '决赛发布材料/1002PPT决赛完善版/预览_10021714/智烤管家_10021714_创客25逐图学习蓝白母版重做版.pdf' '决赛发布材料/1002PPT决赛完善版/预览_10021714/智烤管家_10021714_蓝白母版重做版_15页预览.pdf'
+          pdfinfo '决赛发布材料/1002PPT决赛完善版/预览_10021714/智烤管家_10021714_蓝白母版重做版_15页预览.pdf' | head -20
+      - name: Commit preview
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/预览_10021714/智烤管家_10021714_蓝白母版重做版_15页预览.pdf'
+          git commit -m 'Add 15-page preview PDF for blue-white PPT rebuild'
+          git push origin HEAD:main
