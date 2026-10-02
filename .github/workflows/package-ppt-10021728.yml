@@ -1,0 +1,25 @@
+name: Package PPT 10021728
+
+on:
+  push:
+    paths:
+      - 'scripts/PACKAGE_PPT_10021728_READY'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: Upload final deck and preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: 智烤管家_10021728_创客25逐图学习蓝白标题终版
+          path: |
+            决赛发布材料/1002PPT决赛完善版/智烤管家_10021728_创客25逐图学习蓝白标题终版.pptx
+            决赛发布材料/1002PPT决赛完善版/预览_10021728/智烤管家_10021728_蓝白标题终版_15页预览.pdf
+          if-no-files-found: error
