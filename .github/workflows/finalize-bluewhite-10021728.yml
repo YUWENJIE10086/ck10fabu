@@ -1,0 +1,52 @@
+name: Finalize blue-white Creator25 PPT 10021728
+
+on:
+  push:
+    paths:
+      - 'scripts/FINALIZE_BLUEWHITE_10021728_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx lxml
+      - name: Fix blue-white titles and black fallback text
+        run: python scripts/finalize_bluewhite_titles_10021728.py
+      - name: Validate deck
+        run: |
+          python - <<'PY'
+          from pptx import Presentation
+          from pathlib import Path
+          p=Path('决赛发布材料/1002PPT决赛完善版/智烤管家_10021728_创客25逐图学习蓝白标题终版.pptx')
+          prs=Presentation(p)
+          assert len(prs.slides)==15
+          print('slides',len(prs.slides),'bytes',p.stat().st_size)
+          PY
+      - name: Install renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libreoffice-impress fonts-noto-cjk poppler-utils
+      - name: Render 15-page preview PDF
+        run: |
+          mkdir -p '决赛发布材料/1002PPT决赛完善版/预览_10021728'
+          libreoffice --headless --convert-to pdf --outdir '决赛发布材料/1002PPT决赛完善版/预览_10021728' '决赛发布材料/1002PPT决赛完善版/智烤管家_10021728_创客25逐图学习蓝白标题终版.pptx'
+          mv '决赛发布材料/1002PPT决赛完善版/预览_10021728/智烤管家_10021728_创客25逐图学习蓝白标题终版.pdf' '决赛发布材料/1002PPT决赛完善版/预览_10021728/智烤管家_10021728_蓝白标题终版_15页预览.pdf'
+          pdfinfo '决赛发布材料/1002PPT决赛完善版/预览_10021728/智烤管家_10021728_蓝白标题终版_15页预览.pdf' | grep -E 'Pages|Page size'
+      - name: Commit final deck and preview
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/智烤管家_10021728_创客25逐图学习蓝白标题终版.pptx'
+          git add '决赛发布材料/1002PPT决赛完善版/预览_10021728/智烤管家_10021728_蓝白标题终版_15页预览.pdf'
+          git commit -m 'Finalize Creator25 PPT with restored blue-white titles and readable cards'
+          git push origin HEAD:main
