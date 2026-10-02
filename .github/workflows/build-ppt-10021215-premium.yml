@@ -1,0 +1,30 @@
+name: Build 10021215 premium competition PPT
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_10021215_PREMIUM_READY'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx pillow
+      - name: Build 10021215 premium editable PPT
+        run: python scripts/build_ppt_10021215_patch.py
+      - name: Commit final PPT and study note
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021215_一等奖高阶光效价值深化版.pptx"
+          git add "决赛发布材料/1002PPT决赛完善版/创客25图片_401张逐图样式学习与本版应用_10021215.md"
+          git commit -m "Add 10021215 premium high-glow value competition PPT" || true
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
