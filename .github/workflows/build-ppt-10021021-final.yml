@@ -1,4 +1,4 @@
-name: Build 10021021 final competition PPT
+name: Build 10021021 final speech-aligned PPT
 on:
   push:
     paths:
@@ -16,18 +16,13 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install python-pptx pillow
-      - name: Reconstruct refined PPT generator
-        run: |
-          cat scripts/.tmp_10021021_1.b64 scripts/.tmp_10021021_2.b64 scripts/.tmp_10021021_3.b64 scripts/.tmp_10021021_4.b64 > /tmp/build.py.gz.b64
-          base64 -d /tmp/build.py.gz.b64 | gzip -d > /tmp/build_ppt_10021021.py
-      - name: Build refined editable PPT
-        run: python /tmp/build_ppt_10021021.py
-      - name: Commit final PPT and clean temporary build files
+      - name: Build final editable PPT
+        run: python scripts/build_ppt_10021021_final.py
+      - name: Commit final PPT
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -f --ignore-unmatch .github/workflows/build-ppt-10021021-final.yml scripts/BUILD_PPT_10021021_FINAL_READY scripts/.tmp_10021021_1.b64 scripts/.tmp_10021021_2.b64 scripts/.tmp_10021021_3.b64 scripts/.tmp_10021021_4.b64
-          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021021_演讲稿主线母版科技完善版.pptx"
-          git commit -m "Add 10021021 refined final competition PPT" || exit 0
+          git add "决赛发布材料/10021021PPT演讲稿融合深化版"
+          git commit -m "Add 10021021 speech-aligned final competition PPT" || exit 0
           git pull --rebase origin main
-          git push origin main
+          git push
