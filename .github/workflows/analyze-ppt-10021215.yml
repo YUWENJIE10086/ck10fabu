@@ -1,0 +1,26 @@
+name: Analyze PPT 10021215 shapes
+
+on:
+  push:
+    paths:
+      - 'scripts/ANALYZE_PPT_10021215_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx pillow lxml
+      - run: python scripts/analyze_ppt_10021215_shapes.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/_tmp_ppt_shape_audit_10021215.md
+          git commit -m "Add temporary PPT shape audit"
+          git push origin HEAD:main
