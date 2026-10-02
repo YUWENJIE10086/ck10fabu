@@ -21,6 +21,6 @@ jobs:
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/_tmp_ppt_shape_audit_10021215.md
-          git commit -m "Add temporary PPT shape audit"
+          git add scripts/_tmp_ppt_audit_10021215/
+          git commit -m "Add per-slide temporary PPT shape audit"
           git push origin HEAD:main
