@@ -5,7 +5,10 @@ BASE = (Path('/mnt/data/build_editable_10022128.py') if Path('/mnt/data/build_ed
 src = BASE.read_text(encoding='utf-8')
 
 src = src.replace("STAMP='10022128'", "STAMP='10022216'")
-src = src.replace("import math, zipfile, shutil", "import math, zipfile, shutil\nfrom PIL import Image, ImageEnhance, ImageDraw")
+if "import math, zipfile, shutil" in src:
+    src = src.replace("import math, zipfile, shutil", "import math, zipfile, shutil\nfrom PIL import Image, ImageEnhance, ImageDraw")
+else:
+    src = src.replace("import math, zipfile", "import math, zipfile\nfrom PIL import Image, ImageEnhance, ImageDraw")
 src = src.replace("W=13.333; H=7.5", "W=13.333; H=7.5\nBG_FULL='/tmp/zhikao_bg_full.jpg'; BG_REDUCED='/tmp/zhikao_bg_reduced.jpg'; SOURCE_PPT=(Path('/mnt/data/智烤管家_10021912_蓝白山海光路无框视觉决赛版.pptx') if Path('/mnt/data/智烤管家_10021912_蓝白山海光路无框视觉决赛版.pptx').exists() else Path('决赛发布材料/1002PPT决赛完善版/智烤管家_10021912_蓝白山海光路无框视觉决赛版.pptx'))")
 
 new_bg = r'''def add_bg(slide,road=True,seed=1):
