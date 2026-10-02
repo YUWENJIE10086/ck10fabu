@@ -1,0 +1,34 @@
+name: Build 10021155 premium competition PPT
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_10021155_PREMIUM_READY'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx pillow
+      - name: Reconstruct premium builder
+        shell: bash
+        run: |
+          cat scripts/.tmp_10021155_1.b64 scripts/.tmp_10021155_2.b64 scripts/.tmp_10021155_3.b64 scripts/.tmp_10021155_4.b64 > /tmp/build.py.gz.b64
+          base64 -d /tmp/build.py.gz.b64 | gzip -d > /tmp/build_premium.py
+      - name: Build premium editable PPT
+        run: python /tmp/build_premium.py
+      - name: Commit premium PPT and clean temporary build files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021155_高阶光效内容深化决赛版.pptx"
+          git rm -f scripts/.tmp_10021155_1.b64 scripts/.tmp_10021155_2.b64 scripts/.tmp_10021155_3.b64 scripts/.tmp_10021155_4.b64 scripts/BUILD_PPT_10021155_PREMIUM_READY .github/workflows/build-ppt-10021155-premium.yml
+          git commit -m "Add 10021155 premium glow final competition PPT"
+          git pull --rebase origin main
+          git push
