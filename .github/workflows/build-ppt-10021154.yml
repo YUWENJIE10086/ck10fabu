@@ -1,0 +1,35 @@
+name: Build 10021154 premium dynamic competition PPT
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_10021154_READY'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install python-pptx pillow
+      - name: Decode premium builders
+        shell: bash
+        run: |
+          base64 -d scripts/.tmp_premium_10021154.b64 | gzip -d > /tmp/build_premium_10021154.py
+          base64 -d scripts/.tmp_enhance_10021154.b64 | gzip -d > /tmp/enhance_10021154.py
+      - name: Build premium base
+        run: python /tmp/build_premium_10021154.py
+      - name: Add gradient titles and dynamic scan-light effects
+        run: python /tmp/enhance_10021154.py
+      - name: Commit final PPT and style note
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021154_高级科技动态深化决赛版.pptx" "决赛发布材料/1002PPT决赛完善版/样式学习与本版应用_10021154.md"
+          git commit -m "Add 10021154 premium dynamic competition PPT" || exit 0
+          git pull --rebase origin main
+          git push
