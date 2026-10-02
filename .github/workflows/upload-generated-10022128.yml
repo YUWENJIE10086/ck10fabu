@@ -1,0 +1,70 @@
+name: Upload generated editable PPT 10022128
+
+on:
+  push:
+    branches: [tmp-upload-10022128]
+    paths:
+      - 'scripts/UPLOAD_GENERATED_10022128_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reassemble generated binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/out
+          cat scripts/_upload_tmp_10022128/A.part* | base64 -d > '/tmp/out/智烤管家_10022128_10021912原视觉全组件可编辑还原版.pptx'
+          cat scripts/_upload_tmp_10022128/B.part* | base64 -d > '/tmp/out/智烤管家_10022128_全组件可编辑减光路8分钟优化版.pptx'
+          cat scripts/_upload_tmp_10022128/W.part* | base64 -d > '/tmp/out/智烤管家_10022128_8分钟逐页演讲建议与素材补充说明.docx'
+      - name: Validate package integrity
+        shell: bash
+        run: |
+          python - <<'PY'
+          import zipfile, pathlib
+          for p in pathlib.Path('/tmp/out').iterdir():
+              with zipfile.ZipFile(p) as z:
+                  bad = z.testzip()
+                  if bad:
+                      raise SystemExit(f'{p.name} corrupted at {bad}')
+              print('OK', p.name, p.stat().st_size)
+          PY
+      - name: Rewrite staging branch as one clean commit on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          BASE=$(git rev-parse origin/main)
+          git reset --hard "$BASE"
+          DEST='决赛发布材料/1002PPT决赛完善版'
+          mkdir -p "$DEST"
+          cp /tmp/out/* "$DEST/"
+          cat > "$DEST/全组件可编辑版本说明_10022128.md" <<'EOF'
+          # 智烤管家全组件可编辑版本（10022128）
+
+          本次基于 `智烤管家_10021912_蓝白山海光路无框视觉决赛版` 的视觉语言重新绘制为 PowerPoint 原生组件。
+
+          - A版：`智烤管家_10022128_10021912原视觉全组件可编辑还原版.pptx`
+            - 尽量保留 10021912 版的深蓝山海、蓝白标题、节点、光环与光路节奏。
+            - 页面主体由可编辑文本、形状、线条、流程、数字、图表与示意组件组成。
+          - B版：`智烤管家_10022128_全组件可编辑减光路8分钟优化版.pptx`
+            - 第1—2页保留较强舞台光路。
+            - 第3页开始压低/移除底部大光路，减少与讲解内容冲突。
+            - 内容按8分钟决赛发布节奏减负并统一讲稿口径。
+          - 演讲建议：`智烤管家_10022128_8分钟逐页演讲建议与素材补充说明.docx`
+            - 含15页逐页口播、A/B角色、建议时长、动作/翻页点、真实图片与15—20秒视频补充建议。
+
+          备注：真实业务截图/照片不应被“矢量化造假”。主版先以可编辑占位组件呈现，后续可将真实小程序、后台、选址地图、工单等截图替换到指定证据位。
+          EOF
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add "$DEST"
+          git commit -m 'Add editable Creator25-style PPT versions and 8-minute speaking guide 10022128'
+          git push --force origin HEAD:tmp-upload-10022128
