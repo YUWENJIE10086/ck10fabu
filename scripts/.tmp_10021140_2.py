@@ -1,4 +1,4 @@
-=50000)
+50000)
             add_text(slide,label,x,.07,.62,.22,8,YELLOW if active else MUTED,True,PP_ALIGN.CENTER)
             x+=.68
 
