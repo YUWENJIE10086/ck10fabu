@@ -1,0 +1,39 @@
+name: Build 10021320 refined competition PPT
+
+on:
+  push:
+    paths:
+      - 'scripts/BUILD_PPT_10021320_REFINED_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install slide editing dependencies
+        run: pip install python-pptx pillow lxml
+
+      - name: Build restrained high-end competition deck
+        run: python scripts/build_ppt_10021320_refined.py
+
+      - name: Commit refined PPT and design note
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "决赛发布材料/1002PPT决赛完善版/智烤管家_10021320_母版原生克制高级美学重构版.pptx" \
+                  "决赛发布材料/1002PPT决赛完善版/去荧光审美重构说明_10021320.md"
+          git commit -m "Add 10021320 restrained high-end competition PPT" || true
+          git reset --hard HEAD
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
