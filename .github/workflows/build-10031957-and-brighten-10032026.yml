@@ -1,0 +1,43 @@
+name: Build editable vector decks 10032026
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/TRIGGER_10032026'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx
+      - name: Rebuild 10031957 vector deck
+        shell: bash
+        run: |
+          cat scripts/rebuild_full_editable_10031957_part1.txt \
+              scripts/rebuild_full_editable_10031957_part2.txt \
+              scripts/rebuild_full_editable_10031957_part3.txt \
+              scripts/rebuild_full_editable_10031957_part4.txt > /tmp/rebuild_full.py
+          python /tmp/rebuild_full.py
+      - name: Build brighter mother-style version
+        run: python scripts/brighten_full_editable_10032026.py
+      - name: Commit PPT files
+        shell: bash
+        run: |
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_10031957_原图1比1全矢量可编辑重构_15页合并版.pptx'
+          git add '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_10032026_全矢量可编辑_亮蓝科技黄标母版精修版.pptx'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Add editable vector deck 10031957 and bright refinement 10032026'
+            git push
+          fi
