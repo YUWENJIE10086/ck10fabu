@@ -1,0 +1,120 @@
+    for li,(col,base,xs) in enumerate(layers):
+        pts=[(0,H)]
+        for j,x in enumerate(xs):
+            # deterministic mountain heights with multi-frequency waves
+            y=base - (0.33*math.sin(x*1.28+li*.8)+0.18*math.sin(x*2.8+li)+0.10*math.sin(x*5.0+li*.2))
+            pts.append((x,max(3.5,min(5.15,y))))
+        pts.append((W,H))
+        freeform_poly(s,pts,fill=col,trans=0,name=f'背景_山体层_{li+1}')
+    # vertical tech pillars
+    for k,x in enumerate([.55,.82,1.06,11.98,12.25,12.55]):
+        line(s,x,3.35,x,5.65,color='#3ABDF3',width=.55,trans=40,name=f'背景_数据光柱_{k+1}')
+        circle(s,x-.025,3.30,.05,fill='#80E8FF',line=None,trans=20,name=f'背景_光柱节点_{k+1}')
+    # ground stage
+    rect(s,0,5.05,W,2.45,fill='#031427',trans=5,name='背景_地面暗层')
+    if road:
+        # editable luminous paths, no bitmap
+        for idx,off in enumerate([-.55,0,.55]):
+            pts=[]
+            for i in range(25):
+                t=i/24; x=6.67+(t-.5)*13.0
+                y=5.82+off*.10 + 1.0*(t-.5)**2 + .16*math.sin(t*10+idx)
+                pts.append((x,y))
+            for a,b in zip(pts[:-1],pts[1:]):
+                line(s,a[0],a[1],b[0],b[1],color='#0B6A9C',width=4.8,trans=78,name=f'背景_光路底_{idx}')
+                line(s,a[0],a[1],b[0],b[1],color=CYAN,width=1.0,trans=10,name=f'背景_光路亮线_{idx}')
+        # horizon glow rings
+        for d,t in [(5.2,93),(3.9,90),(2.6,86)]:
+            e=s.shapes.add_shape(MSO_SHAPE.OVAL,Inches(6.67-d/2),Inches(5.10-d*.11),Inches(d),Inches(d*.22)); e.name='背景_地平线光环'
+            e.fill.background(); e.line.color.rgb=rgb('#59DEFF'); e.line.width=Pt(.8); set_alpha_line(e,t)
+
+# icon primitives
+
+def server_icon(s,cx,cy,z=.50,prefix='图标_资源调度'):
+    for i in range(3):
+        y=cy-z*.42+i*z*.34
+        r=rect(s,cx-z*.38,y,z*.76,z*.22,fill='#0A4B70',line=CYAN,trans=0,lw=1,radius=True,name=f'{prefix}_服务器{i+1}')
+        circle(s,cx-z*.27,y+z*.07,z*.06,fill=YELLOW,line=None,name=f'{prefix}_状态灯{i+1}')
+        line(s,cx-z*.12,y+z*.11,cx+z*.26,y+z*.11,color=ICE,width=.7,name=f'{prefix}_槽{i+1}')
+    # orbital sweep
+    e=s.shapes.add_shape(MSO_SHAPE.ARC,Inches(cx-z*.52),Inches(cy-z*.10),Inches(z*1.12),Inches(z*.70)); e.name=f'{prefix}_环绕轨迹'; e.fill.background(); e.line.color.rgb=rgb(CYAN); e.line.width=Pt(1.2)
+
+def wrench_gear(s,cx,cy,z=.58,prefix='图标_抢修服务'):
+    line(s,cx-z*.35,cy+z*.28,cx+z*.18,cy-z*.24,CYAN,4.0,name=f'{prefix}_扳手柄')
+    circle(s,cx+z*.05,cy-z*.38,z*.31,fill=NAVY,line=CYAN,lw=3,name=f'{prefix}_扳手头')
+    circle(s,cx-z*.43,cy+z*.18,z*.19,fill=NAVY,line=CYAN,lw=2.2,name=f'{prefix}_扳手尾')
+    # gear as 8-tooth star
+    g=s.shapes.add_shape(MSO_SHAPE.GEAR_6,Inches(cx+z*.05),Inches(cy+z*.02),Inches(z*.34),Inches(z*.34)); g.name=f'{prefix}_齿轮'; g.fill.solid(); g.fill.fore_color.rgb=rgb(CYAN); g.line.fill.background()
+
+def bars_icon(s,cx,cy,z=.55,prefix='图标_投入决策'):
+    vals=[.32,.58,.88]
+    for i,v in enumerate(vals): rect(s,cx-z*.38+i*z*.28,cy+z*.35-v*z*.70,z*.17,v*z*.70,fill=CYAN,line=None,name=f'{prefix}_柱{i+1}')
+    line(s,cx-z*.46,cy+z*.37,cx+z*.48,cy+z*.37,CYAN,1,name=f'{prefix}_基线')
+
+def house_icon(s,cx,cy,z=.65,prefix='图标_烤房'):
+    roof=s.shapes.add_shape(MSO_SHAPE.ISOSCELES_TRIANGLE,Inches(cx-z*.48),Inches(cy-z*.52),Inches(z*.96),Inches(z*.45)); roof.name=f'{prefix}_屋顶'; roof.fill.solid(); roof.fill.fore_color.rgb=rgb(ICE); roof.line.color.rgb=rgb(CYAN); roof.line.width=Pt(1.2)
+    body=rect(s,cx-z*.38,cy-z*.08,z*.76,z*.54,fill='#0B4C70',line=CYAN,trans=0,lw=1.1,name=f'{prefix}_房体')
+    rect(s,cx+z*.05,cy+z*.10,z*.16,z*.34,fill=NAVY,line=CYAN2,trans=0,lw=.7,name=f'{prefix}_门')
+
+def chain_break(s,cx,cy,z=.68,prefix='图标_断链'):
+    # two rotated rounded rectangles as chain links + spark
+    for j,(dx,dy,rot) in enumerate([(-.18,.06,-42),(.18,-.06,-42)]):
+        sh=s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,Inches(cx+dx*z-z*.21),Inches(cy+dy*z-z*.10),Inches(z*.42),Inches(z*.20)); sh.name=f'{prefix}_链环{j+1}'; sh.rotation=rot
+        sh.fill.background(); sh.line.color.rgb=rgb(CYAN); sh.line.width=Pt(2.6)
+    for j,(ang,l) in enumerate([(0,.22),(60,.18),(120,.18),(180,.22),(240,.18),(300,.18)]):
+        a=math.radians(ang); line(s,cx+math.cos(a)*z*.09,cy+math.sin(a)*z*.09,cx+math.cos(a)*z*(.09+l),cy+math.sin(a)*z*(.09+l),YELLOW,1.4,name=f'{prefix}_火花{j+1}')
+
+def ring_platform(s,cx,cy,w=.95,h=.22,prefix='平台'):
+    for i,scale in enumerate([1.0,.76,.52]):
+        e=s.shapes.add_shape(MSO_SHAPE.OVAL,Inches(cx-w*scale/2),Inches(cy-h*scale/2),Inches(w*scale),Inches(h*scale)); e.name=f'{prefix}_光环{i+1}'; e.fill.background(); e.line.color.rgb=rgb(CYAN); e.line.width=Pt(1.0 if i else 1.6); set_alpha_line(e,15+i*18)
+
+def db_icon(s,cx,cy,z=.60,prefix='图标_数据库'):
+    for i in range(3):
+        y=cy-z*.28+i*z*.20
+        e=s.shapes.add_shape(MSO_SHAPE.OVAL,Inches(cx-z*.36),Inches(y),Inches(z*.72),Inches(z*.18)); e.name=f'{prefix}_盘{i+1}'; e.fill.solid(); e.fill.fore_color.rgb=rgb('#0B4C70'); e.line.color.rgb=rgb(CYAN); e.line.width=Pt(1)
+
+def file_search_icon(s,cx,cy,z=.58,prefix='图标_标准判定'):
+    rect(s,cx-z*.34,cy-z*.42,z*.55,z*.72,fill='#0A4569',line=CYAN,trans=0,lw=1,radius=True,name=f'{prefix}_文件')
+    for i in range(3): line(s,cx-z*.24,cy-z*.22+i*z*.17,cx+z*.10,cy-z*.22+i*z*.17,ICE,.8,name=f'{prefix}_文本{i+1}')
+    circle(s,cx+z*.10,cy+z*.06,z*.25,fill=NAVY,line=CYAN,lw=1.4,name=f'{prefix}_放大镜圈')
+    line(s,cx+z*.28,cy+z*.24,cx+z*.40,cy+z*.36,CYAN,2.0,name=f'{prefix}_放大镜柄')
+
+def folder_icon(s,cx,cy,z=.60,prefix='图标_一房一档'):
+    rect(s,cx-z*.38,cy-z*.20,z*.76,z*.53,fill='#0A4C72',line=CYAN,lw=1,radius=True,name=f'{prefix}_文件夹体')
+    rect(s,cx-z*.30,cy-z*.32,z*.30,z*.18,fill='#0A4C72',line=CYAN,lw=1,radius=True,name=f'{prefix}_文件夹签')
+    circle(s,cx+z*.18,cy+z*.04,z*.17,fill=YELLOW,line=None,name=f'{prefix}_档案点')
+
+def doc_icon(s,cx,cy,z=.55,prefix='图标_文档'):
+    rect(s,cx-z*.30,cy-z*.40,z*.60,z*.80,fill='#0B4668',line=CYAN,lw=1,radius=True,name=f'{prefix}_纸张')
+    for i in range(3): line(s,cx-z*.18,cy-z*.18+i*z*.18,cx+z*.18,cy-z*.18+i*z*.18,ICE,.8,name=f'{prefix}_文本{i+1}')
+
+def radar_chart(s,cx,cy,r=.55,prefix='雷达图'):
+    for k,scale in enumerate([1,.72,.44]):
+        pts=[]
+        for i in range(6):
+            a=-math.pi/2+i*math.pi/3; pts.append((cx+math.cos(a)*r*scale,cy+math.sin(a)*r*scale))
+        for a,b in zip(pts,pts[1:]+pts[:1]): line(s,a[0],a[1],b[0],b[1],color='#407D99',width=.7,trans=15,name=f'{prefix}_网格{k}')
+    pts=[]; vals=[.78,.54,.70,.62,.83,.68]
+    for i,v in enumerate(vals):
+        a=-math.pi/2+i*math.pi/3; pts.append((cx+math.cos(a)*r*v,cy+math.sin(a)*r*v))
+    poly=freeform_poly(s,pts,fill='#37D5FF',linec=CYAN,trans=70,lw=1,name=f'{prefix}_数据面')
+
+def curve_chart(s,x,y,w,h,prefix='曲线图'):
+    # axes
+    line(s,x,y+h,x+w,y+h,'#54859E',.8,name=f'{prefix}_X轴'); line(s,x,y,x,y+h,'#54859E',.8,name=f'{prefix}_Y轴')
+    vals=[1.0,.98,.94,.88,.76,.60,.42,.28,.18]
+    pts=[]
+    for i,v in enumerate(vals): pts.append((x+i*w/(len(vals)-1),y+h-v*h))
+    for a,b in zip(pts[:-1],pts[1:]): line(s,a[0],a[1],b[0],b[1],CYAN,1.7,name=f'{prefix}_线')
+    for i,(px,py) in enumerate(pts): circle(s,px-.025,py-.025,.05,fill=WHITE,line=None,name=f'{prefix}_点{i}')
+
+def map_network(s,x,y,w,h,prefix='地图网络'):
+    rnd=random.Random(100)
+    pts=[]
+    for i in range(16):
+        px=x+rnd.uniform(.05,.95)*w; py=y+rnd.uniform(.10,.90)*h; pts.append((px,py))
+    # nearest connections
+    for i,(px,py) in enumerate(pts):
+        dists=sorted((( (px-qx)**2+(py-qy)**2,j,qx,qy) for j,(qx,qy) in enumerate(pts) if j!=i))[:2]
+        for _,j,qx,qy in dists: line(s,px,py,qx,qy,'#0B6F9D',.7,trans=25,name=f'{prefix}_连接')
+    for i,(px,py) in enumerate(pts): circle(s,px-.035,py-.035,.07,fill=YELLOW if i in [3,9,13] else CYAN,line=None,trans=5,name=f'{prefix}_节点{i}')
