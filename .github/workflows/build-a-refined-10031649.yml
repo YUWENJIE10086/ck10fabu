@@ -1,0 +1,31 @@
+name: Build refined A deck 10031649
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/BUILD_A_10031649'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx pillow
+      - name: Build refined deck
+        run: python scripts/refine_a_10031649.py
+      - name: Commit generated PPT
+        shell: bash
+        run: |
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_10031649_A版精修终稿_文字渐变可编辑_小图标原生矢量_统一亮背景无光路.pptx'
+          git commit -m 'Add refined editable A deck 10031649'
+          git push
