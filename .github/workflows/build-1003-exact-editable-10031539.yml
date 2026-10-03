@@ -1,0 +1,38 @@
+name: Build 1003 exact editable deck 10031539
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/BUILD_10031539_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx pillow numpy opencv-python-headless
+      - name: Build layered editable deck
+        run: python scripts/rebuild_1003_exact_native_10031539.py
+      - name: Move result into 1003 folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST='决赛发布材料/1002PPT决赛完善版/1003'
+          mkdir -p "$DEST"
+          mv '智烤管家_10031539_1003原图1比1字效原样+文字可编辑下层+图标分层+背景无光路版.pptx' "$DEST/"
+      - name: Commit generated PPT
+        shell: bash
+        run: |
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/1003'
+          git commit -m 'Add 1003 exact layered editable deck 10031539'
+          git push
