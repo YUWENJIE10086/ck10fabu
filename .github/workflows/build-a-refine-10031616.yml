@@ -1,0 +1,38 @@
+name: Build A refined editable deck 10031616
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/BUILD_A_REFINE_10031616_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx pillow numpy opencv-python-headless
+      - name: Build refined editable A deck
+        run: python scripts/build_1003_a_refine_10031616.py
+      - name: Move result into 1003 folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST='决赛发布材料/1002PPT决赛完善版/1003'
+          mkdir -p "$DEST"
+          mv '智烤管家_10031616_A版原图视觉保持+文字渐变可编辑+小图标原生组件+亮背景无底部光路版.pptx' "$DEST/"
+      - name: Commit generated PPT
+        shell: bash
+        run: |
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/1003'
+          git commit -m 'Add refined editable A deck 10031616'
+          git push
