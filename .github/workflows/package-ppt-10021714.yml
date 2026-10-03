@@ -1,29 +1,24 @@
-name: Package PPT 10021714
+name: Package 1003 source PPTs
 
 on:
   push:
+    branches: [main]
     paths:
       - 'scripts/PACKAGE_PPT_10021714_READY'
 
 permissions:
   contents: read
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          lfs: false
-      - name: Package final deck and preview
+      - name: Upload 1003 source decks
         uses: actions/upload-artifact@v4
         with:
-          name: 智烤管家_10021714_蓝白母版重做版
+          name: zhikao-1003-sources
           path: |
-            决赛发布材料/1002PPT决赛完善版/智烤管家_10021714_创客25逐图学习蓝白母版重做版.pptx
-            决赛发布材料/1002PPT决赛完善版/预览_10021714/智烤管家_10021714_蓝白母版重做版_15页预览.pdf
+            决赛发布材料/1002PPT决赛完善版/1003/智烤管家_142106_1比1蓝白山海光路抠图还原版_副本2.pptx
+            决赛发布材料/1002PPT决赛完善版/1003/智烤管家_142106_1比1蓝白山海光路抠图还原版_副本3.pptx
           if-no-files-found: error
