@@ -1,0 +1,33 @@
+name: Build Zhikao redesign 10031742
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/BUILD_ZHIKAO_REDESIGN_10031742'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install python-pptx python-docx pillow numpy opencv-python-headless
+      - name: Build PPT and Word
+        run: python scripts/build_zhikao_10031742_redesign.py
+      - name: Commit generated files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'YUWENJIE10086'
+          git config user.email '44671256+YUWENJIE10086@users.noreply.github.com'
+          git add '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_10031742_8分钟决赛蓝白黄标全组件可编辑重设计版.pptx'
+          git add '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_10031742_8分钟逐页演讲稿与PPT设计说明.docx'
+          git commit -m 'Add 8-minute Zhikao redesign 10031742'
+          git push
