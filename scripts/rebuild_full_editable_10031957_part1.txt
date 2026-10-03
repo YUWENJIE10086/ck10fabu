@@ -1,0 +1,120 @@
+from pathlib import Path
+from copy import deepcopy
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import math, re, random
+
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.dml.color import RGBColor
+from pptx.oxml.xmlchemy import OxmlElement
+from pptx.oxml.ns import qn
+
+TZ=ZoneInfo('Asia/Shanghai')
+STAMP=datetime.now(TZ).strftime('%m%d%H%M')
+ROOT=Path('.')
+DEST=ROOT/'决赛发布材料/1002PPT决赛完善版/1003'
+SRC=DEST/'智烤管家_10031539_1003文字直接可编辑版_图标分层背景无光路.pptx'
+STAMP='10031957'
+OUT=DEST/f'智烤管家_{STAMP}_原图1比1全矢量可编辑重构_15页合并版.pptx'
+OUT3=DEST/f'智烤管家_{STAMP}_副本3_原图1比1全矢量可编辑重构版.pptx'
+OUT2=DEST/f'智烤管家_{STAMP}_副本2_原图1比1全矢量可编辑重构版.pptx'
+
+W=13.333; H=7.5
+EMU=914400
+NAVY='#03162B'; NAVY2='#06213C'; NAVY3='#083654'; BLUE='#0D5F8B'; CYAN='#46D9FF'; CYAN2='#8BEAFF'; WHITE='#F8FCFF'; ICE='#DDF7FF'; MUTED='#9FBACD'; YELLOW='#FFD65A'; GREEN='#44D8B0'
+FONT_CN='Microsoft YaHei'; FONT_EN='Arial'
+
+def rgb(h):
+    h=h.replace('#',''); return RGBColor(int(h[:2],16),int(h[2:4],16),int(h[4:6],16))
+
+def set_alpha_fill(shape, transparency):
+    if shape.fill.type is None: return
+    solid=shape.fill._xPr.find(qn('a:solidFill'))
+    if solid is not None and len(solid):
+        clr=solid[0]
+        for a in list(clr.findall(qn('a:alpha'))): clr.remove(a)
+        a=OxmlElement('a:alpha'); a.set('val',str(int((100-transparency)*1000))); clr.append(a)
+
+def set_alpha_line(shape, transparency):
+    ln=shape.line._get_or_add_ln(); sf=ln.find(qn('a:solidFill'))
+    if sf is not None and len(sf):
+        clr=sf[0]
+        for a in list(clr.findall(qn('a:alpha'))): clr.remove(a)
+        a=OxmlElement('a:alpha'); a.set('val',str(int((100-transparency)*1000))); clr.append(a)
+
+def rect(s,x,y,w,h,fill=NAVY2,line=None,trans=0,lw=1,radius=False,name=None):
+    typ=MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE
+    sh=s.shapes.add_shape(typ,Inches(x),Inches(y),Inches(w),Inches(h))
+    if name: sh.name=name
+    sh.fill.solid(); sh.fill.fore_color.rgb=rgb(fill); set_alpha_fill(sh,trans)
+    if line:
+        sh.line.color.rgb=rgb(line); sh.line.width=Pt(lw)
+    else: sh.line.fill.background()
+    return sh
+
+def circle(s,x,y,d,fill=NAVY2,line=CYAN,trans=0,lw=1,name=None):
+    sh=s.shapes.add_shape(MSO_SHAPE.OVAL,Inches(x),Inches(y),Inches(d),Inches(d))
+    if name: sh.name=name
+    sh.fill.solid(); sh.fill.fore_color.rgb=rgb(fill); set_alpha_fill(sh,trans)
+    if line:
+        sh.line.color.rgb=rgb(line); sh.line.width=Pt(lw)
+    else: sh.line.fill.background()
+    return sh
+
+def line(s,x1,y1,x2,y2,color=CYAN,width=1,trans=0,name=None,arrow=False):
+    sh=s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,Inches(x1),Inches(y1),Inches(x2),Inches(y2))
+    if name: sh.name=name
+    sh.line.color.rgb=rgb(color); sh.line.width=Pt(width)
+    if trans: set_alpha_line(sh,trans)
+    if arrow: sh.line.end_arrowhead=True
+    return sh
+
+def txt(s,text,x,y,w,h,size=12,color=WHITE,bold=False,align=PP_ALIGN.CENTER,name=None):
+    sh=s.shapes.add_textbox(Inches(x),Inches(y),Inches(w),Inches(h));
+    if name: sh.name=name
+    tf=sh.text_frame; tf.clear(); tf.word_wrap=True; tf.vertical_anchor=MSO_ANCHOR.MIDDLE
+    tf.margin_left=tf.margin_right=tf.margin_top=tf.margin_bottom=0
+    p=tf.paragraphs[0]; p.alignment=align
+    r=p.add_run(); r.text=text; r.font.name=FONT_EN; r.font.size=Pt(size); r.font.bold=bold; r.font.color.rgb=rgb(color)
+    rPr=r._r.get_or_add_rPr(); ea=rPr.find(qn('a:ea'))
+    if ea is None: ea=OxmlElement('a:ea'); rPr.append(ea)
+    ea.set('typeface',FONT_CN)
+    return sh
+
+def freeform_poly(s,points,fill,linec=None,trans=0,lw=.6,name=None):
+    b=s.shapes.build_freeform(Inches(points[0][0]),Inches(points[0][1]),scale=1.0)
+    verts=[(Inches(x),Inches(y)) for x,y in points[1:]]
+    b.add_line_segments(verts,close=True)
+    sh=b.convert_to_shape()
+    if name: sh.name=name
+    sh.fill.solid(); sh.fill.fore_color.rgb=rgb(fill); set_alpha_fill(sh,trans)
+    if linec:
+        sh.line.color.rgb=rgb(linec); sh.line.width=Pt(lw)
+    else: sh.line.fill.background()
+    return sh
+
+def background(s,road=True,stars=True,variant=0):
+    rect(s,0,0,W,H,fill=NAVY,name='背景_深蓝底_可编辑')
+    # light beams top-left
+    for i,(x,alpha) in enumerate([(0.0,86),(0.30,90),(0.70,93)]):
+        pts=[(x,0),(x+1.0,0),(x+2.65,2.0),(x+2.35,2.0)]
+        freeform_poly(s,pts,fill='#78CFFF',trans=alpha,name=f'背景_左上光束_{i+1}')
+    # stars
+    if stars:
+        rnd=random.Random(2000+variant)
+        for i in range(45):
+            x=rnd.uniform(.4,12.8); y=rnd.uniform(.35,4.6); d=rnd.choice([.015,.02,.025,.03,.04])
+            circle(s,x,y,d,fill='#CFF7FF',line=None,trans=rnd.randint(25,70),name=f'背景_星点_{i+1}')
+    # fog ellipses
+    for i,(x,y,w,h,t) in enumerate([(-1.0,3.55,6.5,1.1,90),(3.4,3.70,6.4,1.0,92),(8.2,3.55,6.2,1.1,90)]):
+        sh=s.shapes.add_shape(MSO_SHAPE.OVAL,Inches(x),Inches(y),Inches(w),Inches(h)); sh.name=f'背景_云雾_{i+1}'
+        sh.fill.solid(); sh.fill.fore_color.rgb=rgb('#B8E6FF'); set_alpha_fill(sh,t); sh.line.fill.background()
+    # mountain layers
+    layers=[
+        ('#0A2E4A',4.05,[0,0.55,1.1,1.55,2.0,2.4,2.9,3.35,3.85,4.3,4.8,5.35,5.9,6.4,6.9,7.5,8.1,8.75,9.35,9.9,10.5,11.1,11.75,12.4,13.33]),
+        ('#082944',4.35,[0,.48,1.0,1.42,1.9,2.32,2.72,3.22,3.75,4.20,4.72,5.20,5.70,6.15,6.62,7.05,7.60,8.15,8.70,9.25,9.75,10.32,10.85,11.40,12.0,12.55,13.33]),
+        ('#061F36',4.70,[0,.42,.88,1.30,1.72,2.15,2.60,3.05,3.45,3.95,4.42,4.86,5.30,5.80,6.26,6.72,7.18,7.62,8.08,8.52,8.98,9.45,9.92,10.38,10.86,11.36,11.82,12.35,13.33]),
+    ]
