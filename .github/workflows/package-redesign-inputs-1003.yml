@@ -1,0 +1,29 @@
+name: Package redesign inputs 1003
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/REDESIGN_INPUTS_READY_1003'
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Collect source files
+        shell: bash
+        run: |
+          mkdir -p package
+          cp 'ppt参考/3S共享烤房-0829.pptx' package/
+          cp 'ppt参考/智烤管家演讲讲稿9.30.docx' package/
+          cp '决赛发布材料/1002PPT决赛完善版/1003/智烤管家_142106_1比1蓝白山海光路抠图还原版_副本3.pptx' package/
+          cp '决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714/README_逐图学习与本版应用_10021714.md' package/
+          cp '决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714/最终视觉复核说明_10021734.md' package/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: redesign-inputs-1003
+          path: package/
+          retention-days: 3
