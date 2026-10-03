@@ -1,0 +1,120 @@
+
+def bar_chart(s,x,y,w,h,prefix='柱状图',highlight=4):
+    vals=[.35,.48,.58,.72,.86,.78,.64]
+    bw=w/(len(vals)*1.55); gap=bw*.55
+    for i,v in enumerate(vals):
+        col=YELLOW if i==highlight else CYAN
+        rect(s,x+i*(bw+gap),y+h-v*h,bw,v*h,fill=col,line=None,trans=0,radius=False,name=f'{prefix}_柱{i+1}')
+    line(s,x-.05,y+h,x+w,y+h,'#4B7890',.8,name=f'{prefix}_基线')
+
+def phone(s,x,y,w=1.2,h=2.0,prefix='手机'):
+    rect(s,x,y,w,h,fill='#082B48',line=CYAN,lw=1,radius=True,name=f'{prefix}_外框')
+    rect(s,x+.08,y+.18,w-.16,h-.38,fill='#0B3D5E',line='#1C7FAB',trans=10,lw=.6,radius=False,name=f'{prefix}_屏幕')
+    for i in range(4):
+        rect(s,x+.16,y+.38+i*.28,w-.32,.20,fill='#0D4B6C',line=None,trans=15,radius=True,name=f'{prefix}_菜单{i+1}')
+    rect(s,x+.29,y+h-.38,w-.58,.18,fill='#138CCC',line=None,trans=0,radius=True,name=f'{prefix}_按钮')
+
+def people_icon(s,cx,cy,z=.65,prefix='图标_队伍'):
+    for i,dx in enumerate([-.22,0,.22]):
+        circle(s,cx+dx*z-z*.08,cy-z*.30,z*.16,fill=CYAN if i!=1 else YELLOW,line=None,name=f'{prefix}_头{i+1}')
+        rect(s,cx+dx*z-z*.13,cy-z*.06,z*.26,z*.30,fill='#0A4B70',line=CYAN,lw=.7,radius=True,name=f'{prefix}_身{i+1}')
+
+def shield_icon(s,cx,cy,z=.60,prefix='图标_盾牌'):
+    sh=s.shapes.add_shape(MSO_SHAPE.HEXAGON,Inches(cx-z*.36),Inches(cy-z*.40),Inches(z*.72),Inches(z*.80)); sh.name=f'{prefix}_盾'; sh.fill.solid(); sh.fill.fore_color.rgb=rgb('#0A4A70'); sh.line.color.rgb=rgb(CYAN); sh.line.width=Pt(1)
+    line(s,cx-z*.14,cy,cx,cy+z*.13,YELLOW,1.5,name=f'{prefix}_勾1'); line(s,cx,cy+z*.13,cx+z*.19,cy-z*.14,YELLOW,1.5,name=f'{prefix}_勾2')
+
+def coin_icon(s,cx,cy,z=.58,prefix='图标_基金'):
+    for i in range(3): circle(s,cx-z*.30+i*z*.08,cy-z*.30+i*z*.05,z*.60,fill='#0B4C70',line=CYAN,lw=1,name=f'{prefix}_币{i+1}')
+    txt(s,'¥',cx-z*.16,cy-z*.16,z*.32,z*.32,12,YELLOW,True,name=f'{prefix}_符号')
+
+def clone_texts(src_slide,dst_slide):
+    for sh in src_slide.shapes:
+        if getattr(sh,'has_text_frame',False) and sh.text.strip():
+            el=deepcopy(sh._element); dst_slide.shapes._spTree.insert_element_before(el,'p:extLst')
+
+# drawings per slide
+
+def draw_slide(slide,n):
+    background(slide,road=True,stars=True,variant=n)
+    if n==1:
+        # giant arc dome + centered road glow
+        e=slide.shapes.add_shape(MSO_SHAPE.ARC,Inches(2.15),Inches(.15),Inches(9.05),Inches(6.45)); e.name='封面_科技穹顶'; e.fill.background(); e.line.color.rgb=rgb('#236D9C'); e.line.width=Pt(1.1); set_alpha_line(e,40)
+        # horizon vertical data columns
+        for i,x in enumerate([.75,1.02,1.30,11.75,12.05,12.36]): line(slide,x,4.22,x,5.95,'#32BBF2',.7,trans=45,name=f'封面_光柱_{i+1}')
+    elif n==2:
+        # right-side small icons, editable
+        server_icon(slide,8.55,2.43,.54,'S02_资源调度')
+        wrench_gear(slide,8.55,3.92,.54,'S02_抢修服务')
+        bars_icon(slide,8.55,5.33,.54,'S02_投入决策')
+        # chevrons between left/right
+        for yy in [2.43,3.92,5.33]:
+            for dx in [0,.14]:
+                pts=[(7.75+dx,yy-.10),(7.88+dx,yy),(7.75+dx,yy+.10)]
+                for a,b in zip(pts[:-1],pts[1:]): line(slide,a[0],a[1],b[0],b[1],CYAN,1.8,name='S02_箭头')
+        # left number crescents
+        for yy in [2.25,3.73,5.16]:
+            e=slide.shapes.add_shape(MSO_SHAPE.ARC,Inches(.95),Inches(yy-.35),Inches(1.0),Inches(.70)); e.name='S02_序号光弧'; e.fill.background(); e.line.color.rgb=rgb(CYAN); e.line.width=Pt(1.2)
+            line(slide,1.18,yy+.34,2.05,yy+.34,CYAN,.8,trans=20,name='S02_序号底线')
+    elif n==3:
+        # triangle edges
+        p1=(6.2,2.70); p2=(4.90,4.70); p3=(7.85,4.72)
+        # broad underglow then bright lines
+        for a,b in [(p1,p2),(p1,p3),(p2,p3)]:
+            line(slide,a[0],a[1],b[0],b[1],'#0A5E8C',5.0,trans=72,name='S03_三角连线底光')
+            line(slide,a[0],a[1],b[0],b[1],CYAN,1.2,trans=10,name='S03_三角连线')
+        # node platforms and icons
+        ring_platform(slide,p1[0],p1[1]+.35,1.05,.26,'S03_用房节点平台'); house_icon(slide,p1[0],p1[1],.72,'S03_用房图标')
+        ring_platform(slide,p2[0],p2[1]+.30,1.08,.26,'S03_维修节点平台'); wrench_gear(slide,p2[0],p2[1],.70,'S03_维修图标')
+        ring_platform(slide,p3[0],p3[1]+.30,1.08,.26,'S03_投入节点平台'); bars_icon(slide,p3[0],p3[1],.70,'S03_投入图标')
+        chain_break(slide,6.38,4.06,.80,'S03_中心断链')
+        # node halos
+        for cx,cy in [(6.2,2.70),(4.90,4.70),(7.85,4.72)]: circle(slide,cx-.46,cy-.48,.92,fill='#0A3554',line=CYAN,trans=76,lw=.8,name='S03_节点光圈')
+    elif n==4:
+        # rising light route
+        pts=[(1.25,5.12),(3.45,4.52),(6.15,3.92),(8.98,3.38),(11.15,2.92)]
+        for a,b in zip(pts[:-1],pts[1:]):
+            line(slide,a[0],a[1],b[0],b[1],'#0C638F',7,trans=75,name='S04_路线底光'); line(slide,a[0],a[1],b[0],b[1],CYAN,1.4,name='S04_路线亮线')
+        icons=[lambda:house_icon(slide,1.65,4.95,.42,'S04_一库'), lambda:bars_icon(slide,4.38,4.22,.45,'S04_双模'), lambda:wrench_gear(slide,7.10,3.62,.42,'S04_三智'), lambda:people_icon(slide,10.05,3.03,.48,'S04_四队')]
+        for f in icons: f()
+        for cx,cy in [(1.65,5.18),(4.38,4.45),(7.10,3.85),(10.05,3.25)]: ring_platform(slide,cx,cy,.85,.20,'S04_节点平台')
+        for i,(a,b) in enumerate(zip(pts[:-1],pts[1:])): line(slide,(a[0]+b[0])/2-.08,(a[1]+b[1])/2-.04,(a[0]+b[0])/2+.10,(a[1]+b[1])/2-.04,CYAN,2,name=f'S04_箭头{i}')
+    elif n==5:
+        # top three process icons
+        db_icon(slide,2.05,2.36,.52,'S05_现场采集'); file_search_icon(slide,5.92,2.36,.52,'S05_标准判定'); folder_icon(slide,9.78,2.36,.52,'S05_一房一档')
+        for x in [3.62,7.52]:
+            for k in range(2): line(slide,x+k*.12,2.34,x+.20+k*.12,2.34,CYAN,1.8,name='S05_步骤箭头')
+        # map network and record card
+        map_network(slide,1.25,3.45,5.7,1.75,'S05_现场数据网络')
+        # simplified archive panel
+        rect(slide,8.35,3.25,3.60,2.35,fill='#062942',line=CYAN,trans=10,lw=.9,radius=True,name='S05_档案卡')
+        for i in range(6): rect(slide,8.62,3.62+i*.27,2.65,.14,fill='#0B4768',line=None,trans=20,radius=True,name=f'S05_档案字段{i+1}')
+        circle(slide,11.10,4.90,.55,fill='#0A4B70',line=CYAN,lw=1,name='S05_健康分环'); txt(slide,'92',11.10,5.03,.55,.20,10,YELLOW,True,name='S05_健康分')
+    elif n==6:
+        # left state list and house
+        for i in range(5): circle(slide,1.58,3.18+i*.37,.11,fill=CYAN,line=None,name=f'S06_状态点{i+1}'); line(slide,1.75,3.24+i*.37,2.55,3.24+i*.37,'#4C8CA6',.7,name='S06_状态线')
+        house_icon(slide,3.25,4.35,1.12,'S06_烤房体检示意'); ring_platform(slide,3.25,4.96,1.85,.30,'S06_烤房平台')
+        radar_chart(slide,6.18,3.88,.68,'S06_AHP雷达')
+        curve_chart(slide,8.70,3.15,2.45,1.65,'S06_Weibull曲线')
+        # bottom outputs
+        doc_icon(slide,4.35,5.83,.42,'S06_健康等级'); shield_icon(slide,6.15,5.83,.42,'S06_风险部位'); wrench_gear(slide,8.05,5.83,.40,'S06_维修优先')
+    elif n==7:
+        # left map/network
+        map_network(slide,1.08,3.05,4.30,2.15,'S07_村级产能网络')
+        # middle bars
+        bar_chart(slide,5.72,3.35,2.55,1.55,'S07_需求对比',highlight=4)
+        # right action icons
+        actions=[('先调剂',db_icon),('再维修',wrench_gear),('仍缺再建',house_icon)]
+        for i,(name,fn) in enumerate(actions):
+            cx=9.25+i*1.15; fn(slide,cx,4.05,.42,f'S07_{name}'); ring_platform(slide,cx,4.40,.65,.16,f'S07_{name}_平台')
+    elif n==8:
+        # two clusters with central oval
+        for base_x,label in [(2.80,'S08_模型1'),(9.60,'S08_模型2')]:
+            # bars centerpiece
+            bar_chart(slide,base_x-.75,3.15,1.50,1.15,label+'_能力柱')
+            for j,(dx,dy,fn) in enumerate([(-1.0,.55,db_icon),(1.0,.55,house_icon),(-.65,-.60,shield_icon),(.70,-.60,doc_icon)]):
+                fn(slide,base_x+dx,3.35+dy,.36,f'{label}_子图标{j+1}')
+                line(slide,base_x,3.60,base_x+dx,3.35+dy,CYAN,.7,trans=20,name=f'{label}_连接{j+1}')
+        # central output ellipse
+        e=slide.shapes.add_shape(MSO_SHAPE.OVAL,Inches(5.45),Inches(3.45),Inches(2.50),Inches(.82)); e.name='S08_双模耦合输出'; e.fill.solid(); e.fill.fore_color.rgb=rgb('#063352'); set_alpha_fill(e,18); e.line.color.rgb=rgb(CYAN); e.line.width=Pt(1.1)
+        line(slide,4.10,3.80,5.42,3.80,CYAN,1.0,name='S08_输入线1'); line(slide,7.98,3.80,9.12,3.80,CYAN,1.0,name='S08_输入线2')
+    elif n==9:
