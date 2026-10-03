@@ -28,6 +28,7 @@ jobs:
           DEST='决赛发布材料/1002PPT决赛完善版/1003'
           mkdir -p "$DEST"
           mv '智烤管家_10031539_1003原图1比1字效原样+文字可编辑下层+图标分层+背景无光路版.pptx' "$DEST/"
+          mv '智烤管家_10031539_1003文字直接可编辑版_图标分层背景无光路.pptx' "$DEST/"
       - name: Commit generated PPT
         shell: bash
         run: |
