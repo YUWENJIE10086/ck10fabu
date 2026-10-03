@@ -113,3 +113,19 @@ for gi,(srcprs,slide) in enumerate(sources,1):
             txt=T.get(gi,{}).get(ci); q.name=f'原字效切片_S{gi:02d}_{ci:03d}_删除后可直接编辑下层文字' if txt is not None else f'原始切片_S{gi:02d}_{ci:03d}_独立可删除'
             if txt is not None: add_native_under(dst,q,txt,ci,gi)
 prs.save(OUT); print(OUT)
+
+
+# Also create a second deck where native text is immediately visible/editable.
+DIRECT=ROOT/f'智烤管家_{STAMP}_1003文字直接可编辑版_图标分层背景无光路.pptx'
+p2=Presentation(OUT)
+for slide in p2.slides:
+    for sh in list(slide.shapes):
+        n=sh.name or ''
+        if n.startswith('原字效切片_'):
+            el=sh._element; el.getparent().remove(el)
+        elif n.startswith('可编辑文字下层_'):
+            c=sh._element.xpath('.//p:cNvPr')[0]
+            c.attrib.pop('hidden',None)
+            sh.name=n.replace('可编辑文字下层_','原生可编辑文字_').replace('_上方保留原字效切片','')
+p2.save(DIRECT)
+print(DIRECT)
