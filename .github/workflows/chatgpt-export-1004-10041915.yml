@@ -1,0 +1,30 @@
+name: ChatGPT export 1004 source pack 10041915
+on:
+  push:
+    paths:
+      - '.github/workflows/chatgpt-export-1004-10041915.yml'
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble source pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p export
+          cp -a "1004" export/
+          mkdir -p "export/读取资料"
+          cp -a "读取资料/1学习优秀的" "export/读取资料/"
+          mkdir -p "export/决赛发布材料/1002PPT决赛完善版"
+          cp -a "决赛发布材料/1002PPT决赛完善版/创客25图片解压整理_10021714" "export/决赛发布材料/1002PPT决赛完善版/"
+          find export -type f -print | sort > export/FILELIST.txt
+      - name: Upload source pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-pack-10041915
+          path: export
+          retention-days: 1
+          if-no-files-found: error
