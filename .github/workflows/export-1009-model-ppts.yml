@@ -1,0 +1,20 @@
+name: Export 1009 model PPTs
+on:
+  push:
+    paths:
+      - '.github/workflows/export-1009-model-ppts.yml'
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: model-ppts-1009
+          path: |
+            1009/100910_智烤管家_10.pptx
+            1009/几个模型讲解-1.pptx
+            1009/智烤管家0909-1_副本3.pptx
+            1009/*.drawio
+            1009/*.png
+          if-no-files-found: error
