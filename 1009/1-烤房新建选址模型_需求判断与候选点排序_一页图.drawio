@@ -1,0 +1,169 @@
+<mxfile host="app.diagrams.net" agent="Codex">
+  <diagram id="new-build-site-onepage" name="烤房新建选址模型（需求判断+候选点排序）">
+    <mxGraphModel dx="1778" dy="1036" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1080" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#23313F;fontSize=34;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="烤房新建选址模型（需求判断＋候选点排序）" vertex="1">
+          <mxGeometry height="52" width="1680" x="60" y="22" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="先回答“哪个村需要建、需要建几栋”，再回答“候选点中具体建在哪里”" vertex="1">
+          <mxGeometry height="30" width="1680" x="60" y="76" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="whiteSpace=wrap;html=1;rounded=0;arcSize=0;fillColor=#24537A;strokeColor=#24537A;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="1" width="1680" x="60" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#F4F6F8;strokeColor=#24537A;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="660" width="300" x="45" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="660" width="680" x="385" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="660" width="395" x="1105" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=18;fillColor=#FBF3E5;strokeColor=#C7923E;strokeWidth=3;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=1;opacity=100;" value="" vertex="1">
+          <mxGeometry height="660" width="215" x="1540" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="9" edge="1" parent="1" source="5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#24537A;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=4;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#24537A;strokeColor=#24537A;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;数据输入&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;基础台账＋生产与点位数据&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="296" x="47" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#4F81BD;strokeColor=#4F81BD;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;村级新建需求测算&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;判断哪里需要建、需要建几栋&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="676" x="387" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#2F7D61;strokeColor=#2F7D61;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;候选点综合评价&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;AHP＋熵权＋TOPSIS&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="391" x="1107" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#C7923E;strokeColor=#C7923E;strokeWidth=1;fontColor=#FFFFFF;fontSize=22;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 23px;&quot;&gt;决策输出&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;形成可执行的新建建议&lt;/span&gt;" vertex="1">
+          <mxGeometry height="72" width="211" x="1542" y="167" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;span style=&quot;background-color: light-dark(#ffffff, var(--ge-dark-color, #121212));&quot;&gt;&lt;b&gt;&lt;font&gt;① 烤房基础数据&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;&lt;font&gt;健康分、容量、使用状态、所在村&lt;/font&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="96" width="264" x="63" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b style=&quot;&quot;&gt;&lt;font&gt;② 烟叶生产数据&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;收购量、种烟面积、在用烤房栋数&lt;/span&gt;" vertex="1">
+          <mxGeometry height="96" width="264" x="63" y="365" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;font&gt;&lt;b&gt;③ 村级发展数据&lt;/b&gt;&lt;br&gt;&lt;/font&gt;&lt;span style=&quot;&quot;&gt;规模增长、管护缴费、政策、服务、韧性&lt;/span&gt;" vertex="1">
+          <mxGeometry height="96" width="264" x="63" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font&gt;④ 候选点数据&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;地形、水文、电力、交通、烟田匹配等8项指标&lt;/span&gt;" vertex="1">
+          <mxGeometry height="96" width="264" x="63" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#24537A;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font&gt;⑤ 专家判断参数&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;AHP两两比较矩阵、组合系数α（默认0.6）&lt;/span&gt;" vertex="1">
+          <mxGeometry height="96" width="264" x="63" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#4F81BD;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;① 有效烤能折算&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;单栋 Eᵢ = 健康分/100 × capacityKg × 状态系数（默认5000 kg/座）&lt;br&gt;状态系数：在用1.0 · 闲置0.4 · 损毁/待修0.1 · 其他0&lt;br&gt;村级 Q = 0.70×在用A + 0.20×闲置B + 0.10×待修C&lt;/span&gt;" vertex="1">
+          <mxGeometry height="130" width="650" x="400" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#4F81BD;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;② 理论需求与承载匹配&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;D = 收购量kg（担×50）；缺失时按面积×capacityKg÷20&lt;br&gt;Hc = min（100，Q/D×100）　P = D÷max（Q，1）&lt;br&gt;Lc：P≤0.85→100 · ≤1.00→85 · ≤1.20→70 · ≤1.50→50 · 其他30&lt;/span&gt;" vertex="1">
+          <mxGeometry height="125" width="650" x="400" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#6750A4;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;③ 发展指数与需求分&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;Dc = 规模增长、管护缴费、政策争取、服务能力、扩张韧性综合得分&lt;br&gt;&lt;b&gt;V = 0.50Hc + 0.30Lc + 0.20Dc&lt;/b&gt;&lt;br&gt;&lt;b&gt;需求分 N = 100 − V&lt;/b&gt;（N越低，表示新建需求越迫切）&lt;/span&gt;" vertex="1">
+          <mxGeometry height="125" width="650" x="400" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="24" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FBF3E5;strokeColor=#C7923E;strokeWidth=2;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;④ 推荐栋数与新增推演&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;loadBefore = 收购kg ÷（在用栋数×capacityKg）&lt;br&gt;needBarns = ceil（loadBefore − 1.0）&lt;br&gt;Q′ = Q＋新增栋数×capacityKg → 重算V′；改善值 ΔV = V′−V&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="630" x="410" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="25" edge="1" parent="1" source="21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4F81BD;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="26" edge="1" parent="1" source="22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6750A4;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" edge="1" parent="1" source="23" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C7923E;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="24" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="28" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;⑤ 八项指标量化&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;对每个候选点的地形、水文、电力、交通、烟田匹配、环境安全、集群效益和成本经济进行统一评分。&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="130" width="345" x="1130" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="29" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#F3EFFA;strokeColor=#6750A4;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;⑥ 主客观组合赋权&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;AHP两两比较 → 主观权重 W主观&lt;br&gt;熵权法计算信息差异 → 客观权重 W客观&lt;br&gt;&lt;b style=&quot;&quot;&gt;W = αW主观＋（1−α）W客观&lt;/b&gt;（α默认0.6）&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="145" width="345" x="1130" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="30" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#52A36C;strokeWidth=2;fontColor=#000000;fontSize=18;fontFamily=Microsoft YaHei;fontStyle=0;align=left;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;⑦ TOPSIS候选点排序&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;构建加权评价矩阵 → 确定正、负理想解&lt;br&gt;计算候选点与理想解的距离&lt;br&gt;&lt;b style=&quot;&quot;&gt;贴近度 Cᵢ 越大，候选点综合适宜性越高&lt;/b&gt;&lt;/font&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="160" width="345" x="1130" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="31" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#2F7D61;strokeColor=#2F7D61;strokeWidth=1;fontColor=#FFFFFF;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=1;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="村级优先序＋点位排名共同形成项目清单" vertex="1">
+          <mxGeometry height="42" width="345" x="1130" y="762" as="geometry" />
+        </mxCell>
+        <mxCell id="32" edge="1" parent="1" source="28" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2F7D61;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="29" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="33" edge="1" parent="1" source="29" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6750A4;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontFamily=Microsoft YaHei;fontSize=16;fontColor=#5C6B78;labelBackgroundColor=#FFFFFF;" target="30" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;村级新建优先级&lt;/b&gt;&lt;br&gt;&lt;span&gt;发展指数V&lt;br&gt;需求分N&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="179" x="1558" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="35" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;推荐建设数量&lt;/b&gt;&lt;br&gt;&lt;span&gt;建议新建栋数&lt;br&gt;建设前负载率&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="179" x="1558" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="36" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#C7923E;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;候选点排名&lt;/b&gt;&lt;br&gt;&lt;span&gt;TOPSIS贴近度&lt;br&gt;最优候选点&lt;/span&gt;" vertex="1">
+          <mxGeometry height="115" width="179" x="1558" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="37" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=12;fillColor=#FFFFFF;strokeColor=#B85450;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;情景改善结果&lt;/b&gt;&lt;br&gt;&lt;span&gt;建成后V′&lt;br&gt;改善值ΔV&lt;br&gt;判断建得值不值&lt;/span&gt;" vertex="1">
+          <mxGeometry height="130" width="179" x="1558" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="38" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#4F81BD;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="190" width="845" x="45" y="855" as="geometry" />
+        </mxCell>
+        <mxCell id="39" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#4F81BD;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="发展因子 Dc：5项各占20%" vertex="1">
+          <mxGeometry height="32" width="805" x="65" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="40" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=1;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;规模增长&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;面积≥1000→85&lt;br&gt;≥800→70 · 其他50&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="145" x="65" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="41" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=1;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;管护缴费&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;在用占比×100&lt;br&gt;限定40—100&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="145" x="225" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="42" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=1;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;政策争取&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;有候选点85&lt;br&gt;无候选点70&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="145" x="385" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="43" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=1;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;服务能力&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;有在用烤房75&lt;br&gt;无在用烤房40&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="145" x="545" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="44" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF2F8;strokeColor=#4F81BD;strokeWidth=1;fontColor=#000000;fontSize=17;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;扩张韧性&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;&quot;&gt;+10%/5%/2%可承载&lt;br&gt;100/80/60 · 否则40&lt;/span&gt;" vertex="1">
+          <mxGeometry height="110" width="145" x="705" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="45" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=16;fillColor=#FFFFFF;strokeColor=#2F7D61;strokeWidth=2;fontColor=#23313F;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="" vertex="1">
+          <mxGeometry height="190" width="840" x="915" y="855" as="geometry" />
+        </mxCell>
+        <mxCell id="46" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontColor=#2F7D61;fontSize=19;fontFamily=Microsoft YaHei;fontStyle=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="候选点八项指标及AHP主观参考权重" vertex="1">
+          <mxGeometry height="32" width="800" x="935" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="47" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;地形地势&lt;/b&gt;　0.15" vertex="1">
+          <mxGeometry height="44" width="180" x="935" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="48" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;水文条件&lt;/b&gt;　0.12" vertex="1">
+          <mxGeometry height="44" width="180" x="1130" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="49" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;电力保障&lt;/b&gt;　0.18" vertex="1">
+          <mxGeometry height="44" width="180" x="1325" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="50" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;交通条件&lt;/b&gt;　0.10" vertex="1">
+          <mxGeometry height="44" width="180" x="1520" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="51" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;烟田匹配&lt;/b&gt;　0.20" vertex="1">
+          <mxGeometry height="44" width="180" x="935" y="964" as="geometry" />
+        </mxCell>
+        <mxCell id="52" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;环境安全&lt;/b&gt;　0.10" vertex="1">
+          <mxGeometry height="44" width="180" x="1130" y="964" as="geometry" />
+        </mxCell>
+        <mxCell id="53" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;集群效益&lt;/b&gt;　0.08" vertex="1">
+          <mxGeometry height="44" width="180" x="1325" y="964" as="geometry" />
+        </mxCell>
+        <mxCell id="54" parent="1" style="whiteSpace=wrap;html=1;rounded=1;arcSize=10;fillColor=#EAF5EF;strokeColor=#2F7D61;strokeWidth=1;fontColor=#000000;fontSize=20;fontFamily=Microsoft YaHei;fontStyle=0;align=center;verticalAlign=middle;spacing=10;spacingLeft=10;spacingRight=10;spacingTop=6;dashed=0;shadow=0;opacity=100;" value="&lt;b&gt;成本经济&lt;/b&gt;　0.07" vertex="1">
+          <mxGeometry height="44" width="180" x="1520" y="964" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
