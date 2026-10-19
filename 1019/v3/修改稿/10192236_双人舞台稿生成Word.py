@@ -85,11 +85,11 @@ def runtext(p,text):
         r._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"),"仿宋_GB2312")
         r.font.size=Pt(14)
         if part in keywords:r.bold=True
-def speaker(d,line):
+def speaker(d,line,compact=False):
     role,content=line.split("：",1)
     p=d.add_paragraph()
-    p.paragraph_format.space_after=Pt(4)
-    p.paragraph_format.line_spacing=1.13
+    p.paragraph_format.space_after=Pt(2 if compact else 4)
+    p.paragraph_format.line_spacing=1.06 if compact else 1.13
     r=p.add_run(role+"：")
     r.bold=True;r.font.name="黑体";r.font.size=Pt(14)
     r._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"),"黑体")
@@ -98,6 +98,7 @@ def subtitle(d,line):
     p=d.add_paragraph()
     p.paragraph_format.space_before=Pt(3)
     p.paragraph_format.space_after=Pt(1)
+    p.paragraph_format.keep_with_next=True
     r=p.add_run(line)
     r.font.name="黑体";r.font.size=Pt(9)
     r.font.color.rgb=RGBColor(93,103,119)
@@ -127,7 +128,7 @@ def base_staging(d,notes=True):
             elif "【P25" in head:cue="【舞台】最后一组排比抬头看观众，不催促谢幕"
             if cue:subtitle(d,cue)
         for line in bl["lines"]:
-            if line.startswith(("A：","B：")):speaker(d,line)
+            if line.startswith(("A：","B：")):speaker(d,line,notes)
             elif notes:aside(d,line)
 
 # with precise PPT pages and performance cues
