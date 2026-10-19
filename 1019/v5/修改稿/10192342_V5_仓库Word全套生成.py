@@ -171,3 +171,5 @@ for f in sorted(HERE.glob('10192342_*.docx')):
  z=Document(str(f));lines.append(f'- {f.name}: {len(z.paragraphs)} paragraphs, {len(z.inline_shapes)} images, {f.stat().st_size} bytes')
 (HERE/'10192342_核验清单.md').write_text('\n'.join(lines),encoding='utf8')
 print('\n'.join(lines))
+
+# trigger V5 full-source Word generation and auditing
