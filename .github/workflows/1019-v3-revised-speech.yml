@@ -1,0 +1,67 @@
+name: CK10 V3 Revised Speech Word
+on:
+  push:
+    paths:
+      - '1019/v3/修改稿/*_生成Word.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install fonts and Word tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          pip install --quiet python-docx pymupdf pillow
+      - name: Build refined V3 DOCX files
+        run: python "1019/v3/修改稿/10192236_双人舞台稿生成Word.py"
+      - name: Render and inspect every page
+        run: |
+          mkdir -p /tmp/ck10-v3-revision-pdf
+          for f in 1019/v3/修改稿/10192236_*.docx; do
+            libreoffice -env:UserInstallation=file:///tmp/ck10-rev-lo --headless --convert-to pdf --outdir /tmp/ck10-v3-revision-pdf "$f"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import fitz
+          fs=sorted(Path('1019/v3/修改稿').glob('10192236_*.docx'))
+          assert len(fs)==3,(len(fs),[x.name for x in fs])
+          lines=['# V3舞台强化修改稿：Word验收结果','']
+          for f in fs:
+              d=Document(str(f))
+              assert len(d.paragraphs)>15
+              pdf=Path('/tmp/ck10-v3-revision-pdf')/(f.stem+'.pdf')
+              assert pdf.exists(), f
+              p=fitz.open(pdf)
+              assert 1<=len(p)<=8,(f.name,len(p))
+              blank=[i+1 for i,page in enumerate(p) if len(page.get_text().strip())<5]
+              assert not blank,(f.name,blank)
+              lines.append(f'- {f.name}: {len(p)}页，{len(d.paragraphs)}段，未发现空白页')
+          Path('1019/v3/修改稿/10192236_Word排版核验.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Publish to requested V3 modification folder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v3/修改稿/'
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/v3修改稿: 朗朗上口的决赛双人稿与逐页演讲稿'
+            for try in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 5
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
