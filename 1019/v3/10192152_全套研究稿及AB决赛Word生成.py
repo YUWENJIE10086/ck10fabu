@@ -551,3 +551,5 @@ print("\n".join(report))
 # trigger checked V3 document build
 
 # rebuild with table-heavy comparison validation
+
+# final build after GitHub ref race mitigation
