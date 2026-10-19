@@ -299,3 +299,5 @@ section(f,'主要文字修订理由','去掉原稿“95.8%”“抢修全由AI�
 f.save(OUT/f'{STAMP}_05_25页PPT逐页口播与改稿对照.docx')
 print('DELIVERABLES:')
 for x in sorted(OUT.glob(f'{STAMP}*.docx')):print(x.name,x.stat().st_size)
+
+# second-phase generator trigger
