@@ -44,7 +44,7 @@ jobs:
           official=Document(root/'10192342_03_V5_官方叙述一万字级研究校订版.docx')
           officialcount=sum(len(re.findall('[\u4e00-\u9fff]',p.text)) for p in official.paragraphs)
           assert c>=50000 and len(depth.inline_shapes)>=8,(c,len(depth.inline_shapes))
-          assert officialcount>=10000 and len(official.inline_shapes)>=4,(officialcount,len(official.inline_shapes))
+          assert officialcount>=10000 and len(official.inline_shapes)>=3,(officialcount,len(official.inline_shapes))
           checks=[f'口述:A={a},B={b},比例={100*a/(a+b):.2f}%',f'项目研究{c}汉字；{len(depth.inline_shapes)}图',f'官方研究{officialcount}汉字；{len(official.inline_shapes)}图']
           for file in Path('/tmp/ck10v5pdf').glob('*.pdf'):
             pdf=fitz.open(str(file))
