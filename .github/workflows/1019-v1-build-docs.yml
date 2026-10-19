@@ -1,0 +1,47 @@
+name: CK10 1019 V1 Word Reports
+on:
+  push:
+    paths:
+      - '1019/v1/*_四份Word与对应稿生成器.py'
+      - '1019/v1/*_双人演讲稿正文.md'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  word:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install document and analysis tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y antiword fonts-noto-cjk
+          pip install python-docx python-pptx beautifulsoup4 lxml openpyxl xlrd pymupdf pillow
+      - name: Build all requested Word outputs and audit extracts
+        run: python "1019/v1/10192020_四份Word与对应稿生成器.py"
+      - name: Structural output check
+        run: |
+          python - <<'PY'
+          from docx import Document
+          from pathlib import Path
+          p=Path('1019/v1')
+          fs=sorted(p.glob('10192020*.docx'))
+          assert len(fs)==5, [(x.name) for x in fs]
+          for f in fs:
+              d=Document(f)
+              assert len(d.paragraphs)>12, f.name
+              print(f.name,len(d.paragraphs))
+          PY
+      - name: Commit generated documents
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v1/'
+          git diff --cached --quiet || (git commit -m '1019/v1: 交付四类研究Word、净稿和PPT口播对照' && git push)
