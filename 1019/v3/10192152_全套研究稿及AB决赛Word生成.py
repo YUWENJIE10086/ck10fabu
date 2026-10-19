@@ -285,7 +285,7 @@ add(base,"最新PPT内嵌开场视频原文件长约41.5秒，而用户预留约
 add(base,"第十五章 跨领域评委如何听得懂并认可","h2")
 add(base,"信息类评委首先要听懂数据关系、权重与预警、组合赋权、参数校准是否可解释，因此可以适度保留AHP、TOPSIS的名称，却不滥用“人工智能自动决策”。烟叶类评委更在乎旺季调剂、故障风险与资金投入是否被正确解决。让两类评委在同一条链上相遇，正是“烤房健康影响有效烤能，有效烤能影响新建判断；执行产生新数据，模型再次更新”。")
 real_fig(base,"1-智用智投智管_协同关系图_含两个模型(2).drawio.png","补充：从源头数据到三智四队的原始协同图")
-base.save(OUT/f"{STAMP}_03_官方文稿一万字研究与叙述规范V2.docx")
+base.save(OUT/f"{STAMP}_03_官方文稿一万字研究与叙述规范V3.docx")
 # 04 faithful to original document style including section; 14pt speaker and body.
 speak=Document(str(BASE))
 body=speak._element.body
