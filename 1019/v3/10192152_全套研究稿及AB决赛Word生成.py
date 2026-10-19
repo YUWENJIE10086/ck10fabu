@@ -549,3 +549,5 @@ for p in sorted(OUT.glob("10192152_*.docx")):
 print("\n".join(report))
 
 # trigger checked V3 document build
+
+# rebuild with table-heavy comparison validation
