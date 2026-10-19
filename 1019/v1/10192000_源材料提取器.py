@@ -112,3 +112,5 @@ for t,group in zip(['获奖解说词','项目素材','官方表述','早期稿']
  for p in group:summary.append(f'- {p.relative_to(ROOT).as_posix()}（{p.stat().st_size}字节）')
 (OUT/f'{STAMP}_资料完整清单.md').write_text('\n'.join(summary),encoding='utf-8')
 print('complete')
+
+# 1019 首版源材料提取触发
