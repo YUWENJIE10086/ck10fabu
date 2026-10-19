@@ -242,3 +242,5 @@ f"- 230汉字/分钟＋30秒开场视频＋20秒换页：{(TOTAL/230*60+50):.1f}
 print("\n".join(review))
 for file in sorted(OUT.glob(f"{STAMP}*.docx")):
  d=Document(file);print("READY",file.name, file.stat().st_size, "paragraphs",len(d.paragraphs),"images",len(d.inline_shapes))
+
+# Run V4 Word builder after workflow setup.
