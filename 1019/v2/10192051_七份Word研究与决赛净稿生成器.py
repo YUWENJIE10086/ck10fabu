@@ -397,3 +397,5 @@ for f in sorted(OUT.glob(f"{STAMP}*.docx")):
  summary.append(f"- {f.name}：{han}汉字；{len(doc.paragraphs)}段；{len(doc.inline_shapes)}幅图；{f.stat().st_size}字节")
 (OUT/f"{STAMP}_README_核验清单.md").write_text("\n".join(summary),encoding="utf-8")
 print("\n".join(summary))
+
+# execute V2 after workflow installation
