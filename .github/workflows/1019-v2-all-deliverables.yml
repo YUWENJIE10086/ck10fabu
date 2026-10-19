@@ -1,0 +1,50 @@
+name: CK10 1019 V2 Full Deliverables
+on:
+  push:
+    paths:
+      - '1019/v2/*_七份Word研究与决赛净稿生成器.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  create-v2:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare Word authoring dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y antiword fonts-noto-cjk libreoffice-writer
+          python -m pip install --quiet python-docx python-pptx pillow beautifulsoup4 lxml
+      - name: Build v2 documents from originals, official reports, prior extraction and v2 speech
+        run: python "1019/v2/10192051_七份Word研究与决赛净稿生成器.py"
+      - name: Verify words, paragraph structure and layout
+        run: |
+          mkdir -p /tmp/ck10v2_pdf
+          libreoffice -env:UserInstallation=file:///tmp/ck10v2_office --headless --convert-to pdf --outdir /tmp/ck10v2_pdf "1019/v2/10192051_04_智烤管家V2_8分钟AB决赛完整净稿.docx"
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import re
+          fs=sorted(Path('1019/v2').glob('10192051*.docx'))
+          assert len(fs)==6,[x.name for x in fs]
+          for f in fs:
+             d=Document(f)
+             assert len(d.paragraphs)>20,f.name
+             print(f.name,len(d.paragraphs),len(d.inline_shapes))
+          from subprocess import run
+          assert any(Path('/tmp/ck10v2_pdf').glob('*.pdf'))
+          PY
+      - name: Commit files into requested v2 folder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v2/'
+          git diff --cached --quiet || (git commit -m '1019/v2: publish evidence-based Word analysis and 70-30 AB final script' && git pull --rebase origin main && git push origin main)
