@@ -209,3 +209,5 @@ print("\n".join(readme))
 print("OUTPUTS:",*[x.name for x in [stage_path,clean_path,review_path]])
 
 # verified source-to-Word build trigger
+
+# rerun with table-heavy document QA correction
