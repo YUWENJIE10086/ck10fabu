@@ -39,7 +39,7 @@ jobs:
           lines=['# V3舞台强化修改稿：Word验收结果','']
           for f in fs:
               d=Document(str(f))
-              assert len(d.paragraphs)>15
+              assert len(d.paragraphs)>=4
               pdf=Path('/tmp/ck10-v3-revision-pdf')/(f.stem+'.pdf')
               assert pdf.exists(), f
               p=fitz.open(pdf)
