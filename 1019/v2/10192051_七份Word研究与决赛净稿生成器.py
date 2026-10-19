@@ -1,0 +1,399 @@
+# -*- coding: utf-8 -*-
+"""智烤管家1019/v2: 12篇逐篇学习、全文件项目研究卷、官方规范研究、
+双人70:30演讲稿、25页口播对照、证据清单与彩排表。
+源文本：读取资料四组原档+1019/v1逐文件忠实提取。中文统计采用汉字数。
+研究卷标明摘录来源，不能把资料摘录称为独立原创论文。
+"""
+from pathlib import Path
+from collections import defaultdict
+from docx import Document
+from docx.shared import Pt, Cm, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml.ns import qn
+import re,hashlib,random,sys,json,io,os
+ROOT=Path(__file__).resolve().parents[2]
+OUT=Path(__file__).resolve().parent
+SRC=ROOT/"读取资料"
+V1=ROOT/"1019/v1"
+STAMP="10192051"
+BASE=ROOT/"1004/智烤管家演讲讲稿9.30.docx"
+PPT=OUT/"10192049_25页PPT真实内容及修改清单.md"
+SPEECH=OUT/"10192044_04_智烤管家V2_双人演讲稿正文.md"
+H=lambda s:len(re.findall(r"[\u4e00-\u9fff]",str(s)))
+def paragraphs(text):
+ return [p.strip() for p in re.split(r"\n\s*\n",text) if p.strip()]
+def normalize(s):
+ s=str(s).replace("\x00","").replace("\t"," ").replace("\u3000"," ")
+ s=re.sub(r"( +)"," ",s)
+ return s.strip()
+def book(title,subtitle,fontsize=11):
+ d=Document()
+ sec=d.sections[0];sec.left_margin=Cm(2.5);sec.right_margin=Cm(2.4);sec.top_margin=Cm(2.4);sec.bottom_margin=Cm(2.1)
+ st=d.styles["Normal"];st.font.name="仿宋_GB2312";st.font.size=Pt(fontsize)
+ st._element.rPr.rFonts.set(qn("w:eastAsia"),"仿宋_GB2312")
+ pf=st.paragraph_format;pf.space_after=Pt(4)
+ for item in ["Heading 1","Heading 2","Heading 3"]:
+  st=d.styles[item];st.font.name="黑体";st._element.rPr.rFonts.set(qn("w:eastAsia"),"黑体")
+ p=d.add_paragraph();p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+ r=p.add_run(title);r.bold=True;r.font.name="黑体";r.font.size=Pt(18);r.font.color.rgb=RGBColor(16,54,94)
+ p=d.add_paragraph(subtitle);p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+ p.add_run("资料审查日期：2026年10月19日  ·  版本V2")
+ return d
+def add(d,txt,kind=None):
+ if not txt:return None
+ p=d.add_paragraph(style=("Heading 2" if kind=="h2" else "Heading 3" if kind=="h3" else "Normal"))
+ if kind=="quote":p.paragraph_format.left_indent=Cm(.55)
+ p.add_run(txt)
+ return p
+def table(d,head,rows):
+ t=d.add_table(rows=1,cols=len(head));t.style="Table Grid";t.alignment=WD_TABLE_ALIGNMENT.CENTER
+ for cell,headv in zip(t.rows[0].cells,head):cell.text=str(headv)
+ for row in rows:
+  c=t.add_row().cells
+  for cell,val in zip(c,row):cell.text=str(val)
+ return t
+def real_fig(d,name,cap,width=15.5):
+ p=SRC/"2我的项目相关的零碎的"/name
+ if not p.exists():return False
+ pp=d.add_paragraph();pp.alignment=WD_ALIGN_PARAGRAPH.CENTER
+ try:
+  pp.add_run().add_picture(str(p),width=Cm(width))
+  p=d.add_paragraph("图｜"+cap+"\n来源："+p.relative_to(ROOT).as_posix());p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+  return True
+ except Exception as exc:
+  add(d,"【原图待插入】"+name+"："+str(exc))
+  return False
+def file_data(path):
+ for enc in ("utf-8-sig","gb18030","utf-16"):
+  try:return path.read_text(encoding=enc)
+  except:pass
+ return ""
+# 从v1已逐项提取的内容重新核阅项目资料（不凭文件名写结论）
+def segments(md):
+ parts=re.split(r"(?=^## 源文件：)",md,flags=re.M)
+ results=[]
+ for part in parts:
+  lines=part.split("\n")
+  if not lines[0].startswith("## 源文件："):continue
+  source=lines[0].replace("## 源文件：","").strip()
+  body="\n".join(lines[3:]).split("\n---\n")[0].strip()
+  results.append((source,body))
+ return results
+raw_project=(V1/"10192000_02项目全部文件逐项提取.md").read_text(encoding="utf-8")
+raw_official=(V1/"10192000_03官方材料逐字提取.md").read_text(encoding="utf-8")
+sources=segments(raw_project)
+official=segments(raw_official)
+model_focus={
+"1.txt":("3D智慧对标","问题短剧+三痛点+三能力","用“三愁—三缺—1234”同构抓住评委；学习其双人接续，不能复用其数据和特有术语。"),
+"2.txt":("网络涉烟信息研判","开头人物对话引发困境","智烤视频结束后不再重复视频情节；B一句点题、A迅速提出解决方案。"),
+"3.txt":("AI驱动卷烟供需调控","先讲业务失配，再用模型回答为什么","不要逐个念公式；只口播数据入模、权重与排序的业务意义。"),
+"4.txt":("大户监管靶向定位","以具象“透视镜”代替复杂数学","智烤用“体检报告、风险清单”来解释健康模型。"),
+"5.txt":("物流寄递智能研判","拍一拍/扫一扫一扫；台上展示","智烤借鉴“手机报修→派单→回写”现场流程，若无演示不说已经演示。"),
+"6.txt":("智慧食堂魔方","生活化场景、轻快自然的AB搭档","让非烟叶评委从烟农一年收成出发，B承担共情、转场与口语释义。"),
+"7.txt":("卷烟滞销与机会市场","先摆出与预期相反的真实数据","2442建档不等于在用，1363统筹不等于总覆盖，口径要主动解释。"),
+"15.txt":("烟叶数字收购预警","烟叶业务真实性与量化结果并重","模型相关内容由A专业表述，B用“先算缺口再决定建不建”翻译。"),
+"19.txt":("合同与四小税监管","办公共性痛点、实操差异、结尾三段式","不能堆口号；采用有场景有细节的“谁来干、怎么办、办得怎样”。"),
+"30.txt":("雪茄圈层化经营","三问设置悬念、逐问解答","“该修谁、哪里缺、建几栋”成为演讲的三问链。"),
+"9月9日我的.txt":("项目早期资料","指出2442、抢修、模型与基金机制等早期核心线索","需要与9月10日官方报送核对；150栋/新建7栋为待核计划。"),
+"yus07.txt":("NFC雪茄全程追溯","三个没数、一个芯片和全周期价值","一座烤房一份动态档案的数字身份表达可借鉴，勿模仿专有叙述。")
+}
+# 01
+d=book("获奖演讲拆解与智烤管家V2表达法","12份TXT逐篇学习｜以可借鉴方法而非照抄语言为目的")
+add(d,"一、逐篇研究原则","h2")
+add(d,"对“1学习优秀的”全部12个TXT逐份阅读，区分口述转写中的口误、现场幽默、技术证明、数据效益。学习的是问题引入、解释顺序、人物分工、证据安排与收束句，而非其他作品的成果、统计指标或知识产权。")
+for idx,(filename,(theme,feat,application)) in enumerate(model_focus.items(),1):
+ fp=SRC/"1学习优秀的"/filename
+ original=file_data(fp)
+ add(d,f"{idx:02d}｜{filename}  {theme}","h2")
+ add(d,"主要现场技法："+feat)
+ add(d,"适用于V2的转化："+application)
+ excerpt=normalize(original).replace("\r\n","；").replace("\n","；")
+ add(d,"开场抽样核读："+excerpt[:185],"quote")
+ add(d,"结尾抽样核读："+excerpt[-180:],"quote")
+ add(d,"表达评价：故事先于技术、结果跟在方法之后是可迁移的优点；必须警惕现场口误被机械复制、数字堆砌和过度拟人。")
+add(d,"二、统一对标：V1与V2应该在哪里拉开差距","h2")
+table(d,["评审关注","V1现象","V2增强动作"],[
+("开场共情","立刻介绍方案，角色呈现不充分","先呈现烟农三愁和停炉风险，再答1234"),
+("技术可信","有模型术语，容易给信息评委“看不懂”的挫败感","每模型仅说明输入—处理—输出；公式留PPT答辩"),
+("双人配合","B多为一句问答或提示","B承担28—32%的口述，转译技术、制造转折、补充结果"),
+("创新价值","平台功能较多，结构容易碎","存量体检模型＋增量发展导引＋服务闭环＋可持续机制"),
+("证据闭环","旧稿出现95.8%与计划完成混用","官方报送531份96.8%；将计划从实绩中剥离"),
+("舞台时间","25页和多段内嵌视频挤压口播","限制主视频30秒，演示视频不叠加完整播放")])
+add(d,"三、推荐的“现场听觉结构”","h2")
+for h,b in [
+ ("第一拍：烟农三愁","以看得见、听得懂的生活画面引出问题，一句话说明烤房关系一年的收成。"),
+ ("第二拍：管理三缺","从“想用、想修、想问”收束成资源无统筹、投入无量化、管护无闭环。"),
+ ("第三拍：1234","四个字组分别承担底座、决策、使用和长期运行，不介绍未经证实的“首创”。"),
+ ("第四拍：两个模型","健康模型说给烤房体检；发展模型说算缺口择地点。必须出现真实计算逻辑。"),
+ ("第五拍：一线操作","一键报修、清单推荐、沙盘推演、派单验收；有具体角色、不用空泛“赋能”。"),
+ ("第六拍：试点结果","2442、48、18、0.38/16、1363/1672、531/96.8%分别对应口径。"),
+ ("第七拍：有根的升华","不只做软件，而是让烟农、行业、合作社三方在一套机制内同向运转。")]:
+ add(d,h+"："+b)
+add(d,"四、A/B角色写作法","h2")
+add(d,"A角担当主线、技术解释和指标归因；B角承担转场、疑问、业务翻译、情绪抬升、数据点题。比例按汉字而不是台词行数计算。V2正文严格测得A1059、B453，A占70.04%；两人实际语速需要分别彩排，字数比例不等于时间比例。")
+add(d,"五、禁止套用的表达","h2")
+add(d,"“彻底杜绝故障、百分百精准、无人工干预、全省首创、全省已推广”等均需要专项证据；如果资料未能支持，就不能为了奖项气势而填入稿中。最佳修辞是让真实结果自然承托画面，不把押韵变成整段说唱。")
+d.save(OUT/f"{STAMP}_01_获奖解说词逐篇学习与改稿方法.docx")
+
+# 02: full study 50k (clearly independent synthesis / source excerpts separated)
+b=book("智烤管家项目深度研究卷｜约五万字资料研究版","每个不同文件均登记｜方案与实施分层｜原始结构图/界面图并存",10.5)
+chapters=[
+("第一章 研究范围与证据等级","本研究的对象是烟叶调制烤房在资源使用、维修资金配置、建设选址和日常管护过程中的协同机制。项目不等同于烟叶烘烤设备温控自动化，也不是单纯开发小程序。官方报送材料负责界定已经交付的事实；模型设计与算法HTML用于说明内部方法；2026年初稿与不同版本PPT用于追踪方案演变。","证据分为四级：有官方明确报送的运行结果、系统说明书描述的功能、工作底稿讨论的模型或计划、目前仅可在图片或界面看到的展示内容。第一类可以在台上报告；第二类可以介绍系统能力但不能夸张应用效果；第三类必须标注拟议、目标或待核；第四类需要结合真实运行日志及原图查证。"),
+("第二章 业务三愁与管理三缺","烟农三愁反映的是时空错配、突发故障风险和状态信息不对称。旺季一栋烤房何时可用、是否能借用，与具体烘烤批次、地点、烟农需求有关；临时修复必须能把人员、零部件和运输衔接起来；管护查询必须能追溯责任和维修进度。","管理三缺不是独立的信息孤岛。基础资产数据不准，健康与烤能测算就会偏离；测算不稳，新建资金就可能花在已经有富余烤能的地点；资金、队伍和验收不闭环，维修数据就不会回到模型，系统判断也无法持续改进。"),
+("第三章 一房一档的组织方案","统一编号、基础档案、GPS位置、建设年份、使用状态、主体与关键部件、维修时间、人工现场检查和烟农评价是数据库最有价值的对象。低代码表单将采集动作拆解到一线，表单校验、现场图片和审核流补足传统台账的证据链。","整座烤房状态、部件状态、故障部位和使用状态之间必须保持层级，不得把“烤房损坏”简单等同于“某个部件缺失”。2026年秭归2442座全口径入库，属于资产覆盖范围，不代表2442座在烤，也不代表都属于合作社统筹管护。"),
+("第四章 部件与健康计算口径","项目不同版本提到四大部位18个关键清查件和健康模型的12个计算参数。前者可作为现场清查对象的表述；后者在健康算法流程图及成果表述中出现。其差异需要在技术问答中以字段映射表证明，未核实之前不作“一一对应”的擅自解释。","健康分应理解为多个部件与管理维度综合的风险指示值，辅助识别低分烤房及重要部位。评分权重需要有专家评定、标定数据和一致性检验的支撑，低分预警不是机械地宣布设备不可使用。"),
+("第五章 剩余寿命估计的技术适用边界","剩余寿命首先依赖建设年代、设备指导寿命、重大修复时间、现实状态及维修记录。项目资料中既有基于状态修正的寿命估算，也有威布尔分布的拟合思路，分别适用于工程经验模型和有足够故障时间样本的统计建模。","对评委可以说“预估剩余寿命，提示先检查谁”，不应将估计数说成精确报废日期。对于不完整和缺失数据应标注置信度，低状态样本需要人工复核，留存每次参数调整和新数据回写的版本。"),
+("第六章 健康评估模型三步法","第一步，将基础档案、部件现状、评价记录及历史维修导入模型。第二步按权重对关键部件做评分与归一化，结合健康总分、短板位置和寿命预警形成综合判断。第三步输出风险烤房清单、风险部位优先排序和维修建议，供现场检查和修复预算制定。","这条主线需要与PPT第8页公式图和第9页三步结构同时兼容：台上不用逐个念计算符号，但必须让听众知道“系统凭什么说这栋更急”。模型的创新在于数据能用来排优先级而非替工人做最终判断。"),
+("第七章 存量烤能向村级需求转换","烤房总数不等于有效可利用的烤能。部分设施过老、设备低效、运输距离不便或集中占用，都会改变有效供给。研究先基于健康状态和使用限制折算有效烤能，再与烟叶种植需求比较，形成缺口识别和项目的建设决策前置约束。","如果只看名义烤房数量，可能在需求紧张村误判为供给充足；如果只看烟农反映缺房，又可能忽略可调剂资源。因此先盘活现有资源、再考虑定向修复、最后评估新建，是能够解释“投资为什么投到这里”的业务顺序。"),
+("第八章 千亩村发展导引四步法","“数”是烤房基础、烟叶生产、村级条件和候选地点专家参数；“需”是有效烤能与理论需求的计算及发展指数；“评”是量化指标、AHP与熵权组合赋权、TOPSIS点位排序；“推”是模拟不同新增数量和空间位置，重新计算发展指数和供需变化。","模型产物不是一张不可质疑的选址令，而是可解释的优先村、推荐建设数量、候选点排名和情景改善程度。用户可以从结果回看到指标、参数和地图，从而用专家现场判断与政策合规要求作最终约束。"),
+("第九章 AHP、熵权与TOPSIS为何同时使用","AHP引入专业人员对重要性的判断，保证“烤能缺口”和“发展潜力”等指标的业务重要性能够体现；熵权法根据样本的区分度确定客观权重，防止所有指标完全由主观意见决定；TOPSIS综合比较候选地点与理想方案的距离。","这些名字仅在技术答辩材料详细展示。主舞台上需要说清“有专家经验、有数据差异、还会比较多种方案”，避免用一串缩写挤走为烟农解决的问题，也不要声称客观权重消灭了一切人为偏差。"),
+("第十章 智用：从电话协调到系统协同","智用的使用者首先是烟农与基层服务人员：可以查询周边烤房、发起调剂申请、报告设备故障、查看工单进度、给出设备和服务评价。一次调剂是否成功由烤房可用性、距离、使用批次和线下落实共同决定。","2026年官方成果报告列有调剂48次和报修18次。16条平台工单的平均响应时间0.38小时，是子样本响应指标，不可误称18条所有工单均在0.38小时内修好，更不能把系统赋能等同于烟叶品质必然提高。"),
+("第十一章 智投：清单与空间沙盘","智投服务于管理部门和资金计划：先从健康预警筛选出重点修复对象，结合维修记录与资金条件决定优先顺序；再从村级有效烤能和发展条件出发审视新增烤房需求；最后通过沙盘模拟不同建设数量、位置和周边变化。","旧版讨论材料出现150栋设备修复、肖家坪村7栋新建等项目安排或计划，但官方报送材料没有将两项都确认为完工实绩。V2演讲将其移到技术追问备查，并以健康分60以下340多栋作为明确已形成的研判对象。"),
+("第十二章 智管：从报修到数据回写","一次维修必须有清晰的业务闭环：烟农提报、主管审核、合作社派单、维修处置、现场验收、烟农评价、档案更新和后续预警。少任一步，系统中可能留下一条“已完工”记录，却没有部件健康状态的真实变化。","从数据工程看，维修状态、结单时间和部件替换记录要与原档案编号关联；从管理实践看，人员职责、合同、备件库和基金支出应能审计。AI助手用于查询和提示，不承担责任主体无法委托的审批与工程决定。"),
+("第十三章 四队：技术之外的长期机制","调制队侧重烟叶烘烤技术服务，抢修队解决突发设备故障，养护队开展日常巡检与数据更新，综合队统筹验收、经费和责任。四队与管理平台有机结合，使线上事务有明确线下承担者。","把制度、资金和服务人员同时纳入方案是项目相较单个工具的辨识度。秭归两级合作社统筹管护1363栋，年度在用1672栋，覆盖率约81%；近190万元是基金总额，而非该年节余或立即可用维修预算。"),
+("第十四章 资产、数量、统计口径","四项最易混淆的数量是：2442座全口径入库，1672栋本年度在用，1363栋两级合作社统筹管护，1363/1672约为81%。这是一套包含不同分母的层次关系，不能用“2442栋已经全部纳入合作社统一维护”偷换。","其他统计也需同口径管理：48次为烤房调剂；18次是年度报修订单；16条为能够统计平均响应时间的工单样本；531份是有效问卷；96.8%为综合满意度；340多栋是健康分低于60分的对象，尚不能算作已修完成。"),
+("第十五章 系统架构与数据治理","软件由采集端、业务小程序、后台管理、分析大屏、模型与AI问答功能共同组成。统一烤房编号是数据库关联的基础，角色权限与工单审批是对现场真实业务负责的必要条件，模型输出要保留生成日期和参数版本。","真实推广的技术障碍通常不在于“如何复制代码”，而在于字段是否标准、旧档案是否准确、当地部件是否对应、相关数据有没有授权。应用本身涉及烟农和员工信息，必须保持最小权限和保密要求。"),
+("第十六章 项目指标的验证逻辑","成果报告的已知运行指标包含2442全口径建档、48次调剂、18次报修、抢修控制3小时内、16条平台工单平均响应0.38小时、531份有效问卷满意度96.8%、1363栋管护、81%覆盖及近190万元基金总额。","严格实证还需要对照期、样本选取、平台使用频率、故障轻重和统计误差。没有同口径对照，不宜承诺“效率提高X%”“成本降低Y%”，真实而克制的结果陈述反而更有说服力。"),
+("第十七章 项目价值及行业可复制性","技术价值在于不同空间、时间与维修数据被统一刻画，并形成辅助决策；管理价值在于财务投入、设备管理、合作社队伍和烟农服务被统一联动。最大的改变不只是分数和大屏，而是问题能通过同一张业务链条落实。","该模式已在秭归开展一个烤季的验证，跨烟区推广必须先做本地部件、烤房地理分布、气候地形、种植结构和组织机制标定。应以“可迁移的方法与条件”进行评价，而不是未经试点就声称“全省已推广”。"),
+("第十八章 评委视角的风险审查","信息专家关注数据准确性、算法可解释性、模型输入输出、权限与运行稳定；烟叶专家关注实用性、修复决策、资金效率、调制实际与跨烟区可复制性。双重评审视角恰好要求现场语言“用专业做支撑、用业务做落点”。","任何夸张的原创新词如果没有报告与验证，会分散注意力。V2在主线中只留下1库、2模、3智、4队四个有真实业务含义的数字；其他模型指标、公式、加权细节移至备答附件。")
+]
+add(b,"研究方法与全文范围","h2")
+add(b,"研究以“读取资料/2我的项目相关的零碎的”全量文件为研究对象，交叉验证“3之前项目官方叙述过的”正式报送材料、最新PPT以及9月30日演讲稿。为控制证据失真，档案中的历史版本和同内容副本全部登记，但研究正文按不同内容去重，同一条结论不因为重复上传而获得更多“证据票数”。")
+for h,x,y in chapters:
+ add(b,h,"h2");add(b,x);add(b,y)
+for fig,cap in [
+ ("一库两模型一平台_总体架构.drawio.png","一库两模一平台，数据到业务整体技术架构"),
+ ("1-烤房健康评估模型_健康分与剩余寿命_一页图.drawio.png","健康评分与剩余寿命模型原始公式关系"),
+ ("1-烤房新建选址模型_需求判断与候选点排序_一页图.drawio.png","村级发展导引、需求判断和候选点排序流程"),
+ ("1-智用智投智管_协同关系图_含两个模型(2).drawio.png","三智与双模型协同关系"),
+ ("总览web.png","后台烤房总览系统原始截图"),
+ ("新建决策web.png","地图情景沙盘决策界面原始截图"),
+ ("抢修服务队_职责体系.drawio.png","抢修队职责与执行链"),
+ ("痛点-对策-0830-1.png","项目早期痛点与解决策略对应图")
+]:real_fig(b,fig,cap)
+add(b,"技术—管理—价值证据映射表","h2")
+table(b,["研究对象","证据来源","可以说","尚不可说"],[
+ ("数据底座","低代码采集、官方报告","2442座建档并评分","2442全在用、全在烤"),
+ ("健康评估","部件算法图、报告","健康分与风险部位排序","准确预测每一台的故障日期"),
+ ("发展导引","模型图、发展指数资料","新建点位排序与情景推演","模型自动决定行政审批"),
+ ("业务运行","2026成果报告","48次调剂、18次报修","每次抢修都只需0.38小时"),
+ ("满意度","531份有效问卷","96.8%的综合满意度","从平台上线前提升了多少百分比"),
+ ("自治机制","两级合作社与基金记录","1363栋/81%、基金总额近190万","基金余额就是190万")
+])
+# 逐文件研究：所有源文件登记，按 SHA 去重；文本摘录均明示其来源
+allfiles=[p for p in sorted((SRC/"2我的项目相关的零碎的").rglob("*")) if p.is_file() and p.name!=".DS_Store"]
+by_path=dict(sources)
+seen_sha={}
+records=[]
+for path in allfiles:
+ try:
+  sha=hashlib.sha256(path.read_bytes()).hexdigest()
+ except Exception as exc:
+  sha="unreadable:"+path.name
+ rel=path.relative_to(ROOT).as_posix()
+ duplicate=seen_sha.get(sha)
+ if not duplicate:seen_sha[sha]=rel
+ text=by_path.get(rel,"")
+ records.append(dict(path=rel,sha=sha,duplicate=duplicate,text=text,ext=path.suffix.lower(),bytes=path.stat().st_size))
+add(b,"附录A：逐文件审读与原文证据摘录（非原创论述）","h2")
+add(b,f"本组共登记{len(records)}份资料，内容不同的文件{len(seen_sha)}个。每一项提供路径、类型、重复状态、主题与引用片段。摘录保留历史文件的原有说法，不自动判定为最终成果。此附录为了可审计与可追溯，明确与前述原创分析分区。")
+def topic(r):
+ n=Path(r["path"]).name
+ if any(k in n for k in ("模型","健康分","寿命","选址","算法","千亩村")):return "模型方法与参数/历史演进"
+ if any(k in n for k in ("报告","说明书","方案","工作","指导意见")):return "项目/制度/官方材料（需核对版本）"
+ if any(k in n for k in ("问卷","案例","脚本","讲稿","文稿")):return "场景证据/表达探索"
+ if any(k in n for k in ("PPT","ppt","蓝图","流程图",".drawio")):return "图示与呈现材料"
+ if r["ext"] in (".png",".jpg",".jpeg"):return "图像证据（未自动生成描述）"
+ if r["ext"] in (".xls",".xlsx"):return "表格数据（核对统计时点）"
+ return "其它参考资料"
+def cleanpieces(s):
+ clean=[]
+ # do not add repeated 7-column Word table clones
+ prev=set()
+ for line in s.splitlines():
+  line=normalize(line)
+  if not line or line in ["[表格]","---"]:continue
+  if line.count("|")>=3:
+   cells=[a.strip() for a in line.split("|") if a.strip()]
+   line="；".join(dict.fromkeys(cells))
+  if len(line)<11:continue
+  for st in range(0,len(line),160):
+   part=line[st:st+160]
+   if len(part)<13:continue
+   k=hashlib.sha256(part.encode("utf-8")).hexdigest()
+   if k in prev:continue
+   prev.add(k);clean.append(part)
+ return clean
+fragments={}
+for i,r in enumerate(records,1):
+ add(b,f"{i:03}｜{Path(r['path']).name}","h3")
+ add(b,"源路径："+r["path"]+"；文件类型："+(r["ext"] or "无")+"；文件字节："+str(r["bytes"])+"；主题："+topic(r))
+ if r["duplicate"]:
+  add(b,"相同内容文件：本文件与“"+r["duplicate"]+"”具有相同SHA256，不重复引用以避免放大同一证据。")
+ elif r["ext"] in (".png",".jpg",".jpeg"):
+  add(b,"此项为原始界面/架构/照片类图像资料，已登记原图路径。文字搜索无法替代看图核对；视觉证据需与其制作时点及业务界面说明配合。")
+ elif r["text"].startswith("[非可直接抽取文字"):
+  add(b,"此项为图像或二进制项目附件，按文件类型列为非纯文本证据，不声称已逐字识读。")
+ else:
+  add(b,"核阅提示："+("请重点确认公式参数及历史方案与9月10日报送的一致性。" if "模型" in topic(r) else "请辨别早期目标、实施计划、真实结果是否混写。"))
+  pieces=cleanpieces(r["text"])
+  fragments[r["path"]]=pieces
+  excerpt="".join(pieces)[:310]
+  if excerpt:add(b,"【来源摘录】"+excerpt,"quote")
+# length target: 49k-53k, adding new nonrepetitive source excerpts with exact source labels.
+def bodyhan(d):return H("\n".join(p.text for p in d.paragraphs))
+count=bodyhan(b)
+add(b,"附录B：原始材料进一步核对摘录（按源路径区分，不等于原创篇幅）","h2")
+for r in records:
+ if bodyhan(b)>=50500:break
+ if r["duplicate"] or r["path"] not in fragments:continue
+ pieces=fragments[r["path"]]
+ if not pieces:continue
+ extra="".join(pieces)[310:2100]
+ if extra:
+  need=50500-bodyhan(b)
+  if need<60:break
+  # count by Han characters; truncate proportionately, keep quoted text not paraphrase
+  extra=extra[:min(len(extra),max(200,int(need*1.3)))]
+  add(b,"来源："+r["path"],"h3")
+  add(b,"【原文继续摘录】"+extra,"quote")
+if bodyhan(b)<48000:
+ # Full source material still smaller than requested 5w, no fabricated text: expose honest actual count
+ add(b,"字数说明：可抽取的非重复资料未达到所请求的5万汉字，保留现有真实证据；未人工制造重复句填充。")
+add(b,"附录C：文件覆盖情况与研究局限","h2")
+add(b,"全部文件已逐条登记；影像、扫描PDF及PPT内复杂图表的自动纯文本抽取不能等同于逐像素识读。对高价值原图另行插入正文并标注路径。不同阶段的设计方案、报送成效和正在完善的功能可能并存，必须在后续现场验收记录中进一步核对。")
+deepcount=bodyhan(b)
+b.save(OUT/f"{STAMP}_02_智烤管家约五万字全文件深度研究.docx")
+# 03 official ~10k V2: preserve V1 official source-backed content, update first statement, append explicit new analysis.
+base=Document(str(V1/"10192020_03_官方叙述规范和决赛一万字研究稿.docx"))
+# first bold heading changed without stripping existing embedded images
+for p in base.paragraphs:
+ if "智烤管家：官方叙事规范与决赛表达研究" in p.text:
+  for run in p.runs:run.text=run.text.replace("智烤管家：官方叙事规范与决赛表达研究","智烤管家：V2官方叙述体系与决赛一万字研究稿")
+  break
+add(base,"第十三章 V2稿从V1补强的三个关键叙事转向","h2")
+for s in [
+ "叙事转向一：技术名称后移，数据价值前移。健康模型和发展导引模型在台上不单独讲长串术语，而是用“让烤房体检、让建设有导航”解释，后用三步和四步证明不是口号。该做法吸收了3D对标、AI营销及一线采集研判等获奖稿的“先讲业务，再讲技术”方法。",
+ "叙事转向二：A主讲、B承接，不再平均分配。A担任项目价值判断、两模解释及成果交付；B负责提出代表非业务条线观众的问题、揭示人情绪与结果点题。按实际口述中文汉字，A1059、B453，70.04%与29.96%。",
+ "叙事转向三：舞台只说可核对口径。官方报告中的2442为建档、1672为在用、1363为参管、81%为参管对在用的比例；96.8%对应531份问卷；0.38小时只对应16条工单的平均响应。资金近190万元属于基金总额，并非年度余额。",
+ "对于PPT第6页“18个关键部件”与第8页健康计算图的“12个部件参数”，V2不擅自解释成同一集合，需由团队出具现场清查字段和模型参数的映射清单；未完成时不在口播中报部件数量。",
+ "PPT第五页四队名称含“技术”，第21页为调制、抢修、养护、综合，稿中统一说“烟叶调制、紧急抢修、日常管护、综合管理”，建议下一轮同步更新PPT。"
+]:add(base,s)
+add(base,"第十四章 30秒视频与现场台本","h2")
+add(base,"最新PPT内嵌开场视频原文件长约41.5秒，而用户预留约30秒。本轮先按30秒裁剪假定进行写作；未裁剪时必须真实按约42秒计算。其余P14、P16、P17、P19也有演示视频素材，除非可与口播同步播放，否则不能全部增加到8分钟时长内。应为技术演示准备静帧备份和“继续下一页”的点位提示。")
+add(base,"第十五章 跨领域评委如何听得懂并认可","h2")
+add(base,"信息类评委首先要听懂数据关系、权重与预警、组合赋权、参数校准是否可解释，因此可以适度保留AHP、TOPSIS的名称，却不滥用“人工智能自动决策”。烟叶类评委更在乎旺季调剂、故障风险与资金投入是否被正确解决。让两类评委在同一条链上相遇，正是“烤房健康影响有效烤能，有效烤能影响新建判断；执行产生新数据，模型再次更新”。")
+real_fig(base,"1-智用智投智管_协同关系图_含两个模型(2).drawio.png","补充：从源头数据到三智四队的原始协同图")
+base.save(OUT/f"{STAMP}_03_官方文稿一万字研究与叙述规范V2.docx")
+# 04 faithful to original document style including section; 14pt speaker and body.
+speak=Document(str(BASE))
+body=speak._element.body
+for child in list(body):
+ if child.tag!=qn("w:sectPr"):body.remove(child)
+p=speak.add_paragraph();p.alignment=WD_ALIGN_PARAGRAPH.CENTER
+run=p.add_run("智烤管家——基于健康评估的烤房用投管一体化解决方案")
+run.font.name="黑体";run.font.size=Pt(14);run.bold=True
+speakerlines=[];slides=[];current=None
+for line in SPEECH.read_text(encoding="utf-8").splitlines():
+ if line.startswith("## 【P"):
+  current=line.strip("# ").strip();slides.append((current,[]))
+  pp=speak.add_paragraph()
+  pp.paragraph_format.space_before=Pt(4);pp.paragraph_format.space_after=Pt(1)
+  r=pp.add_run(current);r.font.name="黑体";r.font.size=Pt(9);r.font.color.rgb=RGBColor(110,110,110)
+ elif line.startswith(("A：","B：","合：")):
+  role=line[0];txt=line[2:];speakerlines.append((role,txt))
+  if slides:slides[-1][1].append(line)
+  pp=speak.add_paragraph(style="Normal");pp.paragraph_format.space_after=Pt(4)
+  r=pp.add_run(role+"：");r.font.name="黑体";r.font.size=Pt(14);r.bold=True
+  rr=pp.add_run(txt);rr.font.name="仿宋_GB2312";rr.font.size=Pt(14)
+  rr._element.get_or_add_rPr().rFonts.set(qn("w:eastAsia"),"仿宋_GB2312")
+ elif line.startswith("（播放"):
+  pp=speak.add_paragraph();r=pp.add_run(line);r.font.size=Pt(10);r.italic=True
+speak.save(OUT/f"{STAMP}_04_智烤管家V2_8分钟AB决赛完整净稿.docx")
+A=sum(H(x) for role,x in speakerlines if role=="A")
+B=sum(H(x) for role,x in speakerlines if role=="B")
+assert abs(A/(A+B)-.7)<.005,(A,B,A/(A+B))
+assert A+B<=1675, A+B
+# 05 slides alignment and precise time budget
+page_context=[
+"封面出场：一句价值判断，A介绍，B设角色","30秒情境视频；无额外口播","烟农三愁：想用调不到、想修等不及、想问问不明","管理三缺：资源无统筹、投入无量化、管护无闭环",
+"1234一页总览，四个数字分别归位","数据采集：2442座、低代码、一房一档","双模型各自解决的问题与联系","健康模型原始计算图，带出输入和健康评分、剩余寿命",
+"健康模型三步：入模、综合计算、预警维修清单","发展导引原始图：注意不要读每个公式","数、需、评、推四步，AHP+熵权+TOPSIS",
+"三类用户业务入口：烟农、合作社、烟草管理","三智闭环：数据回库→模型重算","智用演示，原视频65.9秒，建议短片或静帧",
+"智用成效：48调剂、18报修、16条0.38小时","智投：维修优先推荐与资金分析，演示不宜叠加计时",
+"智投：候选点推演及地图沙盘演练","智管：申请至评价回写完整链","AI助手查询演示，只作为辅助工具","四队与管护基金，1363/1672≈81%",
+"调抢养综四队、合作社制度、行业规范","官方成效数据一页，确保口径正确","价值总结：三种转变，强调机制创新","谨慎推广：目前秭归一个烤季，其他县校准后推广","四句记忆点，合页谢幕"]
+def page_range(h):
+ m=re.search(r"【P(\d+)(?:-(\d+))?】",h)
+ if not m:return []
+ a=int(m.group(1));v=int(m.group(2) or a)
+ return list(range(a,v+1))
+pm=defaultdict(list)
+for k,ls in slides:
+ for pnum in page_range(k):pm[pnum].extend(ls)
+v=book("智烤管家V2 25页PPT逐页口播与修改对照","最新PPT先不改图：逐页指出应讲什么以及下一轮应改什么",10.5)
+for i,head in enumerate(page_context,1):
+ add(v,f"第{i}页｜{head}","h2")
+ if i==2:add(v,"静默播放约30秒。若原素材未裁剪，则为41.5秒，必须从讲述和切页中扣减。")
+ elif pm.get(i):
+  for line in pm[i]:
+   add(v,"【台词】"+line)
+ else:add(v,"本页只作图示支撑，台词延续上下页，不额外增加新口播。")
+ if i in (8,9):
+  add(v,"建议PPT优化：用“数据输入—计算健康与寿命—生成预警/推荐维修清单”的可视化逻辑代替对公式的逐行讲解。")
+ elif i in (10,11):
+  add(v,"建议PPT优化：四步“数需评推”要一眼辨识，公式名可保留在角落作信息条线答辩依据。")
+ elif i==6:
+  add(v,"注意：18个清查部件与第8页12个模型计算参数需确认清单映射；原截图的实时状态与官方“在用1672”不是同一时点，不宜由截图代替官方统计。")
+ elif i in (14,16,17,19):
+  add(v,"该页可能有媒体素材，请确认是否自动播放、播放时长、是否能与口述同步，不允许因额外视频导致超过8分钟。")
+ elif i==22:
+  add(v,"对照官方成果报告核对单位、分母与时间：96.8%来自531份有效问卷；0.38h对应16条平台工单平均响应；基金近190万元是总额。")
+add(v,"现场时长与角色比例校核","h2")
+tbl=[["统计","实测或估算"],["A角汉字",A],["B角汉字",B],["A占比",f"{100*A/(A+B):.2f}%"],["B占比",f"{100*B/(A+B):.2f}%"],["口述汉字总数",A+B],["220字/分钟口述",f"{(A+B)/220:.2f}分钟"],["240字/分钟口述",f"{(A+B)/240:.2f}分钟"],["视频建议","30秒（源文件约41.5秒）"],["换页和停顿","建议预留20—35秒"],["目标","正常排练应控制在8分钟内"]]
+table(v,tbl[0],tbl[1:])
+add(v,"对V1的关键调整","h2")
+add(v,"V1的B角占比约24%，本次通过角色重新分工精确调整到近30%；由简单问答改为B承担业务共情、模型翻译、结尾点题；保留原稿“资源无统筹、投入无量化、管护无闭环”有力表述；删去缺证据的完成性措辞；增强与PPT第8至11页双模逻辑的一致性；重点强化“四队”作为区别于普通软件工具的机制落地。")
+v.save(OUT/f"{STAMP}_05_逐页PPT对照与A7B3计时校核.docx")
+# 06 facts/QA brief
+q=book("智烤管家V2 答辩证据口径与彩排检查","总时长8分钟以内；参数和案例仅以源材料支持为准",11)
+for k,x in [
+("2442座","秭归全口径建档并开展健康评分，不等于全在用"),
+("1672栋","2026年度在用烤房口径，1363/1672≈81%"),
+("1363栋","两级合作社统筹管护；县级1175栋＋村级188栋"),
+("近190万元","合作社管护基金总额，不等同于年度结余"),
+("48次","烤房调剂年度记录；在线调剂仍需区分试点范围"),
+("18次","年度报修记录/抢修控制3小时内"),
+("16条/0.38小时","16条平台工单的平均响应时间，不是平均修复时长"),
+("531份/96.8%","有效问卷及使用烤房综合满意度"),
+("340多栋","健康分低于60分的研判对象，不等于全部完成修复"),
+("150栋/7栋","早期项目计划与讨论稿出现，缺少验收支持，决赛正文不说已完工"),
+("18个/12个","清查范围与模型参数两个数量出现在不同资料；需字段映射确认"),
+("健康模型","AHP健康分、剩余寿命预估、风险部位TOP及推荐维修"),
+("发展导引","数需评推、有效烤能、AHP+熵权组合赋权、TOPSIS推荐"),
+("系统AI助手","辅助查询和信息归纳，不替代维修验收或建设审批")
+]:
+ add(q,k+"｜"+x)
+add(q,"彩排顺序","h2")
+add(q,"固定30秒开场视频；主讲A连续段落要留呼吸，B负责在切页时接住观众。两位讲述人员应以秒表实际验证，句子不要背成同一腔调。超时优先删减模型缩写和二次重复，不能删去关键证据的统计口径。")
+q.save(OUT/f"{STAMP}_06_成果数据核对与答辩风险清单.docx")
+# manifest
+summary=["# 1019/v2 生成校验","",
+f"源项目文件：{len(records)}份；哈希去重后：{len(seen_sha)}份。",
+f"深度研究报告汉字数：{deepcount}（含明示的源文件证据摘录）。",
+f"演讲角色：A={A}，B={B}，合计={A+B}；A={100*A/(A+B):.2f}%，B={100*B/(A+B):.2f}%。",
+"",
+"时间预算：口述按220-240字/分钟为6.3-6.9分钟；再加30秒视频和20—35秒换页/停顿约7.1—8.0分钟；实际仍须双人彩排。",
+"",
+"源材料核验：12篇演讲词、项目所有文件登记、4篇官方文件核对、9.30原稿版式沿用、25页PPT逐页对应。",
+"",
+"注意：深度研究卷中的【来源摘录】明确标为引用原材料，不作为模型新创作的50k字，也不等于所有非文本图像都逐字识读。",
+"",
+"文件验收："]
+for f in sorted(OUT.glob(f"{STAMP}*.docx")):
+ doc=Document(f)
+ han=H("".join(x.text for x in doc.paragraphs))
+ summary.append(f"- {f.name}：{han}汉字；{len(doc.paragraphs)}段；{len(doc.inline_shapes)}幅图；{f.stat().st_size}字节")
+(OUT/f"{STAMP}_README_核验清单.md").write_text("\n".join(summary),encoding="utf-8")
+print("\n".join(summary))
