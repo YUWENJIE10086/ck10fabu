@@ -175,6 +175,23 @@ chapters=[
  ('第十四章 评估方法与改进路线','下一轮完善应集中解决健康分分布稳定性、部件权重审查、维修前后对比、村级需求模型校准、跨县迁移、基金财务闭环；多渠道材料出现冲突时优先官方报送版，然后参考最新版PPT并注明口径变更。'),
  ('第十五章 可复制应用前提','复制时应迁移数据模型、流程标准与责任机制，而不是仅复制软件代码。外地区要校准烤房编号体系、使用状态、部件参数、种植规模、村级烤能测算、地形与距离因素，推广表述宜使用“可复制条件具备”而非“已经全省推广”。')]
 for h,body in chapters:section(d,h,body)
+# 已有真实架构与模型图片：采用仓库原图，避免再画臆造架构。
+for pic,cap in [
+ ('一库两模型一平台_总体架构.drawio.png','总体架构（原项目图片）'),
+ ('1-烤房健康评估模型_健康分与剩余寿命_一页图.drawio.png','健康评估模型原始流程图'),
+ ('1-烤房新建选址模型_需求判断与候选点排序_一页图.drawio.png','新建选址决策模型原始流程图'),
+ ('1-智用智投智管_协同关系图_含两个模型(2).drawio.png','智用智投智管协同关系（原始图）'),
+ ('抢修服务队_职责体系.drawio.png','抢修服务队原始职责图'),
+ ('总览web.png','Web端烤房总览真实界面'),
+ ('新建决策web.png','新建决策Web端真实界面')]:
+ path=MATS/pic
+ if path.exists():
+  add(d,'项目技术图与运行界面｜'+cap,'heading')
+  pp=d.add_paragraph();pp.alignment=WD_ALIGN_PARAGRAPH.CENTER
+  try:
+   pp.add_run().add_picture(str(path),width=Cm(15.2))
+   add(d,'图源：'+path.relative_to(ROOT).as_posix())
+  except Exception as ex:add(d,'插入原图失败，原始路径：'+str(path))
 tbl(d,['证据指标','官方口径','不宜混淆'],[
  ('2442','秭归全口径建档/评分','不是正在使用或纳入管护的栋数'),('1672','本年度在用烤房','不是所有已建烤房'),('1363 / 81%','两级合作社统筹管护/相对在用占比','不是2442的81%'),('48 / 18','调剂次数/报修工单次数','不是同一服务'),('16 / 0.38小时','16条工单平均响应时间','不是维修完结时间'),('531 / 96.8%','有效问卷/综合满意度','不沿用初稿95.8%'),('近190万元','管护基金总额','不是年度结余'),('340多栋','健康分60以下预警对象','不是全部已经完成维修')])
 section(d,'附录A：项目素材逐文件研读及可追溯摘录','以下逐份登记源码、文稿、表格、流程图、视频说明、设计示意和报告草稿。每一篇摘录均保留文件路径。因同一项目存在迭代版本，对算法阈值、健康部件数和统计口径不一致的材料，不以早期版本直接覆盖正式报送口径。')
@@ -235,6 +252,13 @@ for pth in off:
 section(doc,'交付约束与校核表','这是一份10,000字级别叙述研究的v1结构；官方材料的完整逐字抽取文件另存同目录（03官方材料逐字提取.md）。正式答辩现场仅使用8分钟精简版，不能把这篇研究稿直接朗读。')
 tbl(doc,['风险','处理原则'],[
  ('18个与12个部件','区分清查范围与健康模型所用计算参数，技术现场再次核对'),('0.38h与≤3h','平均响应时间与抢修完结时限严格分开'),('95.8%与96.8%','采用官方531份问卷、96.8%'),('150栋与7栋','未有验收资料不报成已完成实绩'),('视频1分钟与30秒','本次时间按约30秒开场视频配置'),('排名第一','以争取目标表述，不能预设获奖')])
+# 官方篇引用两份原始项目架构图，连接技术路线和落地效果。
+for pic,caption in [('一库两模型一平台_总体架构.drawio.png','项目总体架构原图'),('1-烤房新建选址模型_需求判断与候选点排序_一页图.drawio.png','发展导引原始算法结构')]:
+ path=MATS/pic
+ if path.exists():
+  pp=doc.add_paragraph();pp.alignment=WD_ALIGN_PARAGRAPH.CENTER
+  pp.add_run().add_picture(str(path),width=Cm(15.2))
+  add(doc,'图源：'+path.relative_to(ROOT).as_posix())
 doc.save(OUT/f'{STAMP}_03_官方叙述规范和决赛一万字研究稿.docx')
 
 # 04: 复用原稿的页面、页边距与字体风格；不照搬旧段落。
@@ -301,3 +325,13 @@ print('DELIVERABLES:')
 for x in sorted(OUT.glob(f'{STAMP}*.docx')):print(x.name,x.stat().st_size)
 
 # second-phase generator trigger
+
+# 文件/字数审查清单（依据Word正文真实提取，不计附录图片）。
+measures=[]
+for ff in sorted(OUT.glob(f'{STAMP}*.docx')):
+ x=Document(ff)
+ body_text=''.join(p.text for p in x.paragraphs)
+ han=sum(1 for ch in body_text if '\u4e00'<=ch<='\u9fff')
+ measures.append((ff.name,han,len(x.paragraphs),len(x.inline_shapes)))
+(OUT/f'{STAMP}_Word字数与图件核查.md').write_text('# 1019/v1 Word文稿实测字数与插图\n\n'+'\n'.join(f'- {a}：汉字{b}、段落{c}、图{di}幅' for a,b,c,di in measures)+'\n\n数据口径一律以官方成果报告为准；长篇研究卷含标注来源的原始材料摘录，不把原文摘录算作原创分析。',encoding='utf-8')
+print(measures)
