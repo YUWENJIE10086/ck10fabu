@@ -244,3 +244,5 @@ for file in sorted(OUT.glob(f"{STAMP}*.docx")):
  d=Document(file);print("READY",file.name, file.stat().st_size, "paragraphs",len(d.paragraphs),"images",len(d.inline_shapes))
 
 # Run V4 Word builder after workflow setup.
+
+# Rebuild with updated table-rich QA check.
