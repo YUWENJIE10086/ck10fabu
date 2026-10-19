@@ -1,0 +1,73 @@
+name: CK10 1019 V5 full Word package
+on:
+  push:
+    paths:
+      - '1019/v5/修改稿/10192342_V5_仓库Word全套生成.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install document dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          python -m pip install -q python-docx pymupdf pillow
+      - name: Generate full-source V5 Word files
+        run: python "1019/v5/修改稿/10192342_V5_仓库Word全套生成.py"
+      - name: Verify word count, images, scripts and rendered pages
+        run: |
+          mkdir -p /tmp/ck10v5pdf "1019/v5/修改稿/_版式核验"
+          libreoffice -env:UserInstallation=file:///tmp/v5lo --headless --convert-to pdf --outdir /tmp/ck10v5pdf "1019/v5/修改稿/10192342_04_V5_正式决赛8分钟AB演讲净稿.docx" "1019/v5/修改稿/10192342_05_V5_25页PPT对应双人舞台稿.docx"
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import re,fitz
+          root=Path('1019/v5/修改稿')
+          docs=list(root.glob('10192342_*.docx'))
+          assert len(docs)==7, [i.name for i in docs]
+          s=Document(root/'10192342_04_V5_正式决赛8分钟AB演讲净稿.docx')
+          a=sum(len(re.findall('[\u4e00-\u9fff]',p.text[2:])) for p in s.paragraphs if p.text.startswith('A：'))
+          b=sum(len(re.findall('[\u4e00-\u9fff]',p.text[2:])) for p in s.paragraphs if p.text.startswith('B：'))
+          assert 1500<=a+b<=1570 and .69<a/(a+b)<.71,(a,b)
+          depth=Document(root/'10192342_02_V5_项目五万字级全文件研究与双模创新增订.docx')
+          c=sum(len(re.findall('[\u4e00-\u9fff]',p.text)) for p in depth.paragraphs)
+          official=Document(root/'10192342_03_V5_官方叙述一万字级研究校订版.docx')
+          officialcount=sum(len(re.findall('[\u4e00-\u9fff]',p.text)) for p in official.paragraphs)
+          assert c>=50000 and len(depth.inline_shapes)>=8,(c,len(depth.inline_shapes))
+          assert officialcount>=10000 and len(official.inline_shapes)>=4,(officialcount,len(official.inline_shapes))
+          checks=[f'口述:A={a},B={b},比例={100*a/(a+b):.2f}%',f'项目研究{c}汉字；{len(depth.inline_shapes)}图',f'官方研究{officialcount}汉字；{len(official.inline_shapes)}图']
+          for file in Path('/tmp/ck10v5pdf').glob('*.pdf'):
+            pdf=fitz.open(str(file))
+            assert 2<=len(pdf)<=6,(file.name,len(pdf))
+            assert all(len(pg.get_text().strip())>5 for pg in pdf),(file.name,'blank')
+            checks.append(f'{file.name}：{len(pdf)}页，无空白页')
+          for f in docs:checks.append(f'{f.name}: {f.stat().st_size} bytes')
+          (root/'_版式核验/10192348_V5_Word质量核对.md').write_text('\n'.join(checks),encoding='utf8')
+          print('\n'.join(checks))
+          PY
+      - name: Commit complete V5 Word files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v5/修改稿/'
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/V5: 发布7份全版Word、70/30双人决赛稿与PPT核对'
+            for i in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 5
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
