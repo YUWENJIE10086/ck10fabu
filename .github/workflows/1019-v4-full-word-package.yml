@@ -1,0 +1,81 @@
+name: CK10 1019 V4 Word Package
+on:
+  push:
+    paths:
+      - '1019/v4/修改稿/10192325_V4全部Word研究与演讲稿生成.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  author:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install document renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          python -m pip install -q python-docx pymupdf pillow
+      - name: Generate V4 Word research and speech
+        run: python "1019/v4/修改稿/10192325_V4全部Word研究与演讲稿生成.py"
+      - name: Render and verify final speech and research
+        run: |
+          mkdir -p /tmp/ck10v4pdf "1019/v4/修改稿/_版式核查"
+          libreoffice -env:UserInstallation=file:///tmp/ck10v4libre --headless --convert-to pdf --outdir /tmp/ck10v4pdf "1019/v4/修改稿/10192325_04_按原稿字体格式_正式净稿.docx" "1019/v4/修改稿/10192325_05_25页PPT对应_双人舞台稿.docx"
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import fitz,zipfile
+          from PIL import Image
+          out=Path('1019/v4/修改稿')
+          docs=sorted(out.glob('10192325_*.docx'))
+          assert len(docs)==7,(len(docs),[p.name for p in docs])
+          checks=['# 1019/V4 Word实测渲染及交付核对','']
+          for f in docs:
+            d=Document(f)
+            assert len(d.paragraphs)>=6,(f.name,len(d.paragraphs))
+            checks.append(f'- {f.name}：{len(d.paragraphs)}段；{len(d.inline_shapes)}幅插图；{f.stat().st_size}字节')
+          for f in Path('/tmp/ck10v4pdf').glob('*.pdf'):
+            d=fitz.open(f)
+            blank=[i+1 for i,p in enumerate(d) if len(p.get_text().strip())<4]
+            assert 1<len(d)<=8 and not blank,(f.name,len(d),blank)
+            checks.append(f'- {f.name}: {len(d)}页，无空白页')
+            previews=[]
+            for i,page in enumerate(d):
+              pix=page.get_pixmap(matrix=fitz.Matrix(.7,.7),alpha=False)
+              im=Image.frombytes('RGB',(pix.width,pix.height),pix.samples)
+              previews.append(im)
+            w=max(x.width for x in previews);h=max(x.height for x in previews)
+            montage=Image.new('RGB',(w*2,h*((len(previews)+1)//2)),(238,241,246))
+            for i,im in enumerate(previews):montage.paste(im,((i%2)*w,(i//2)*h))
+            montage.save(out/'_版式核查'/('10192330_'+('净稿' if '_04_' in f.name else '舞台稿')+'_全页预览.png'))
+          (out/'_版式核查/10192330_Word核验说明.md').write_text('\n'.join(checks),encoding='utf-8')
+          zpath=out/'10192330_智烤管家V4_修改稿_全套7份Word.zip'
+          with zipfile.ZipFile(zpath,'w',zipfile.ZIP_DEFLATED) as z:
+            for f in docs:z.write(f,f.name)
+            z.write(out/'10192325_README_交付与口径复核.md','README_交付与口径复核.md')
+          assert zpath.stat().st_size>500000,zpath.stat().st_size
+          print('\n'.join(checks))
+          PY
+      - name: Publish all generated Word files to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v4/修改稿'
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/v4: 发布7份Word研究与V4正式双人演讲净稿'
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 6
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
