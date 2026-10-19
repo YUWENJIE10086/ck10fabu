@@ -72,4 +72,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add '1019/v3/'
-          git diff --cached --quiet || (git commit -m '1019/v3: release 10 verified Word docs, stage script and bundle' && git pull --rebase origin main && git push origin main)
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/v3: release 10 verified Word docs, stage script and bundle'
+            for try in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 6
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
