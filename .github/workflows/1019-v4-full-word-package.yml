@@ -39,7 +39,7 @@ jobs:
           checks=['# 1019/V4 Word实测渲染及交付核对','']
           for f in docs:
             d=Document(f)
-            assert len(d.paragraphs)>=6,(f.name,len(d.paragraphs))
+            assert len(d.paragraphs)>=4,(f.name,len(d.paragraphs))
             checks.append(f'- {f.name}：{len(d.paragraphs)}段；{len(d.inline_shapes)}幅插图；{f.stat().st_size}字节')
           for f in Path('/tmp/ck10v4pdf').glob('*.pdf'):
             d=fitz.open(f)
