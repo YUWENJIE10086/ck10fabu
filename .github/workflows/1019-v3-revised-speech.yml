@@ -2,7 +2,7 @@ name: CK10 V3 Revised Speech Word
 on:
   push:
     paths:
-      - '1019/v3/修改稿/*_生成Word.py'
+      - '1019/v3/修改稿/*生成Word.py'
   workflow_dispatch:
 permissions:
   contents: write
