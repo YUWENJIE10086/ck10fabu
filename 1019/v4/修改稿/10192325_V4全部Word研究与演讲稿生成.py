@@ -104,7 +104,12 @@ speech_path=export_spoken(False)
 stage_path=export_spoken(True)
 
 # ==== 01 全部12篇获奖现场学习报告在V3基础上进一步深读，语言方法+具体口播转写
-d=Document(str(OLD/"10192152_01_获奖解说词逐篇学习与改稿方法.docx"))
+def retitle(doc):
+ for p in doc.paragraphs[:10]:
+  for run in p.runs:
+   run.text=run.text.replace("智烤管家V2表达法","智烤管家V4表达法").replace("V3官方叙述","V4官方叙述")
+ return doc
+d=retitle(Document(str(OLD/"10192152_01_获奖解说词逐篇学习与改稿方法.docx")))
 heading(d,"V4补充｜跨作品对标结果：让业务矛盾自己带出技术")
 for title,desc in [
 ("3D智慧对标最应学习“现场问题—一眼懂的三问—可核对的效果”","技术再新，如果开头只有系统名，评委不会跟着走。V4模仿的是节奏而非措辞：从一炕烟的紧迫感开题，转为资源、投入与管护三个业务难，再以1234依次回答。"),
@@ -154,7 +159,7 @@ table(d,["内容","可说的边界","追问准备"],[
 d.save(str(OUT/f"{STAMP}_02_五万字项目全文件研究与V4技术增订.docx"))
 
 # ==== 03 官方叙述研究沿用已读所有官方文档，加入独立V4修辞与指标核查
-d=Document(str(OLD/"10192152_03_官方文稿一万字研究与叙述规范V3.docx"))
+d=retitle(Document(str(OLD/"10192152_03_官方文稿一万字研究与叙述规范V3.docx")))
 heading(d,"十七、V4官方表述定稿条款：激情与准确如何兼容")
 for t in [
 "严守对象：项目专注烟叶调制设施“用、投、管”的资产管理与业务协同，并非自动烘烤温控机器人或卷烟营销智能投放系统。获奖稿提供表达样式，而不提供本项目事实证据。",
