@@ -173,3 +173,5 @@ for f in sorted(HERE.glob('10192342_*.docx')):
 print('\n'.join(lines))
 
 # trigger V5 full-source Word generation and auditing
+
+# rebuild after official-research image-count QA correction
