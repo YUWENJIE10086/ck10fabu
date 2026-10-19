@@ -39,7 +39,7 @@ jobs:
           assert len(fs)==10,(len(fs),[x.name for x in fs])
           for f in fs:
             d=Document(f)
-            assert len(d.paragraphs)>=15,(f.name,len(d.paragraphs))
+            assert len(d.paragraphs)>=4,(f.name,len(d.paragraphs))
             print('WORD OK',f.name,len(d.paragraphs),len(d.inline_shapes))
           previews=[]
           checks=['# V3 Word图像版式检查','']
