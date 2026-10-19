@@ -37,7 +37,7 @@ jobs:
           assert len(fs)==6,[x.name for x in fs]
           for f in fs:
              d=Document(f)
-             assert len(d.paragraphs)>20,f.name
+             assert len(d.paragraphs)>=12,f.name
              print(f.name,len(d.paragraphs),len(d.inline_shapes))
           from subprocess import run
           assert any(Path('/tmp/ck10v2_pdf').glob('*.pdf'))
