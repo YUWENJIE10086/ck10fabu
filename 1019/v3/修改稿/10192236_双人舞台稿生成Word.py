@@ -207,3 +207,5 @@ f"- A角色：{A}口述汉字；B角色：{B}口述汉字；合计：{A+B}；A�
 (DIR/f"{STAMP}_核验和交付说明.md").write_text("\n".join(readme),encoding="utf-8")
 print("\n".join(readme))
 print("OUTPUTS:",*[x.name for x in [stage_path,clean_path,review_path]])
+
+# verified source-to-Word build trigger
