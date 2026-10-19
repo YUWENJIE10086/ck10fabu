@@ -547,3 +547,5 @@ for p in sorted(OUT.glob("10192152_*.docx")):
  z=Document(str(p));report.append(f"- {p.name} | {H(''.join(t.text for t in z.paragraphs))}汉字 | {len(z.paragraphs)}段 | {len(z.inline_shapes)}幅插图 | {p.stat().st_size}字节")
 (OUT/"10192152_核查清单.md").write_text("\n".join(report),encoding="utf-8")
 print("\n".join(report))
+
+# trigger checked V3 document build
