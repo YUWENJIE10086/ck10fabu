@@ -1,0 +1,75 @@
+name: CK10 1019 V3 Deliver and Verify
+on:
+  push:
+    paths:
+      - '1019/v3/10192152_全套研究稿及AB决赛Word生成.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reports:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install docs and render dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk antiword
+          python -m pip install --quiet python-docx python-pptx beautifulsoup4 lxml pillow pymupdf
+      - name: Build V3 reports based on GitHub originals
+        run: python "1019/v3/10192152_全套研究稿及AB决赛Word生成.py"
+      - name: Render, inspect structure, build DOCX package
+        run: |
+          mkdir -p /tmp/ck10v3pdf "1019/v3/_版式核查"
+          libreoffice -env:UserInstallation=file:///tmp/ck10v3_lo --headless --convert-to pdf --outdir /tmp/ck10v3pdf "1019/v3/10192152_04_智烤管家V3_8分钟AB决赛完整净稿.docx" "1019/v3/10192152_07_智烤管家V3_正式演讲无页码净稿.docx"
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import fitz,zipfile
+          from PIL import Image, ImageOps
+          base=Path('1019/v3')
+          fs=sorted(base.glob('10192152_*.docx'))
+          assert len(fs)==10,(len(fs),[x.name for x in fs])
+          for f in fs:
+            d=Document(f)
+            assert len(d.paragraphs)>=15,(f.name,len(d.paragraphs))
+            print('WORD OK',f.name,len(d.paragraphs),len(d.inline_shapes))
+          previews=[]
+          checks=['# V3 Word图像版式检查','']
+          for f in sorted(Path('/tmp/ck10v3pdf').glob('*.pdf')):
+            doc=fitz.open(f)
+            print('PDF PAGES',f.name,len(doc))
+            assert 2<=len(doc)<=10, (f.name,len(doc))
+            empties=[i+1 for i,p in enumerate(doc) if len(p.get_text().strip())<4]
+            assert not empties,(f.name,empties)
+            checks.append(f'- {f.name}：{len(doc)}页，无空白页')
+            for p in doc:
+              pix=p.get_pixmap(matrix=fitz.Matrix(.6,.6),alpha=False)
+              im=Image.frombytes('RGB',(pix.width,pix.height),pix.samples)
+              previews.append(im)
+          w=max(x.width for x in previews)
+          h=max(x.height for x in previews)
+          out=Image.new('RGB',(w*2,h*((len(previews)+1)//2)),'#e9edf2')
+          for i,im in enumerate(previews):out.paste(im,(i%2*w,i//2*h))
+          out.save(base/'_版式核查/10192159_V3双人稿与净稿全页预览.png')
+          (base/'_版式核查/10192159_版式核查.md').write_text('\n'.join(checks),encoding='utf-8')
+          pack=base/'10192159_智烤管家V3_全部10份Word.zip'
+          with zipfile.ZipFile(pack,'w',zipfile.ZIP_DEFLATED) as z:
+            for file in fs:z.write(file,arcname=file.name)
+            z.write(base/'10192152_核查清单.md',arcname='10192152_核查清单.md')
+          assert pack.stat().st_size>500000
+          print('PACKAGE',pack,pack.stat().st_size)
+          PY
+      - name: Commit V3 outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v3/'
+          git diff --cached --quiet || (git commit -m '1019/v3: release 10 verified Word docs, stage script and bundle' && git pull --rebase origin main && git push origin main)
