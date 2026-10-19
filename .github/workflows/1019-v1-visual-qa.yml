@@ -1,0 +1,59 @@
+name: CK10 1019 V1 Visual QA
+on:
+  push:
+    paths:
+      - '1019/v1/*_启动版式检查.txt'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare document rendering
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          pip install pymupdf python-docx pillow
+      - name: Render and verify documents
+        run: |
+          mkdir -p /tmp/qa_pdf '1019/v1/_版式核查'
+          for f in 1019/v1/10192020_*.docx; do
+            libreoffice -env:UserInstallation=file:///tmp/lo_v1_visual --headless --convert-to pdf --outdir /tmp/qa_pdf "$f"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps, ImageDraw
+          import fitz
+          pdfs=sorted(Path('/tmp/qa_pdf').glob('*.pdf'))
+          lines=['# 1019/v1 Word版式渲染实测','']
+          for pdf in pdfs:
+            d=fitz.open(pdf)
+            pages=len(d)
+            empties=[i+1 for i,p in enumerate(d) if len(p.get_text().strip())<2]
+            lines.append(f'- {pdf.name}: {pages}页；疑似空白页：{empties or "无"}')
+            if '_04_' in pdf.name:
+              thumbs=[]
+              for i,p in enumerate(d):
+                im=Image.frombytes('RGB',[p.get_pixmap(matrix=fitz.Matrix(0.65,0.65)).width,p.get_pixmap(matrix=fitz.Matrix(0.65,0.65)).height],p.get_pixmap(matrix=fitz.Matrix(0.65,0.65)).samples)
+                thumbs.append(im)
+              w=max(x.width for x in thumbs);h=max(x.height for x in thumbs)
+              out=Image.new('RGB',(w*2,h*((len(thumbs)+1)//2)),(230,235,239))
+              for i,im in enumerate(thumbs):out.paste(im,((i%2)*w,(i//2)*h))
+              out.save('1019/v1/_版式核查/10192025_演讲净稿全部页面预览.png')
+              assert pages<=12,'演讲稿页数意外偏多'
+              assert not empties,'演讲稿有空白页'
+          Path('1019/v1/_版式核查/10192025_Word渲染审核.md').write_text('\n'.join(lines),encoding='utf-8')
+          print('\n'.join(lines))
+          PY
+      - name: Record visual QC
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v1/_版式核查'
+          git diff --cached --quiet || (git commit -m '1019/v1: 记录Word真实版式渲染检查' && git pull --rebase origin main && git push origin main)
