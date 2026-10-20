@@ -216,3 +216,5 @@ with tarfile.open(archive,'w:gz') as tf:
     tf.add(OUT/f'{STAMP}_完整版正文.md',arcname='完整版正文.md')
     tf.add(OUT/f'{STAMP}_8分钟安全版正文.md',arcname='8分钟安全版正文.md')
 print('READY',len(list(OUT.glob('*.docx'))),archive.stat().st_size,counts(f),counts(s),len(items))
+
+# Trigger definitive V6 2000-character reset build.
