@@ -1,0 +1,76 @@
+name: CK10 1019 V6 Seven Word Deliverables
+on:
+  push:
+    paths:
+      - '1019/v6/修改稿/10201001_V6_全套Word自动生成.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install fonts and document tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          python -m pip install -q python-docx pymupdf pillow
+      - name: Build seven V6 Word documents
+        run: python "1019/v6/修改稿/10201001_V6_全套Word自动生成.py"
+      - name: Validate both speech documents and research volumes
+        run: |
+          mkdir -p /tmp/ck10v6pdf "1019/v6/修改稿/_版式核验"
+          libreoffice -env:UserInstallation=file:///tmp/ck10v6lo --headless --convert-to pdf --outdir /tmp/ck10v6pdf "1019/v6/修改稿/10201001_04_V6_8分钟正式AB演讲净稿.docx" "1019/v6/修改稿/10201001_05_V6_25页PPT双人舞台口播稿.docx"
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import re,pymupdf,zipfile
+          out=Path('1019/v6/修改稿')
+          docs=sorted(out.glob('10201001_*.docx'))
+          assert len(docs)==7, [x.name for x in docs]
+          ds=Document(out/'10201001_04_V6_8分钟正式AB演讲净稿.docx')
+          a=sum(len(re.findall(r'[\u4e00-\u9fff]',p.text[2:])) for p in ds.paragraphs if p.text.startswith('A：'))
+          b=sum(len(re.findall(r'[\u4e00-\u9fff]',p.text[2:])) for p in ds.paragraphs if p.text.startswith('B：'))
+          assert a+b<=1550 and .69<a/(a+b)<.71,(a,b)
+          body=Document(out/'10201001_02_V6_项目五万字级全文件研究与QC方法增订.docx')
+          official=Document(out/'10201001_03_V6_官方叙述一万字级研究及QC规范.docx')
+          bh=sum(len(re.findall(r'[\u4e00-\u9fff]',p.text)) for p in body.paragraphs)
+          oh=sum(len(re.findall(r'[\u4e00-\u9fff]',p.text)) for p in official.paragraphs)
+          assert bh>=50000 and len(body.inline_shapes)>=8,(bh,len(body.inline_shapes))
+          assert oh>=10000 and len(official.inline_shapes)>=3,(oh,len(official.inline_shapes))
+          lines=[f'A={a}; B={b}; A占比={a/(a+b)*100:.2f}%; 总汉字={a+b}',f'项目研究{bh}汉字／{len(body.inline_shapes)}图',f'官方研究{oh}汉字／{len(official.inline_shapes)}图']
+          for pdf in Path('/tmp/ck10v6pdf').glob('*.pdf'):
+            z=pymupdf.open(pdf)
+            assert 2<=len(z)<=7 and all(len(page.get_text().strip())>3 for page in z),(pdf.name,len(z))
+            lines.append(f'{pdf.name}: {len(z)}页，无空白页')
+          bundle=out/'10201001_V6_七份研究与决赛Word完整包.zip'
+          with zipfile.ZipFile(bundle,'w',zipfile.ZIP_DEFLATED) as z:
+            for f in docs:z.write(f,arcname=f.name)
+            z.write(out/'10201001_智烤管家V6_决赛双人演讲稿_源稿.md',arcname='V6_演讲正文源码.md')
+          assert bundle.stat().st_size>1000000
+          (out/'_版式核验/10201001_生成验收报告.md').write_text('\n'.join(lines),encoding='utf8')
+          print('\n'.join(lines))
+          PY
+      - name: Commit actual Word files to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '1019/v6/修改稿'
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/v6: publish seven QA-verified Word reports and AB competition speech'
+            for n in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 5
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
