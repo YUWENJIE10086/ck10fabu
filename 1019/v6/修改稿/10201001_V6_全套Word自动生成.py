@@ -151,3 +151,5 @@ summary=f"口述A={A} B={B} 总={A+B} A比例={100*A/(A+B):.2f}%。\nV6全套7�
 print(summary)
 
 # start verified 1019/V6 word-production workflow
+
+# refresh V6 archive as tar.gz, avoiding Git LFS ZIP pointer
