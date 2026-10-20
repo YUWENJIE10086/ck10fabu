@@ -191,3 +191,5 @@ with tarfile.open(OUT/f'{STAMP}_智烤管家V6全套8份Word.tar.gz','w:gz') as 
  for file in docs:tf.add(file,arcname=file.name)
  tf.add(OUT/f'{STAMP}_README.md',arcname='README.md')
 print('CREATED',len(docs),[(f.name,f.stat().st_size) for f in docs])
+
+# Publish V6 entirely regenerated package 2026-10-20.
