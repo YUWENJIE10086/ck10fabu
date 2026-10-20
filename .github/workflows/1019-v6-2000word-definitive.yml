@@ -34,7 +34,7 @@ jobs:
           import re,tarfile,pymupdf
           r=Path('1019/v6/修改稿')
           docs=sorted(r.glob('*.docx'))
-          assert len(docs)==7,[p.name for p in docs]
+          assert len(docs)==8,[p.name for p in docs]
           nums=[]
           for p in docs[3:6]: pass
           for name,target in [('04_V6_约2000字专业完整版.docx',(1384,594)),('05_V6_8分钟彩排净稿.docx',(1098,474))]:
@@ -58,10 +58,10 @@ jobs:
             assert 2<=len(doc)<=8 and all(len(page.get_text().strip())>5 for page in doc),(p.name,len(doc))
             seen.append(f'{p.name}: {len(doc)}页')
           assert len(seen)==3,seen
-          archive=r/'10201048_智烤管家V6_七份Word完整包.tar.gz'
+          archive=r/'10201048_智烤管家V6_八份Word完整包.tar.gz'
           assert archive.stat().st_size>1000000,archive.stat().st_size
           with tarfile.open(archive,'r:gz') as z:
-            assert len([m for m in z.getmembers() if m.name.endswith('.docx')])==7
+            assert len([m for m in z.getmembers() if m.name.endswith('.docx')])==8
           report='\n'.join(['# 新V6精修验收',*nums,f'项目研究: {pc}个汉字 / {len(proj.inline_shapes)}图',f'官方叙述: {oc}个汉字 / {len(off.inline_shapes)}图',*seen,'2000字完整版不宣称8分钟完成；彩排版含视频预算接近8分钟；最终以实测为准。'])
           (r/'10201048_渲染与需求核对结果.md').write_text(report,encoding='utf-8')
           print(report)
