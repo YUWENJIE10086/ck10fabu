@@ -161,3 +161,5 @@ with tarfile.open(OUT/f'{stamp}_智烤管家V6重建_七份Word.tar.gz','w:gz') 
     for f in docs:tf.add(f,arcname=f.name)
     tf.add(OUT/f'{stamp}_V6完整演讲正文.md',arcname='V6完整演讲正文.md')
 print('V6 built',stamp,a,b,len(docs),[(p.name,p.stat().st_size) for p in docs])
+
+# trigger clean rebuild: 2026-10-20 / fresh V6
