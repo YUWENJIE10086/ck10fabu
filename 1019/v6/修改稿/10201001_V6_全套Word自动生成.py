@@ -149,3 +149,5 @@ d.save(OUT/f"{STAMP}_07_V6_初稿历版QC对照及评委问答.docx")
 summary=f"口述A={A} B={B} 总={A+B} A比例={100*A/(A+B):.2f}%。\nV6全套7份Word；研究02继承V5完整5万字级资料并增订，研究03继承V5完整1万字级官方研究并增订。"
 (OUT/f"{STAMP}_交付与验收说明.md").write_text(summary,encoding="utf8")
 print(summary)
+
+# start verified 1019/V6 word-production workflow
