@@ -81,13 +81,20 @@ qcinsights=[
 ('技术兼容两种评委','信息评委看输入、权重、边界、输出；烟叶评委看有效烤能、旺季调剂、响应速度、队伍责任。每个技术段落须紧接业务价值，并说明人工审核与现场核验边界。'),
 ('语言节奏','只在三愁三缺、1234亮相和结尾用对仗；技术段保持规范短句，不用“太棒了”“神奇”等捧哏或夸大词。')
 ]
+def relabel_reused_cover(doc):
+ # Prior study chapters and source citations are retained; only the inherited cover
+ # version identifier is normalized for this V6 deliverable.
+ for para in doc.paragraphs[:6]:
+  for run in para.runs:
+   run.text=run.text.replace('V5','V6').replace('V4','V6')
+ return doc
 # 01: twelve txt award learning retained plus V6 focused QC chapter
-aw=Document(V5/'10192342_01_V5_十二篇获奖现场解说词学习与创新借鉴.docx')
+aw=relabel_reused_cover(Document(V5/'10192342_01_V5_十二篇获奖现场解说词学习与创新借鉴.docx'))
 head(aw,'V6追加：QC发布词（2026）完整研读与12篇获奖讲词的共同方法')
 for h,b in qcinsights:head(aw,h);add(aw,b)
 aw.save(OUT/f'{STAMP}_01_获奖12篇及QC成果发布词深度学习.docx')
 # 02: 50k previous source-indexed volume retained, 8 original diagrams
-depth=Document(V5/'10192342_02_V5_项目五万字级全文件研究与双模创新增订.docx')
+depth=relabel_reused_cover(Document(V5/'10192342_02_V5_项目五万字级全文件研究与双模创新增订.docx'))
 head(depth,'V6新增：从QC的效果验证链到智烤的真实落地链')
 for h,b in qcinsights:head(depth,h);add(depth,b)
 head(depth,'技术实质：两模不只是并排展示，而是共同决定“先修后建”的投入次序')
@@ -104,7 +111,7 @@ inventory=(OUT/'资料取证/项目源文件清单_全量.tsv').read_text(encodi
 add(depth,f'该资料夹共登记{len(inventory)}个文件（含系统隐藏文件；实质资料比总数少），逐项路径见同目录“资料取证/项目源文件清单_全量.tsv”，不把不同版本、重复副本混为独立成效证据。')
 depth.save(OUT/f'{STAMP}_02_五万字项目研究卷_含QC与双模创新增订.docx')
 # 03: official 10k source-backed volume kept, 3 original visuals
-off=Document(V5/'10192342_03_V5_官方叙述一万字级研究校订版.docx')
+off=relabel_reused_cover(Document(V5/'10192342_03_V5_官方叙述一万字级研究校订版.docx'))
 head(off,'V6重点：QC成果发布规范与数创成果报送的不同要求')
 for h,b in qcinsights:head(off,h);add(off,b)
 head(off,'正式报送的实施结果与计划目标必须分清')
