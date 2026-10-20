@@ -207,3 +207,5 @@ print('CREATED',len(docs),[(f.name,f.stat().st_size) for f in docs])
 # Publish V6 entirely regenerated package 2026-10-20.
 
 # Rebuild V6 final at 10201134.
+
+# Trigger finalized 10201507 V6 clean rebuild after user word-count refinement.
