@@ -53,3 +53,5 @@ if slides.exists():
 files=sorted([x for x in (root/'读取资料/2我的项目相关的零碎的').rglob('*') if x.is_file()])
 (out/'项目源文件清单_全量.tsv').write_text('\n'.join(f'{p.relative_to(root).as_posix()}\t{p.stat().st_size}' for p in files),encoding='utf-8')
 print('TOTAL PROJECT',len(files))
+
+# Run verified source extraction.
