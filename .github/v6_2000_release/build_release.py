@@ -203,14 +203,14 @@ for item in [
 '彩排语速至少要达到220汉字/分钟，且切换/停顿严格控制，安全版才能接近8分钟。'
 ]:add(d,item)
 d.save(OUT/f'{STAMP}_07_原稿官方数据对照与逐项需求验收.docx')
-assert len(list(OUT.glob('*.docx')))==7
+assert len(list(OUT.glob('*.docx')))==8
 (OUT/f'{STAMP}_08_完成说明.md').write_text(
     'V6 从9.30重新写作。\n正式内容完整版口述1978个汉字，安全彩排版1572个，AB均约70:30。'
     '\n5万/1万研究卷是来源归档及本轮增订，不是全部新写。'
     '\n旧V6目录已清理，PPT原件未改。\n',encoding='utf-8')
 (OUT/f'{STAMP}_完整版正文.md').write_text(FULL.read_text(),encoding='utf-8')
 (OUT/f'{STAMP}_8分钟安全版正文.md').write_text(SAFE.read_text(),encoding='utf-8')
-archive=OUT/f'{STAMP}_智烤管家V6_七份Word完整包.tar.gz'
+archive=OUT/f'{STAMP}_智烤管家V6_八份Word完整包.tar.gz'
 with tarfile.open(archive,'w:gz') as tf:
     for p in sorted(OUT.glob('*.docx')):tf.add(p,arcname=p.name)
     tf.add(OUT/f'{STAMP}_完整版正文.md',arcname='完整版正文.md')
