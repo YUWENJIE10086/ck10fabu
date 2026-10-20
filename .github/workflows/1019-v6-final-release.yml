@@ -1,0 +1,66 @@
+name: CK10 1019 V6 Final Release
+on:
+  push:
+    paths:
+      - '1019/v6/修改稿/10201004_全部Word自动生成.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish-v6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Word and render packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libreoffice-writer fonts-noto-cjk
+          python -m pip install -q python-docx pymupdf pillow
+      - name: Generate all eight Word deliverables
+        run: python '1019/v6/修改稿/10201004_全部Word自动生成.py'
+      - name: Render and verify speeches
+        run: |
+          mkdir -p /tmp/ck10v6pdf '1019/v6/修改稿/_版式核验'
+          libreoffice -env:UserInstallation=file:///tmp/ck10v6office --headless --convert-to pdf --outdir /tmp/ck10v6pdf '1019/v6/修改稿/10201004_04_智烤管家V6_QC融合_8分钟AB正式演讲净稿.docx' '1019/v6/修改稿/10201004_05_智烤管家V6_25页PPT双人演讲舞台稿.docx'
+          python - <<'PY'
+          from pathlib import Path
+          from docx import Document
+          import pymupdf,re
+          root=Path('1019/v6/修改稿')
+          fs=list(root.glob('10201004_0*.docx'))
+          assert len(fs)==8,len(fs)
+          checks=[]
+          for file in Path('/tmp/ck10v6pdf').glob('*.pdf'):
+            p=pymupdf.open(file)
+            blank=[i+1 for i,x in enumerate(p) if len(x.get_text().strip())<5]
+            assert 2<=len(p)<=6 and not blank,(file.name,len(p),blank)
+            checks.append(f'{file.name}: {len(p)} pages, no blank')
+          script=Document(root/'10201004_04_智烤管家V6_QC融合_8分钟AB正式演讲净稿.docx')
+          A=sum(len(re.findall('[\u4e00-\u9fff]',p.text[2:])) for p in script.paragraphs if p.text.startswith('A：'))
+          B=sum(len(re.findall('[\u4e00-\u9fff]',p.text[2:])) for p in script.paragraphs if p.text.startswith('B：'))
+          assert (A,B)==(1094,465),(A,B)
+          (root/'_版式核验/10201004_正式版QA.md').write_text('\n'.join(checks)+f'\nA={A},B={B},ratio={A/(A+B):.4f}',encoding='utf8')
+          print('\n'.join(checks))
+          PY
+      - name: Push finished artifacts to GitHub
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '1019/v6/修改稿'
+          if ! git diff --cached --quiet; then
+            git commit -m '1019/v6: QC-informed eight Word deliverables and 70/30 final speech'
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase FETCH_HEAD
+              if git push origin HEAD:main; then break; fi
+              sleep 5
+            done
+            git fetch origin main
+            test "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)"
+          fi
