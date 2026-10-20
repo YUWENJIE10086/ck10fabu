@@ -31,7 +31,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           from docx import Document
-          import re,pymupdf,zipfile
+          import re,pymupdf,tarfile
           out=Path('1019/v6/修改稿')
           docs=sorted(out.glob('10201001_*.docx'))
           assert len(docs)==7, [x.name for x in docs]
@@ -50,10 +50,12 @@ jobs:
             z=pymupdf.open(pdf)
             assert 2<=len(z)<=7 and all(len(page.get_text().strip())>3 for page in z),(pdf.name,len(z))
             lines.append(f'{pdf.name}: {len(z)}页，无空白页')
-          bundle=out/'10201001_V6_七份研究与决赛Word完整包.zip'
-          with zipfile.ZipFile(bundle,'w',zipfile.ZIP_DEFLATED) as z:
-            for f in docs:z.write(f,arcname=f.name)
-            z.write(out/'10201001_智烤管家V6_决赛双人演讲稿_源稿.md',arcname='V6_演讲正文源码.md')
+          old_zip=out/'10201001_V6_七份研究与决赛Word完整包.zip'
+          old_zip.unlink(missing_ok=True)
+          bundle=out/'10201001_V6_七份研究与决赛Word完整包.tar.gz'
+          with tarfile.open(bundle,'w:gz') as z:
+            for f in docs:z.add(f,arcname=f.name)
+            z.add(out/'10201001_智烤管家V6_决赛双人演讲稿_源稿.md',arcname='V6_演讲正文源码.md')
           assert bundle.stat().st_size>1000000
           (out/'_版式核验/10201001_生成验收报告.md').write_text('\n'.join(lines),encoding='utf8')
           print('\n'.join(lines))
