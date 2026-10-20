@@ -218,3 +218,5 @@ with tarfile.open(archive,'w:gz') as tf:
 print('READY',len(list(OUT.glob('*.docx'))),archive.stat().st_size,counts(f),counts(s),len(items))
 
 # Trigger definitive V6 2000-character reset build.
+
+# Re-trigger corrected 8-document release gate.
