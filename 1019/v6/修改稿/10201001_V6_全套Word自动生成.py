@@ -20,7 +20,7 @@ for line in SOURCE.read_text(encoding="utf-8").splitlines():
 A=sum(HAN(t) for _,_,ls in groups for r,t in ls if r=="A")
 B=sum(HAN(t) for _,_,ls in groups for r,t in ls if r=="B")
 assert A+B<=1550 and .69<A/(A+B)<.71,(A,B)
-assert len(groups)==14,len(groups)
+assert len(groups)==13,len(groups)
 def writ(d,t,style=None):return d.add_paragraph(t,style=style)
 def section(d,t):writ(d,t,"Heading 2")
 def table(d,heads,rows):
